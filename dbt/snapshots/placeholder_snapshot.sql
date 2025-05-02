@@ -1,0 +1,1 @@
+-- Placeholder SQL file: placeholder_snapshot.sql

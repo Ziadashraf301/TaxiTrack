@@ -1,0 +1,136 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Database for Airflow
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # PostgreSQL Database for Ingested Data
+  postgres_ingest:
+    image: postgres:16
+    container_name: postgres_ingest
+    environment:
+      POSTGRES_USER: ingest_user
+      POSTGRES_PASSWORD: ingest_password
+      POSTGRES_DB: ingest_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_ingest_data:/var/lib/postgresql/data
+
+  # pgAdmin for managing PostgreSQL
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+      - postgres_ingest
+
+  # Metabase for data visualization
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    ports:
+      - "3000:3000"
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: airflow
+      MB_DB_PORT: 5432
+      MB_DB_USER: airflow
+      MB_DB_PASS: airflow
+      MB_DB_HOST: postgres
+    depends_on:
+      - postgres
+
+  # Airflow Initialization Service
+  airflow-init:
+    image: apache/airflow:2.10.2
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: 'YOUR_FERNET_KEY'
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: utc
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+    entrypoint: >
+      bash -c "
+        airflow db migrate &&
+        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com
+      "
+    volumes:
+      - ./dags:/opt/airflow/dags
+
+  # Airflow Webserver
+  airflow-webserver:
+    image: apache/airflow:2.10.2
+    container_name: airflow-webserver
+    restart: always
+    depends_on:
+      - postgres
+      - airflow-init
+    ports:
+      - "8080:8080"
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: 'YOUR_FERNET_KEY'
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: utc
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+      AIRFLOW__WEBSERVER__SESSION_BACKEND: securecookie  # Use supported 'securecookie' backend
+    command: webserver
+    volumes:
+      - ./dags:/opt/airflow/dags
+
+  # Airflow Scheduler
+  airflow-scheduler:
+    image: apache/airflow:2.10.2
+    container_name: airflow-scheduler
+    restart: always
+    depends_on:
+      - airflow-webserver
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: utc
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+    command: scheduler
+    volumes:
+      - ./dags:/opt/airflow/dags
+
+  # dbt (Data Build Tool)
+  dbt:
+    image: ghcr.io/dbt-labs/dbt-postgres:1.9.0  # supports bash/tail
+    container_name: dbt
+    entrypoint: /bin/bash  # Override the default entrypoint
+    command: -c "tail -f /dev/null"  # Keep the container running
+    volumes:
+      - ./dbt:/dbt
+      - ./dbt/profiles.yml:/root/.dbt/profiles.yml
+    working_dir: /dbt
+    depends_on:
+      - postgres
+
+# Named Volumes\ nvolumes:
+volumes:
+  postgres_data:
+  postgres_ingest_data:
+  pgadmin_data:
+  airflow_data:
+  metabase_data:

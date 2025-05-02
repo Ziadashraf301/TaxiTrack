@@ -1,0 +1,4 @@
+# filepath: c:\Users\MSI\Desktop\course of data\my code\dbt\packages.yml
+packages:
+  - package: dbt-labs/dbt_unit_testing
+    version: [">=0.8.0"]

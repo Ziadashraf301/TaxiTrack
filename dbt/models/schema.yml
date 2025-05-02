@@ -1,0 +1,43 @@
+# Placeholder YAML file
+version: 2
+
+sources:
+  - name: raw
+    schema: public
+    tables:
+      - name: green_tripdata_2019-01
+      - name: green_tripdata_2019-02
+      - name: green_tripdata_2019-04
+      - name: green_tripdata_2019-05
+      - name: green_tripdata_2019-06
+      - name: green_tripdata_2019-07
+      - name: green_tripdata_2019-03
+      - name: green_tripdata_2019-08
+      - name: green_tripdata_2019-09
+      - name: green_tripdata_2019-10
+      - name: green_tripdata_2019-11
+      - name: green_tripdata_2019-12
+      - name: green_tripdata_2020-01
+      - name: green_tripdata_2020-02
+      - name: green_tripdata_2020-03
+      - name: green_tripdata_2020-04
+      - name: green_tripdata_2020-05
+      - name: green_tripdata_2020-06
+      - name: green_tripdata_2020-07
+      - name: green_tripdata_2020-08
+      - name: green_tripdata_2020-09
+      - name: green_tripdata_2020-10
+      - name: green_tripdata_2020-11
+      - name: green_tripdata_2020-12
+      - name: green_tripdata_2021-01
+      - name: green_tripdata_2021-02
+      - name: green_tripdata_2021-03
+      - name: green_tripdata_2021-04
+      - name: green_tripdata_2021-05
+      - name: green_tripdata_2021-06
+      - name: green_tripdata_2021-07
+      - name: green_tripdata_2021-08
+      - name: green_tripdata_2021-09
+      - name: green_tripdata_2021-10
+      - name: green_tripdata_2021-11
+      - name: green_tripdata_2021-12

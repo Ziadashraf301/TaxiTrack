@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: staging_green_tripdata_2019_all
+    description: "Union of all monthly green_tripdata 2019 raw tables"

@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: marts_green_tripdata_summary_2019
+  - name: marts_green_tripdata_summary_all

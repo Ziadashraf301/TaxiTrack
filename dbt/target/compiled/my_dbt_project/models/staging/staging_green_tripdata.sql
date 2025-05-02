@@ -1,0 +1,1 @@
+-- Placeholder SQL file: staging_green_tripdata.sql

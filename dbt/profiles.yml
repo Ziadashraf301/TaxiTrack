@@ -1,0 +1,11 @@
+default:
+  outputs:
+    dev:
+      type: postgres
+      host: postgres_ingest
+      user: ingest_user
+      password: ingest_password
+      port: 5432
+      dbname: ingest_db
+      schema: public
+  target: dev

@@ -1,0 +1,17 @@
+name: my_dbt_project
+version: 1.0.0
+config-version: 2
+
+profile: default
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_modules"
+
+models:
+  staging:
+    +materialized: view  # Removed +schema: public
+
+  marts:
+    +materialized: table  # Removed +schema: public

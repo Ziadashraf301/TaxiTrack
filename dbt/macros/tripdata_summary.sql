@@ -1,0 +1,33 @@
+-- filepath: c:\Users\MSI\Desktop\course of data\my code\dbt\macros\tripdata_summary.sql
+{% macro generate_tripdata_summary(source_ref) %}
+select
+    {{ vendor_label("VendorID") }} as vendor_label,
+    {{ extract_date_parts('lpep_pickup_datetime') }},
+    {{ payment_label('payment_type') }} as payment_type_label,
+    {{ classify_trip_distance('trip_distance') }} as trip_type,
+    count(*) as trip_count,
+    round(avg(trip_distance)::numeric,2) as avg_distance,
+    round(sum(trip_distance)::numeric,2) as total_distance,
+    round(avg(fare_amount)::numeric,2) as avg_fare,
+    round(sum(fare_amount)::numeric,2) as total_fare,
+    round(sum(tip_amount)::numeric,2) as total_tip,
+    round(avg(tip_amount)::numeric,2) as avg_tip,
+    round(avg(total_amount)::numeric,2) as avg_total,
+    round(avg(passenger_count)::numeric,2) as avg_passenger_count,
+    count(distinct "PULocationID") as unique_pickup_locations,
+    min(lpep_pickup_datetime) as first_trip,
+    max(lpep_pickup_datetime) as last_trip,
+
+    -- Peak morning and evening hours using the hour extracted from pickup datetime
+    count(*) filter(where extract(hour from lpep_pickup_datetime) between 6 and 9) as peak_morning_hours,
+    count(*) filter(where extract(hour from lpep_pickup_datetime) between 17 and 19) as peak_evening_hours,
+    {{ max_trip_duration('lpep_pickup_datetime', 'lpep_dropoff_datetime') }} as trip_duration_minutes,
+    -- Calculating average tip rate
+    round({{ calculate_tip_rate('tip_amount', 'fare_amount') }}::numeric, 2) as tip_rate
+
+from {{ ref(source_ref) }}
+where {{ is_valid_trip() }}
+group by vendor_label, trip_month, trip_quarter, trip_day,
+         trip_weekday, day_type, payment_type_label, trip_hour
+order by vendor_label, trip_month, trip_weekday, trip_hour
+{% endmacro %}
