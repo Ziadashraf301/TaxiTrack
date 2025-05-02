@@ -1,40 +1,6 @@
-2025-05-02 11:44:08,246 - INFO - Starting connection to the database...
-2025-05-02 11:44:08,288 - INFO - Successfully connected to the database.
-2025-05-02 11:44:08,291 - ERROR - Error fetching data: relation "table_name" does not exist
-LINE 1: COPY (SELECT * FROM "table_name") TO STDOUT WITH CSV HEADER ...
-                            ^
-
-2025-05-02 11:44:08,291 - ERROR - An error occurred: relation "table_name" does not exist
-LINE 1: COPY (SELECT * FROM "table_name") TO STDOUT WITH CSV HEADER ...
-                            ^
-
-2025-05-02 11:46:22,072 - INFO - Starting connection to the database...
-2025-05-02 11:46:22,086 - INFO - Successfully connected to the database.
-2025-05-02 11:46:22,093 - ERROR - Error fetching data: relation "table_name" does not exist
-LINE 1: COPY (SELECT * FROM "table_name") TO STDOUT WITH CSV HEADER ...
-                            ^
-
-2025-05-02 11:46:22,093 - ERROR - An error occurred: relation "table_name" does not exist
-LINE 1: COPY (SELECT * FROM "table_name") TO STDOUT WITH CSV HEADER ...
-                            ^
-
-2025-05-02 11:46:38,331 - INFO - Starting connection to the database...
-2025-05-02 11:46:38,363 - INFO - Successfully connected to the database.
-2025-05-02 11:46:38,702 - INFO - Data successfully copied to memory.
-2025-05-02 11:46:39,390 - INFO - Data loaded into DataFrame with 97874 rows.
-2025-05-02 11:46:39,390 - INFO - Data fetched into DataFrame with 97874 rows.
-2025-05-02 11:46:39,390 - INFO - Connection closed.
-2025-05-02 12:01:48,103 - INFO - Starting connection to the database...
-2025-05-02 12:01:48,148 - INFO - Successfully connected to the database.
-2025-05-02 12:01:48,509 - INFO - Data successfully copied to memory.
-2025-05-02 12:01:48,875 - INFO - Data loaded into DataFrame with 97874 rows.
-2025-05-02 12:01:48,875 - INFO - Data fetched into DataFrame with 97874 rows.
-2025-05-02 12:01:48,875 - INFO - Connection closed.
-2025-05-02 12:06:51,818 - WARNING - Matplotlib is building the font cache; this may take a moment.
-2025-05-02 12:06:51,904 - INFO - generated new fontManager
-2025-05-02 12:25:40,834 - INFO - Starting connection to the database...
-2025-05-02 12:25:40,858 - INFO - Successfully connected to the database.
-2025-05-02 12:25:41,196 - INFO - Data successfully copied to memory.
-2025-05-02 12:25:41,547 - INFO - Data loaded into DataFrame with 97874 rows.
-2025-05-02 12:25:41,562 - INFO - Data fetched into DataFrame with 97874 rows.
-2025-05-02 12:25:41,562 - INFO - Connection closed.
+2025-05-02 17:32:20,990 - INFO - Starting connection to the database...
+2025-05-02 17:32:21,020 - INFO - Successfully connected to the database.
+2025-05-02 17:32:21,362 - INFO - Data successfully copied to memory.
+2025-05-02 17:32:22,162 - INFO - Data loaded into DataFrame with 97874 rows.
+2025-05-02 17:32:22,162 - INFO - Data fetched into DataFrame with 97874 rows.
+2025-05-02 17:32:22,162 - INFO - Connection closed.
