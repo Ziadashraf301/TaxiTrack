@@ -1,0 +1,42 @@
+2025-05-03 15:06:18,985 - INFO - Starting connection to the database...
+2025-05-03 15:06:19,015 - INFO - Successfully connected to the database.
+2025-05-03 15:06:19,418 - INFO - Data successfully copied to memory.
+2025-05-03 15:06:20,109 - INFO - Data loaded into DataFrame with 97874 rows.
+2025-05-03 15:06:20,109 - INFO - Data fetched into DataFrame with 97874 rows.
+2025-05-03 15:06:20,109 - INFO - Connection closed.
+2025-05-03 15:09:39,309 - INFO - Starting connection to the database...
+2025-05-03 15:09:39,346 - INFO - Successfully connected to the database.
+2025-05-03 15:09:39,736 - INFO - Data successfully copied to memory.
+2025-05-03 15:09:40,249 - INFO - Data loaded into DataFrame with 97874 rows.
+2025-05-03 15:09:40,249 - INFO - Data fetched into DataFrame with 97874 rows.
+2025-05-03 15:09:40,249 - INFO - Connection closed.
+2025-05-03 15:18:30,362 - INFO - Starting connection to the database...
+2025-05-03 15:18:30,413 - INFO - Successfully connected to the database.
+2025-05-03 15:18:30,757 - INFO - Data successfully copied to memory.
+2025-05-03 15:18:31,743 - INFO - Data loaded into DataFrame with 97874 rows.
+2025-05-03 15:18:31,743 - INFO - Data fetched into DataFrame with 97874 rows.
+2025-05-03 15:18:31,758 - INFO - Connection closed.
+2025-05-03 15:20:07,056 - INFO - Starting connection to the database...
+2025-05-03 15:20:07,104 - INFO - Successfully connected to the database.
+2025-05-03 15:20:07,497 - INFO - Data successfully copied to memory.
+2025-05-03 15:20:08,132 - INFO - Data loaded into DataFrame with 97874 rows.
+2025-05-03 15:20:08,132 - INFO - Data fetched into DataFrame with 97874 rows.
+2025-05-03 15:20:08,132 - INFO - Connection closed.
+2025-05-03 15:21:44,841 - INFO - Starting connection to the database...
+2025-05-03 15:21:44,880 - INFO - Successfully connected to the database.
+2025-05-03 15:21:45,298 - INFO - Data successfully copied to memory.
+2025-05-03 15:21:45,704 - INFO - Data loaded into DataFrame with 97874 rows.
+2025-05-03 15:21:45,704 - INFO - Data fetched into DataFrame with 97874 rows.
+2025-05-03 15:21:45,704 - INFO - Connection closed.
+2025-05-03 15:32:07,346 - INFO - Starting connection to the database...
+2025-05-03 15:32:07,376 - INFO - Successfully connected to the database.
+2025-05-03 15:32:07,728 - INFO - Data successfully copied to memory.
+2025-05-03 15:32:08,140 - INFO - Data loaded into DataFrame with 97874 rows.
+2025-05-03 15:32:08,140 - INFO - Data fetched into DataFrame with 97874 rows.
+2025-05-03 15:32:08,140 - INFO - Connection closed.
+2025-05-03 15:41:02,849 - INFO - Starting connection to the database...
+2025-05-03 15:41:02,886 - INFO - Successfully connected to the database.
+2025-05-03 15:41:03,269 - INFO - Data successfully copied to memory.
+2025-05-03 15:41:03,786 - INFO - Data loaded into DataFrame with 97874 rows.
+2025-05-03 15:41:03,786 - INFO - Data fetched into DataFrame with 97874 rows.
+2025-05-03 15:41:03,786 - INFO - Connection closed.

@@ -1,0 +1,12 @@
+2025-05-03 15:06:33,141 - INFO - Model: linear_regression, Params: {}, CV RMSE: 42.45, Test RMSE: 41.45
+2025-05-03 15:06:49,074 - INFO - Model: decision_tree, Params: {'max_depth': 5}, CV RMSE: 26.38, Test RMSE: 26.43
+2025-05-03 15:07:46,245 - INFO - Model: xgboost, Params: {'learning_rate': 0.1, 'max_depth': 4, 'n_estimators': 3000, 'subsample': 0.8, 'random_state': 42, 'device': 'cuda', 'verbosity': 2}, CV RMSE: 13.97, Test RMSE: 13.41
+2025-05-03 15:09:00,277 - INFO - Model: catboost, Params: {'iterations': 3000, 'depth': 4, 'learning_rate': 0.1, 'task_type': 'GPU', 'random_seed': 42, 'early_stopping_rounds': 50, 'verbose': 100}, CV RMSE: 13.91, Test RMSE: 13.26
+2025-05-03 15:09:47,205 - INFO - Model: linear_regression, Params: {}, CV RMSE: 42.45, Test RMSE: 41.45
+2025-05-03 15:09:49,089 - INFO - Model: decision_tree, Params: {'max_depth': 5}, CV RMSE: 26.38, Test RMSE: 26.43
+2025-05-03 15:10:30,942 - INFO - Model: xgboost, Params: {'learning_rate': 0.1, 'max_depth': 4, 'n_estimators': 3000, 'subsample': 0.8, 'random_state': 42, 'device': 'cuda', 'verbosity': 2}, CV RMSE: 13.97, Test RMSE: 13.41
+2025-05-03 15:12:02,783 - INFO - Model: catboost, Params: {'iterations': 3000, 'depth': 4, 'learning_rate': 0.1, 'task_type': 'GPU', 'random_seed': 42, 'early_stopping_rounds': 50, 'verbose': 100}, CV RMSE: 13.91, Test RMSE: 13.26
+2025-05-03 15:22:05,661 - INFO - ✅ Full model trained and saved as 'xgboost_pipeline.pkl'
+2025-05-03 15:32:29,622 - INFO - ✅ Full model trained and saved as 'xgboost_pipeline.pkl'
+2025-05-03 15:41:44,847 - INFO - CV RMSE: 13.97 ± 0.18
+2025-05-03 15:41:51,539 - INFO - Model: xgboost, Params: {'learning_rate': 0.1, 'max_depth': 4, 'n_estimators': 3000, 'subsample': 0.8, 'random_state': 42, 'device': 'cuda', 'verbosity': 2}, CV RMSE: 13.97, Test RMSE: 13.41

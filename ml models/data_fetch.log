@@ -1,6 +1,0 @@
-2025-05-02 17:32:20,990 - INFO - Starting connection to the database...
-2025-05-02 17:32:21,020 - INFO - Successfully connected to the database.
-2025-05-02 17:32:21,362 - INFO - Data successfully copied to memory.
-2025-05-02 17:32:22,162 - INFO - Data loaded into DataFrame with 97874 rows.
-2025-05-02 17:32:22,162 - INFO - Data fetched into DataFrame with 97874 rows.
-2025-05-02 17:32:22,162 - INFO - Connection closed.
