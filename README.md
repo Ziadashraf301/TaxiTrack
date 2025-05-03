@@ -51,7 +51,7 @@
 
 The following components are orchestrated with **Docker Compose**:
 
-![TaxiTrack Pipeline](sandbox:/mnt/data/A_flowchart_diagram_in_this_digital_vector_illustr.png)
+![TaxiTrack Pipeline](data_pipeline.png)
 
 * **PostgreSQL**: Stores raw and modeled data
 * **dbt**: Data transformation and testing
