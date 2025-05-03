@@ -1,6 +1,6 @@
-from ingestion.config import parse_args
-from ingestion.logger import setup_logging
-from ingestion.ingestor import ingest_data_for_file
+from config import parse_args
+from logger import setup_logging
+from ingestor import ingest_data_for_file
 
 def main(params):
     setup_logging()

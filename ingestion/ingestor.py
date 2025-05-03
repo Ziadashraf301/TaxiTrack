@@ -3,8 +3,8 @@ import pandas as pd
 import logging
 from tqdm import tqdm
 from time import time
-from ingestion.downloader import download_file
-from ingestion.db_utils import get_engine, table_exists
+from downloader import download_file
+from db_utils import get_engine, table_exists
 
 # Predefined dtypes
 DTYPE_MAPPING = {
