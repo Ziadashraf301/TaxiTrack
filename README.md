@@ -108,7 +108,7 @@ The ML component forecasts taxi demand using time-series data:
 4. Run the ingestion script manually or schedule it:
 
    ```bash
-      python ingestion/main.py --user USER --password PASSWORD --host HOST --port PORT --db DB --file_name FILE_NAME
+   python ingestion/main.py --user USER --password PASSWORD --host HOST --port PORT --db DB --file_name FILE_NAME
    ```
 
 5. Run dbt transformations:
