@@ -1,0 +1,20 @@
+# Byte-compiled / temporary files
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+*.log
+
+# Byte-compiled / temporary files# dbt artifacts
+dbt/logs/
+dbt/dbt_packages/
+dbt/target/
+data/
+ingestion/__pycache__
+
+# Jupyter Notebooks (optional)
+.ipynb_checkpoints/
+
+# Airflow files (optional if you're using Airflow)
+airflow_logs/
+
