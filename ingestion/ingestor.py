@@ -3,8 +3,8 @@ import pandas as pd
 import logging
 from tqdm import tqdm
 from time import time
-from downloader import download_file
-from db_utils import get_engine, table_exists
+from ingestion.downloader import download_file
+from ingestion.db_utils import get_engine, table_exists
 
 # Predefined dtypes
 DTYPE_MAPPING = {
@@ -41,8 +41,9 @@ def should_skip(url, table_name, engine, processed_urls):
 
 
 def preprocess_datetime_columns(df):
-    df.lpep_pickup_datetime = pd.to_datetime(df.lpep_pickup_datetime)
-    df.lpep_dropoff_datetime = pd.to_datetime(df.lpep_dropoff_datetime)
+    for col in ['lpep_pickup_datetime', 'lpep_dropoff_datetime']:
+        if col in df.columns:
+            df[col] = pd.to_datetime(df[col])
     return df
 
 
@@ -60,9 +61,20 @@ def ingest_chunks(df_iter, table_name, engine):
                 break
 
 
+def load_file(output_file, file_type, dtype_mapping):
+    if file_type == 'csv':
+        df_iter = pd.read_csv(output_file, iterator=True, chunksize=100_000, dtype=dtype_mapping)
+        return df_iter
+    elif file_type == 'parquet':
+        df = pd.read_parquet(output_file)
+        return iter([df])  # Wrap in iterator for uniformity
+    else:
+        raise ValueError(f"Unsupported file type: {file_type}")
+
+
 def ingest_data_for_file(params, file_line):
     url, raw_output_file, table_name = construct_url_and_filename(params.base_url, file_line)
-    output_file = os.path.join('data', raw_output_file)  # Save and read from data/
+    output_file = os.path.join('data', raw_output_file)
 
     engine = get_engine(params.user, params.password, params.host, params.port, params.db)
 
@@ -72,8 +84,10 @@ def ingest_data_for_file(params, file_line):
     params.processed_urls.add(url)
     download_file(url, output_file)
 
+    file_type = 'parquet' if url.endswith('.parquet') else 'csv'
+
     try:
-        df_iter = pd.read_csv(output_file, iterator=True, chunksize=100_000, dtype=DTYPE_MAPPING)
+        df_iter = load_file(output_file, file_type, DTYPE_MAPPING if file_type == 'csv' else None)
         df = next(df_iter)
         df = preprocess_datetime_columns(df)
         df.to_sql(name=table_name, con=engine, if_exists='replace', index=False)

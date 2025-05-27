@@ -1,6 +1,8 @@
 
 
-
+-- 1. Run the summary macro into a CTE
+with monthly_summary as (
+  
 select
     
 coalesce(
@@ -76,7 +78,7 @@ coalesce(
     )
 ::numeric, 2) as tip_rate
 
-from "ingest_db"."public"."staging_green_tripdata_all"
+from "ingest_db"."public"."staging_green_tripdata_current_month"
 where 
     trip_distance > 0
     AND fare_amount > 0
@@ -86,3 +88,29 @@ where
 group by vendor_label, trip_month, trip_quarter, trip_day,
          trip_weekday, day_type, payment_type_label, trip_hour
 order by vendor_label, trip_month, trip_weekday, trip_hour
+
+),
+
+-- 2. Add trip_uid column in a second CTE
+with_uid as (
+  select
+    
+    md5(
+        concat_ws(
+            '||',
+            cast(first_trip as text), cast(last_trip as text), cast(unique_pickup_locations as text)
+        )
+    )
+ as trip_uid,
+    *
+  from monthly_summary
+)
+
+-- 3. Final output with optional incremental filtering
+select *
+from with_uid
+
+
+where trip_uid not in (
+    select trip_uid from "ingest_db"."public"."green_tripdata_summary_all"
+)

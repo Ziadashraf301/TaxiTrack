@@ -1,3 +1,4 @@
+# dbt_project.yml
 name: my_dbt_project
 version: 1.0.0
 config-version: 2
@@ -11,7 +12,10 @@ clean-targets:
 
 models:
   staging:
-    +materialized: view  # Removed +schema: public
-
+    +materialized: view
   marts:
-    +materialized: table  # Removed +schema: public
+    +materialized: table
+
+# >>> ADD OR UPDATE THIS VARS BLOCK <<<
+vars:
+  execution_date: '2020-01-01' # <--- Provide a default date for compilation/devs

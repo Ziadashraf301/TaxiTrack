@@ -1,0 +1,4 @@
+tqdm 
+pandas 
+pyarrow 
+psycopg2-binary

@@ -1,15 +1,19 @@
-from config import parse_args
-from logger import setup_logging
-from ingestor import ingest_data_for_file
+import logging
+from types import SimpleNamespace
+from ingestion.logger import setup_logging  # ✅ updated import
+from ingestion.ingestor import ingest_data_for_file  # ✅ updated import
 
-def main(params):
+def run_ingestion_for_date(file_name: str):
     setup_logging()
-    with open(params.file_name, "r") as f:
-        params.base_url = f.readline().strip()
-        params.processed_urls = set()
-        for file_line in f:
-            ingest_data_for_file(params, file_line)
 
-if __name__ == '__main__':
-    args = parse_args()
-    main(args)
+    params = SimpleNamespace()
+    params.user = "ingest_user"
+    params.password = "ingest_password"
+    params.host = "postgres_ingest"
+    params.port = 5432
+    params.db = "ingest_db"
+    params.base_url = "https://d37ci6vzurychx.cloudfront.net/trip-data/"
+    params.processed_urls = set()
+
+    ingest_data_for_file(params, file_name)
+    logging.info(f"Ingestion completed for file: {file_name}")

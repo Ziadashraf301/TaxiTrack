@@ -58,13 +58,16 @@ services:
 
   # Airflow Initialization Service
   airflow-init:
-    image: apache/airflow:2.10.2
+    # Use 'build' instead of 'image' to build from your custom Dockerfile
+    build:       
+      context: .
+      dockerfile: dags/Dockerfile
     depends_on:
       - postgres
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
-      AIRFLOW__CORE__FERNET_KEY: 'YOUR_FERNET_KEY'
+      AIRFLOW__CORE__FERNET_KEY: '3012001' # !! IMPORTANT: Replace with a strong Fernet key
       AIRFLOW__CORE__DEFAULT_TIMEZONE: utc
       AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
     entrypoint: >
@@ -74,10 +77,16 @@ services:
       "
     volumes:
       - ./dags:/opt/airflow/dags
+      - ./ingestion:/opt/airflow/ingestion # Mount ingestion here too for init if needed by any init scripts
+      - ./airflow_logs:/opt/airflow/logs
+      - /var/run/docker.sock:/var/run/docker.sock
 
   # Airflow Webserver
   airflow-webserver:
-    image: apache/airflow:2.10.2
+    # Use 'build' instead of 'image' to build from your custom Dockerfile
+    build:       
+      context: .
+      dockerfile: dags/Dockerfile
     container_name: airflow-webserver
     restart: always
     depends_on:
@@ -88,17 +97,25 @@ services:
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
-      AIRFLOW__CORE__FERNET_KEY: 'YOUR_FERNET_KEY'
+      AIRFLOW__CORE__FERNET_KEY: '3012001' # !! IMPORTANT: Replace with a strong Fernet key
       AIRFLOW__CORE__DEFAULT_TIMEZONE: utc
       AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
-      AIRFLOW__WEBSERVER__SESSION_BACKEND: securecookie  # Use supported 'securecookie' backend
+      AIRFLOW__WEBSERVER__SESSION_BACKEND: securecookie
+      PYTHONPATH: /opt/airflow/ingestion:/opt/airflow # Added for module discovery
+    # The command is now just the standard Airflow webserver command
     command: webserver
     volumes:
       - ./dags:/opt/airflow/dags
+      - ./ingestion:/opt/airflow/ingestion
+      - ./airflow_logs:/opt/airflow/logs
+      - /var/run/docker.sock:/var/run/docker.sock
 
   # Airflow Scheduler
   airflow-scheduler:
-    image: apache/airflow:2.10.2
+    # Use 'build' instead of 'image' to build from your custom Dockerfile
+    build: 
+      context: .
+      dockerfile: dags/Dockerfile
     container_name: airflow-scheduler
     restart: always
     depends_on:
@@ -106,24 +123,35 @@ services:
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: '3012001' # !! IMPORTANT: Replace with a strong Fernet key
       AIRFLOW__CORE__DEFAULT_TIMEZONE: utc
       AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+      PYTHONPATH: /opt/airflow/ingestion:/opt/airflow # Added for module discovery
+    # The command is now just the standard Airflow scheduler command
     command: scheduler
     volumes:
       - ./dags:/opt/airflow/dags
+      - ./ingestion:/opt/airflow/ingestion
+      - ./airflow_logs:/opt/airflow/logs
+      - /var/run/docker.sock:/var/run/docker.sock
 
-  # dbt (Data Build Tool)
+
+  # dbt (Data Build Tool
+  
   dbt:
-    image: ghcr.io/dbt-labs/dbt-postgres:1.9.0  # supports bash/tail
+    build:
+      context: .
+      dockerfile: dbt/Dockerfile
     container_name: dbt
-    entrypoint: /bin/bash  # Override the default entrypoint
-    command: -c "tail -f /dev/null"  # Keep the container running
     volumes:
       - ./dbt:/dbt
       - ./dbt/profiles.yml:/root/.dbt/profiles.yml
     working_dir: /dbt
+    entrypoint: /bin/bash  # Override the default entrypoint
+    command: -c "tail -f /dev/null"  # Keep the container running
     depends_on:
       - postgres
+
 
 # Named Volumes\ nvolumes:
 volumes:

@@ -17,10 +17,12 @@ actual as (
     select
         *,
         
-    case
-        when fare_amount is null or fare_amount = 0 then null
-        else cast(tip_amount as float) / fare_amount
-    end
+    avg(
+        case
+            when fare_amount is null or fare_amount = 0 then null
+            else cast(tip_amount as float) / fare_amount
+        end
+    )
  as actual_tip_rate
     from test_data
 )
