@@ -10,3 +10,12 @@
 2025-05-03 15:32:29,622 - INFO - ✅ Full model trained and saved as 'xgboost_pipeline.pkl'
 2025-05-03 15:41:44,847 - INFO - CV RMSE: 13.97 ± 0.18
 2025-05-03 15:41:51,539 - INFO - Model: xgboost, Params: {'learning_rate': 0.1, 'max_depth': 4, 'n_estimators': 3000, 'subsample': 0.8, 'random_state': 42, 'device': 'cuda', 'verbosity': 2}, CV RMSE: 13.97, Test RMSE: 13.41
+2025-07-26 19:22:57,938 - INFO - CV RMSE: 37.01 ± 0.57
+2025-07-26 19:22:58,046 - INFO - Model: linear_regression, Params: {}, CV RMSE: 37.01, Test RMSE: 36.87
+2025-07-26 19:23:27,959 - INFO - CV RMSE: 22.53 ± 0.59
+2025-07-26 19:23:28,582 - INFO - Model: decision_tree, Params: {'max_depth': 5}, CV RMSE: 22.53, Test RMSE: 22.27
+2025-07-26 19:25:21,206 - INFO - CV RMSE: 11.97 ± 0.24
+2025-07-26 19:25:42,916 - INFO - Model: xgboost, Params: {'learning_rate': 0.1, 'max_depth': 4, 'n_estimators': 3000, 'subsample': 0.8, 'random_state': 42, 'device': 'cuda', 'verbosity': 2}, CV RMSE: 11.97, Test RMSE: 11.51
+2025-07-26 19:29:22,974 - INFO - CV RMSE: 11.86 ± 0.25
+2025-07-26 19:30:11,280 - INFO - Model: catboost, Params: {'iterations': 3000, 'depth': 4, 'learning_rate': 0.1, 'task_type': 'GPU', 'random_seed': 42, 'early_stopping_rounds': 50, 'verbose': 100}, CV RMSE: 11.86, Test RMSE: 11.55
+2025-07-26 19:31:38,436 - INFO - ✅ Full model trained and saved as 'xgboost_pipeline.pkl'

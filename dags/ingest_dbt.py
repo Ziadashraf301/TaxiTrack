@@ -1,4 +1,5 @@
 from airflow import DAG
+from ingestion import main  # Ensure this import is correct based on your project structure
 from airflow.operators.python import PythonOperator
 from airflow.operators.bash import BashOperator
 from datetime import datetime, timedelta
@@ -23,9 +24,10 @@ def format_monthly_filename(execution_date):
 
 # Placeholder for run_ingestion_for_date - ensure this function exists and is imported correctly
 # If run_ingestion_for_date is not defined or imported, this will cause an error
-def run_ingestion_for_date(file_name):
+def run_ingestion(file_name):
     print(f"Simulating ingestion for file: {file_name}")
     # In a real scenario, this would call your actual ingestion logic
+    main.run_ingestion_for_date(file_name)
 
 def ingest_task_fn(execution_date, **kwargs):
     # Airflow passes execution_date as a datetime object in the PythonOperator's context
@@ -36,7 +38,7 @@ def ingest_task_fn(execution_date, **kwargs):
     file_name = format_monthly_filename(ingestion_date_obj)
     
     # Call your actual ingestion logic
-    run_ingestion_for_date(file_name)
+    run_ingestion(file_name)
 
 
 with DAG(
@@ -57,11 +59,11 @@ with DAG(
         provide_context=True, # Essential for passing Airflow context variables like 'ds'
     )
 
-    dbt_deps = BashOperator(
-        task_id='dbt_install_dependencies',
-        bash_command=f"docker exec {DBT_SERVICE_NAME} dbt deps",
-        do_xcom_push=False,
-    )
+    # dbt_deps = BashOperator(
+    #     task_id='dbt_install_dependencies',
+    #     bash_command=f"docker exec {DBT_SERVICE_NAME} dbt deps",
+    #     do_xcom_push=False,
+    # )
 
     dbt_comp = BashOperator(
         task_id='dbt_compile',
@@ -83,4 +85,4 @@ with DAG(
         do_xcom_push=False,
     )
 
-    ingest_data >> dbt_deps >> dbt_comp >> dbt_run
+    ingest_data  >> dbt_comp >> dbt_run
