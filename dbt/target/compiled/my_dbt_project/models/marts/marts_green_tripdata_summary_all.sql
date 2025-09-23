@@ -110,7 +110,8 @@ with_uid as (
 select *
 from with_uid
 
-
-where trip_uid not in (
-    select trip_uid from "ingest_db"."public"."green_tripdata_summary_all"
-)
+-- 
+-- where trip_uid not in (
+--     select trip_uid from "ingest_db"."public"."green_tripdata_summary_all"
+-- )
+-- 

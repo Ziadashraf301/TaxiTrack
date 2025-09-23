@@ -1,9 +1,12 @@
-select
+
+    select
       count(*) as failures,
       count(*) != 0 as should_warn,
       count(*) != 0 as should_error
     from (
-      -- tests/test_calculate_tip_rate.sql
+      
+    
+  -- tests/test_calculate_tip_rate.sql
 
 with test_data as (
     select 5 as tip_amount, 10 as fare_amount, 0.5 as expected_tip_rate
@@ -33,5 +36,7 @@ where not (
     (actual_tip_rate = expected_tip_rate)
     or (actual_tip_rate is null and expected_tip_rate is null)
 )
+  
+  
       
     ) dbt_internal_test

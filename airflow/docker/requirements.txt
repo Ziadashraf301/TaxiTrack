@@ -1,0 +1,8 @@
+tqdm 
+pandas 
+pyarrow 
+psycopg2-binary
+clickhouse-connect 
+minio   
+fastparquet 
+requests

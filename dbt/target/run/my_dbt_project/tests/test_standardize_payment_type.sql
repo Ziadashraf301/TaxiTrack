@@ -1,9 +1,12 @@
-select
+
+    select
       count(*) as failures,
       count(*) != 0 as should_warn,
       count(*) != 0 as should_error
     from (
-      -- tests/test_standardize_payment_type.sql
+      
+    
+  -- tests/test_standardize_payment_type.sql
 
 with test_data as (
     select 1 as payment_type, 'Credit Card' as expected
@@ -38,5 +41,7 @@ where not (
     actual = expected
     or (actual is null and expected is null)
 )
+  
+  
       
     ) dbt_internal_test

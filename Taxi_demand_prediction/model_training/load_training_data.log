@@ -214,3 +214,9 @@ ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.i
 2025-07-26 20:28:00,402 - INFO - Data loaded into DataFrame with 153997 rows.
 2025-07-26 20:28:00,410 - INFO - Data fetched into DataFrame with 153997 rows.
 2025-07-26 20:28:00,413 - INFO - Connection closed.
+2025-07-28 19:46:49,797 - INFO - Starting connection to the database...
+2025-07-28 19:46:49,859 - INFO - Successfully connected to the database.
+2025-07-28 19:46:50,502 - INFO - Data successfully copied to memory.
+2025-07-28 19:46:51,413 - INFO - Data loaded into DataFrame with 156797 rows.
+2025-07-28 19:46:51,418 - INFO - Data fetched into DataFrame with 156797 rows.
+2025-07-28 19:46:51,418 - INFO - Connection closed.

@@ -1,11 +1,10 @@
-default:
+default:  # profile name
+  target: dev  # default target
   outputs:
     dev:
-      type: postgres
-      host: postgres_ingest
-      user: ingest_user
-      password: ingest_password
-      port: 5432
-      dbname: ingest_db
-      schema: public
-  target: dev
+      type: clickhouse
+      host: clickhouse        # your ClickHouse host (container name or IP)
+      port: 8123              # HTTP port for ClickHouse
+      user: "ziadashraf98765" # your ClickHouse username
+      password: "x5x6x7x8"    # your ClickHouse password
+      schema: data_warehouse  # the "database" in ClickHouse

@@ -3,19 +3,17 @@ name: my_dbt_project
 version: 1.0.0
 config-version: 2
 
-profile: default
+profile: default  # matches the profile in profiles.yml
 
 target-path: "target"
 clean-targets:
   - "target"
   - "dbt_modules"
 
-models:
-  staging:
-    +materialized: view
-  marts:
-    +materialized: table
+# Seeds configuration
+seeds: 
+  my_dbt_project:
+    taxi_zone_lookup:
+      +column_types:
+        locationid: numeric
 
-# >>> ADD OR UPDATE THIS VARS BLOCK <<<
-vars:
-  execution_date: '2020-01-01' # <--- Provide a default date for compilation/devs

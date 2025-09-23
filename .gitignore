@@ -18,3 +18,5 @@ ingestion/__pycache__
 # Airflow files (optional if you're using Airflow)
 airflow_logs/
 
+# Minio
+minio_storage/

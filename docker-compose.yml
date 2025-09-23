@@ -1,8 +1,8 @@
 services:
   # PostgreSQL Database for Airflow
-  postgres:
+  postgres_airflow:
     image: postgres:16
-    container_name: postgres
+    container_name: postgres_airflow
     environment:
       POSTGRES_USER: airflow
       POSTGRES_PASSWORD: airflow
@@ -10,35 +10,37 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_airflow:/var/lib/postgresql/data
 
-  # PostgreSQL Database for Ingested Data
-  postgres_ingest:
-    image: postgres:16
-    container_name: postgres_ingest
-    environment:
-      POSTGRES_USER: ingest_user
-      POSTGRES_PASSWORD: ingest_password
-      POSTGRES_DB: ingest_db
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    hostname: minio
+    mem_limit: 2g
     ports:
-      - "5433:5432"
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: "ziadashraf98765"
+      MINIO_ROOT_PASSWORD: "x5x6x7x8"
+    command: server /data --console-address ":9001"
     volumes:
-      - postgres_ingest_data:/var/lib/postgresql/data
+      - ./minio_storage:/data
 
-  # pgAdmin for managing PostgreSQL
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.3.8
+    container_name: clickhouse
+    hostname: clickhouse
     ports:
-      - "5050:80"
+      - "8123:8123"
+      - "9005:9000"
+    environment:
+      CLICKHOUSE_USER: 'ziadashraf98765'
+      CLICKHOUSE_PASSWORD: 'x5x6x7x8'
+      CLICKHOUSE_DB: 'data_warehouse'
     volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    depends_on:
-      - postgres
-      - postgres_ingest
+      - clickhouse_data_warehouse:/var/lib/clickhouse
 
   # Metabase for data visualization
   metabase:
@@ -53,95 +55,111 @@ services:
       MB_DB_USER: airflow
       MB_DB_PASS: airflow
       MB_DB_HOST: postgres
-    depends_on:
-      - postgres
+    volumes:
+      - metabase_data:/metabase-data
 
   # Airflow Initialization Service
   airflow-init:
-    # Use 'build' instead of 'image' to build from your custom Dockerfile
     build:       
       context: .
-      dockerfile: dags/Dockerfile
+      dockerfile: airflow/docker/Dockerfile
     depends_on:
-      - postgres
+      - postgres_airflow
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
-      AIRFLOW__CORE__FERNET_KEY: '3012001' # !! IMPORTANT: Replace with a strong Fernet key
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres_airflow:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: '3012001'
       AIRFLOW__CORE__DEFAULT_TIMEZONE: utc
       AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+      AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
+      AIRFLOW__SMTP__SMTP_PORT: 587
+      AIRFLOW__SMTP__SMTP_STARTTLS: True
+      AIRFLOW__SMTP__SMTP_SSL: False
+      AIRFLOW__SMTP__SMTP_USER: ziadashraf98765@gmail.com
+      AIRFLOW__SMTP__SMTP_PASSWORD: bqdv sxlf txat hfqs
+      AIRFLOW__SMTP__SMTP_MAIL_FROM: ziadashraf98765@gmail.com
     entrypoint: >
       bash -c "
         airflow db migrate &&
-        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com
+        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email ziadashraf98765@gmail.com
       "
     volumes:
-      - ./dags:/opt/airflow/dags
-      - ./ingestion:/opt/airflow/ingestion # Mount ingestion here too for init if needed by any init scripts
-      - ./airflow_logs:/opt/airflow/logs
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/src/ingestion:/opt/airflow/src/ingestion
+      - ./airflow/airflow_logs:/opt/airflow/logs
       - /var/run/docker.sock:/var/run/docker.sock
 
   # Airflow Webserver
   airflow-webserver:
-    # Use 'build' instead of 'image' to build from your custom Dockerfile
     build:       
       context: .
-      dockerfile: dags/Dockerfile
+      dockerfile: airflow/docker/Dockerfile
     container_name: airflow-webserver
     restart: always
     depends_on:
-      - postgres
+      - postgres_airflow
       - airflow-init
     ports:
       - "8080:8080"
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
-      AIRFLOW__CORE__FERNET_KEY: '3012001' # !! IMPORTANT: Replace with a strong Fernet key
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres_airflow:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: '3012001'
       AIRFLOW__CORE__DEFAULT_TIMEZONE: utc
       AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
       AIRFLOW__WEBSERVER__SESSION_BACKEND: securecookie
-      PYTHONPATH: /opt/airflow/ingestion:/opt/airflow # Added for module discovery
-    # The command is now just the standard Airflow webserver command
+      AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
+      AIRFLOW__SMTP__SMTP_PORT: 587
+      AIRFLOW__SMTP__SMTP_STARTTLS: True
+      AIRFLOW__SMTP__SMTP_SSL: False
+      AIRFLOW__SMTP__SMTP_USER: ziadashraf98765@gmail.com
+      AIRFLOW__SMTP__SMTP_PASSWORD: bqdv sxlf txat hfqs
+      AIRFLOW__SMTP__SMTP_MAIL_FROM: ziadashraf98765@gmail.com
+      PYTHONPATH: /opt/airflow/src:/opt/airflow/src
     command: webserver
     volumes:
-      - ./dags:/opt/airflow/dags
-      - ./ingestion:/opt/airflow/ingestion
-      - ./airflow_logs:/opt/airflow/logs
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/src/ingestion:/opt/airflow/src/ingestion 
+      - ./airflow/airflow_logs:/opt/airflow/logs
       - /var/run/docker.sock:/var/run/docker.sock
 
   # Airflow Scheduler
   airflow-scheduler:
-    # Use 'build' instead of 'image' to build from your custom Dockerfile
     build: 
       context: .
-      dockerfile: dags/Dockerfile
+      dockerfile: airflow/docker/Dockerfile
     container_name: airflow-scheduler
     restart: always
     depends_on:
       - airflow-webserver
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
-      AIRFLOW__CORE__FERNET_KEY: '3012001' # !! IMPORTANT: Replace with a strong Fernet key
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres_airflow:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: '3012001'
       AIRFLOW__CORE__DEFAULT_TIMEZONE: utc
-      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
-      PYTHONPATH: /opt/airflow/ingestion:/opt/airflow # Added for module discovery
-    # The command is now just the standard Airflow scheduler command
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False' 
+      AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
+      AIRFLOW__SMTP__SMTP_PORT: 587
+      AIRFLOW__SMTP__SMTP_STARTTLS: True
+      AIRFLOW__SMTP__SMTP_SSL: False
+      AIRFLOW__SMTP__SMTP_USER: ziadashraf98765@gmail.com
+      AIRFLOW__SMTP__SMTP_PASSWORD: bqdv sxlf txat hfqs
+      AIRFLOW__SMTP__SMTP_MAIL_FROM: ziadashraf98765@gmail.com
+      PYTHONPATH: /opt/airflow/src:/opt/airflow/src
     command: scheduler
     volumes:
-      - ./dags:/opt/airflow/dags
-      - ./ingestion:/opt/airflow/ingestion
-      - ./airflow_logs:/opt/airflow/logs
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/src/ingestion:/opt/airflow/src/ingestion
+      - ./airflow/airflow_logs:/opt/airflow/logs
+      - ./data:/opt/airflow/data
       - /var/run/docker.sock:/var/run/docker.sock
 
 
   # dbt (Data Build Tool
-  
   dbt:
     build:
       context: .
-      dockerfile: dbt/Dockerfile
+      dockerfile: dbt/docker/Dockerfile
     container_name: dbt
     volumes:
       - ./dbt:/dbt
@@ -149,14 +167,12 @@ services:
     working_dir: /dbt
     entrypoint: /bin/bash  # Override the default entrypoint
     command: -c "tail -f /dev/null"  # Keep the container running
-    depends_on:
-      - postgres
 
 
-# Named Volumes\ nvolumes:
+
+# Named Volumes
 volumes:
-  postgres_data:
-  postgres_ingest_data:
-  pgadmin_data:
-  airflow_data:
+  postgres_airflow:
   metabase_data:
+  clickhouse_data_warehouse:
+  minio_storage:

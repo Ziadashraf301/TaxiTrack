@@ -1,9 +1,12 @@
-select
+
+    select
       count(*) as failures,
       count(*) != 0 as should_warn,
       count(*) != 0 as should_error
     from (
-      -- tests/test_is_valid_trip.sql
+      
+    
+  -- tests/test_is_valid_trip.sql
 
 with test_data as (
     select 1 as trip_distance, 10 as fare_amount, 1 as passenger_count,
@@ -29,5 +32,7 @@ actual as (
 select *
 from actual
 where actual_is_valid != expected_is_valid
+  
+  
       
     ) dbt_internal_test

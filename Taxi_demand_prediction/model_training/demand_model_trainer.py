@@ -30,7 +30,7 @@ MODEL_CLASSES = {
     'catboost': CatBoostRegressor
 }
 
-def split_data(data, target_column, test_size=0.2, random_state=42):
+def split_data(data, target_column, test_size=0.2, random_state=42,shuffle = True):
     """Split data into training and testing sets."""
     X = data.drop(columns=[target_column])
     y = data[target_column]
