@@ -54,7 +54,7 @@ services:
       MB_DB_PORT: 5432
       MB_DB_USER: airflow
       MB_DB_PASS: airflow
-      MB_DB_HOST: postgres
+      MB_DB_HOST: postgres_airflow
     volumes:
       - metabase_data:/metabase-data
 
@@ -86,9 +86,18 @@ services:
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/src/ingestion:/opt/airflow/src/ingestion
+      - ./demand_prediction:/opt/airflow/demand_prediction
       - ./airflow/airflow_logs:/opt/airflow/logs
+      - ./airflow/models:/opt/airflow/models
+      - ./airflow/results:/opt/airflow/results
       - /var/run/docker.sock:/var/run/docker.sock
-
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
   # Airflow Webserver
   airflow-webserver:
     build:       
@@ -119,10 +128,19 @@ services:
     command: webserver
     volumes:
       - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/src/ingestion:/opt/airflow/src/ingestion 
+      - ./airflow/src/ingestion:/opt/airflow/src/ingestion
+      - ./demand_prediction:/opt/airflow/demand_prediction
       - ./airflow/airflow_logs:/opt/airflow/logs
+      - ./airflow/models:/opt/airflow/models
+      - ./airflow/results:/opt/airflow/results
       - /var/run/docker.sock:/var/run/docker.sock
-
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
   # Airflow Scheduler
   airflow-scheduler:
     build: 
@@ -150,9 +168,18 @@ services:
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/src/ingestion:/opt/airflow/src/ingestion
+      - ./demand_prediction:/opt/airflow/demand_prediction
       - ./airflow/airflow_logs:/opt/airflow/logs
-      - ./data:/opt/airflow/data
+      - ./airflow/models:/opt/airflow/models
+      - ./airflow/results:/opt/airflow/results
       - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
 
   # dbt (Data Build Tool

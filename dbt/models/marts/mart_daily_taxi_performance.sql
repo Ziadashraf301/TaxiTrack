@@ -1,16 +1,6 @@
-{{
-    config(
-        materialized='incremental',
-        incremental_strategy='append',
-        unique_key=['pickup_date', 'borough', 'service_type']
-    )
-}}
-
--- ================================================================
--- Business Analytics Mart: Daily Taxi Performance Metrics
--- Provides daily KPIs by borough and service type
--- Tracks revenue, trips, passengers, and build timestamp
--- ================================================================
+{{ config(
+    materialized='table'
+) }}
 
 with base as (
     select
@@ -20,8 +10,14 @@ with base as (
         tip_amount,
         congestion_surcharge,
         passenger_count,
+        trip_distance,
         pickup_borough as borough
     from {{ ref('stg_all_trips') }}
+    where fare_amount >= 0
+      and tip_amount >= 0
+      and congestion_surcharge >= 0
+      and passenger_count >= 0
+      and trip_distance > 0
 ),
 
 aggregated as (
@@ -34,8 +30,7 @@ aggregated as (
         sum(fare_amount) as total_fare,
         sum(tip_amount) as total_tips,
         sum(congestion_surcharge) as total_congestion_fees,
-        sum(fare_amount + tip_amount + congestion_surcharge) as total_revenue,
-        now() as dbt_mart_build  
+        sum(fare_amount + tip_amount + congestion_surcharge) as total_revenue
     from base
     group by
         pickup_date,

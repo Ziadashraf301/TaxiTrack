@@ -6,3 +6,6 @@ clickhouse-connect
 minio   
 fastparquet 
 requests
+joblib
+scikit-learn
+xgboost

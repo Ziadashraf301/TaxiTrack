@@ -1,0 +1,13 @@
+pickup_datetime,pickup_zone,pickup_borough,service_type,prediction,model_used,prediction_timestamp,prediction_lower,prediction_upper
+2020-01-01 19:00:00,Allerton/Pelham Gardens,Bronx,green_trip,3,xgboost,2025-09-26 21:53:38.419957,2.4000000000000004,3.5999999999999996
+2020-01-01 20:00:00,Allerton/Pelham Gardens,Bronx,green_trip,3,xgboost,2025-09-26 21:53:38.419957,2.4000000000000004,3.5999999999999996
+2020-01-01 21:00:00,Allerton/Pelham Gardens,Bronx,green_trip,3,xgboost,2025-09-26 21:53:38.419957,2.4000000000000004,3.5999999999999996
+2020-01-01 22:00:00,Allerton/Pelham Gardens,Bronx,green_trip,3,xgboost,2025-09-26 21:53:38.419957,2.4000000000000004,3.5999999999999996
+2020-01-01 23:00:00,Allerton/Pelham Gardens,Bronx,green_trip,2,xgboost,2025-09-26 21:53:38.419957,1.6,2.4
+2020-01-02 00:00:00,Allerton/Pelham Gardens,Bronx,green_trip,2,xgboost,2025-09-26 21:53:38.419957,1.6,2.4
+2020-01-02 01:00:00,Allerton/Pelham Gardens,Bronx,green_trip,2,xgboost,2025-09-26 21:53:38.419957,1.6,2.4
+2020-01-02 02:00:00,Allerton/Pelham Gardens,Bronx,green_trip,2,xgboost,2025-09-26 21:53:38.419957,1.6,2.4
+2020-01-02 03:00:00,Allerton/Pelham Gardens,Bronx,green_trip,2,xgboost,2025-09-26 21:53:38.419957,1.6,2.4
+2020-01-02 04:00:00,Allerton/Pelham Gardens,Bronx,green_trip,2,xgboost,2025-09-26 21:53:38.419957,1.6,2.4
+2020-01-02 05:00:00,Allerton/Pelham Gardens,Bronx,green_trip,3,xgboost,2025-09-26 21:53:38.419957,2.4000000000000004,3.5999999999999996
+2020-01-02 06:00:00,Allerton/Pelham Gardens,Bronx,green_trip,3,xgboost,2025-09-26 21:53:38.419957,2.4000000000000004,3.5999999999999996

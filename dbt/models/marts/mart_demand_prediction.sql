@@ -24,21 +24,14 @@ aggregated as (
     select
         toDate(pickup_datetime) as pickup_date,
         toHour(pickup_datetime) as pickup_hour,
-        pickup_location_id,
         pickup_zone,
         pickup_borough,
         service_type,
-        count(*) as total_trips,
-        sum(passenger_count) as total_passengers,
-        avg(trip_distance) as avg_trip_distance,
-        avg(fare_amount) as avg_fare_amount,
-        avg(tip_amount) as avg_tip_amount,
-        sum(congestion_surcharge) as total_congestion_surcharge
+        count(*) as total_trips
     from base
     group by
         pickup_date,
         pickup_hour,
-        pickup_location_id,
         pickup_zone,
         pickup_borough,
         service_type

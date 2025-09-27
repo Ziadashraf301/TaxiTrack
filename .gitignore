@@ -20,3 +20,7 @@ airflow_logs/
 
 # Minio
 minio_storage/
+
+postgres_airflow/
+
+logs/
