@@ -1,34 +1,19 @@
 import pandas as pd
 import numpy as np
 import joblib
-import logging
 from sklearn.metrics import mean_squared_error
 from data_loader import ClickHouseDataLoader
 from feature_engineer import TimeSeriesFeatureEngineer
 from config import DATA_CONFIG, MODEL_CONFIG, PATH_CONFIG
 from pathlib import Path
-import sys
 import os
 from xgboost import XGBRegressor
+from sklearn.tree import DecisionTreeRegressor
+import gc
+from logger import setup_logger
 
-
-# Setup logging
-def setup_logging():
-    """Setup logging configuration"""
-    log_dir = Path(PATH_CONFIG["logs_dir"])
-    log_dir.mkdir(parents=True, exist_ok=True)
-    
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler(log_dir / 'pipeline.log'),
-            logging.StreamHandler(sys.stdout)
-        ]
-    )
-
-setup_logging()
-logger = logging.getLogger(__name__)
+log_dir = Path(PATH_CONFIG["logs_dir"])
+logger = setup_logger(__name__, f"{log_dir}/pipeline.log")
 
 class TimeSeriesForecastPipeline:
     def __init__(self):
@@ -37,39 +22,65 @@ class TimeSeriesForecastPipeline:
         self.path_config = PATH_CONFIG
         
         self.data_loader = ClickHouseDataLoader()
+
         self.feature_engineer = TimeSeriesFeatureEngineer()
+        self.feature_engineer.Training = True
+
         self.models = {}
         self.feature_names = []
         
-    def run_pipeline(self, table_name, start_date=None, end_date=None, train= False):
+    def run_pipeline(self, table_name, start_date=None, end_date=None):
         """Run complete pipeline with simple train-test split"""
-        logger.info("Starting time series forecasting pipeline...")
+        logger.info("🚀 Starting time series forecasting pipeline...")
         
-        # 1. Load and preprocess data
-        df = self.data_loader.get_processed_data(table_name, start_date, end_date, train = train)
-        logger.info(f"Data loaded: {len(df)} rows")
+        try:
+            # 1. Load and preprocess data
+            df = self.data_loader.get_processed_data(table_name, start_date, end_date)
+        except Exception as e:
+            logger.error(f"❌ Data loading failed for {table_name}: {e}", exc_info=True)
+            raise
+
+        if df.empty:
+            logger.error("❌ Loaded dataframe is empty, aborting pipeline!")
+            return
+
+        logger.info(f"✅ Data loaded: {len(df)} rows")
         logger.info(f"Date range: {df[self.config['timestamp_col']].min()} to {df[self.config['timestamp_col']].max()}")
         
         # 2. Feature engineering
-        df_features = self.feature_engineer.transform(df)
-        logger.info(f"Feature engineering completed. Shape: {df_features.shape}")
+        df_features = self.feature_engineer.fit_transform(df)
+        logger.info(f"🔧 Feature engineering completed. Shape: {df_features.shape}")
         
+        # Delete to free memory
+        del df
+        gc.collect()
+        logger.debug("🧹 GC: Deleted raw df after feature engineering")
+
         # 3. Prepare data for modeling
         X, y, timestamps, groups = self._prepare_features_target(df_features)
-        
+        del df_features
+        gc.collect()
+        logger.debug("🧹 GC: Deleted engineered df after preparing features/target")
+
         # 4. Time-based split ensuring equal time periods for all groups
         X_train, X_test, y_train, y_test, train_times, test_times = self._group_aware_time_split(X, y, timestamps, groups)
-        
+        del X, y, timestamps, groups
+        gc.collect()
+        logger.debug("🧹 GC: Deleted full dataset after time split")
+
         # 5. Train models
         self._train_models_simple(X_train, X_test, y_train, y_test, train_times, test_times)
-        
+        del X_test, y_train, y_test, train_times, test_times
+        gc.collect()
+        logger.debug("🧹 GC: Deleted train/test sets after training")
+
         # 6. Save pipeline artifacts
         self._save_pipeline_artifacts(X_train.columns.tolist())
 
         # 7. Save feature_importance
         self.save_feature_importance()
         
-        logger.info("Pipeline completed successfully!")
+        logger.info("🎉 Pipeline completed successfully!")
         
     def _prepare_features_target(self, df):
         """Prepare features and target variable - NO NaN HANDLING"""
@@ -77,27 +88,29 @@ class TimeSeriesForecastPipeline:
         target_col = self.config["target_col"]
         group_cols = self.config["group_cols"]
         
-        # Remove rows where target is NaN (let it fail if there are NaNs)
-        df_clean = df.dropna(subset=[target_col])
-        
         # Feature columns - exclude timestamp, target, and group columns
         exclude_cols = [timestamp_col, target_col, "pickup_date", "pickup_hour"] + group_cols
-        feature_cols = [col for col in df_clean.columns if col not in exclude_cols]
+        feature_cols = [col for col in df.columns if col not in exclude_cols]
+
+        if not feature_cols:
+            logger.error("❌ No feature columns left after exclusion!")
+            raise ValueError("No feature columns for training")
 
         # Get features, target, timestamps, and groups
-        X = df_clean[feature_cols]
-        y = df_clean[target_col]
-        timestamps = df_clean[timestamp_col]
-        groups = df_clean[group_cols].astype(str).agg('_'.join, axis=1)
+        X = df[feature_cols]
+        y = df[target_col]
+        timestamps = df[timestamp_col]
+        groups = df[group_cols].astype(str).agg('_'.join, axis=1)
         
         # Ensure all arrays have the same length
         assert len(X) == len(y) == len(timestamps) == len(groups), \
             f"Length mismatch: X={len(X)}, y={len(y)}, timestamps={len(timestamps)}, groups={len(groups)}"
         
-        logger.info(f"Final dataset - X: {X.shape}, y: {len(y)}, timestamps: {len(timestamps)}, groups: {groups.nunique()}")
+        logger.info(f"📊 Final dataset - X: {X.shape}, y: {len(y)}, timestamps: {len(timestamps)}, groups: {groups.nunique()}")
         
         return X, y, timestamps, groups
-    
+
+
     def _group_aware_time_split(self, X, y, timestamps, groups):
         """Split each month: train on all but last 3 months, test on last 3 months"""
         # Ensure timestamps are datetime
@@ -105,9 +118,11 @@ class TimeSeriesForecastPipeline:
 
         # Get month boundaries
         month_end = timestamps.max().normalize()
+        test_months = DATA_CONFIG['test_months']
 
-        # Cutoff = last 3 months
-        cutoff_date = month_end - pd.DateOffset(months=6)
+        # Cutoff 
+        cutoff_date = month_end - pd.DateOffset(months=test_months)
+
         # Train = everything before or equal cutoff
         train_mask = timestamps <= cutoff_date
         test_mask = timestamps > cutoff_date
@@ -131,7 +146,8 @@ class TimeSeriesForecastPipeline:
         then retrain incrementally on full month data."""
 
         self.models = {
-            'xgboost': XGBRegressor(**self.model_config["models"]["xgboost"])
+            # 'xgboost': XGBRegressor(**self.model_config["models"]["xgboost"]),
+            'decision_tree': DecisionTreeRegressor(**self.model_config["models"]["decision_tree"]),
         }
 
         results = {}
@@ -140,10 +156,14 @@ class TimeSeriesForecastPipeline:
             logger.info(f"Training {model_name}...")
 
             try:
+
                 model_path = f"{self.path_config['models_dir']}/{model_name}_model.pkl"
 
                 # --- 1) Train on train split ---
-                model.fit(X_train, y_train)
+                if model_name == 'xgboost':
+                    model.fit(X_train, y_train, eval_set=[(X_test, y_test)])
+                else:
+                    model.fit(X_train, y_train)
 
                 # --- 2) Evaluate on test split ---
                 y_pred = model.predict(X_test)
@@ -172,11 +192,25 @@ class TimeSeriesForecastPipeline:
                 y_full = pd.concat([y_train, y_test])
 
                 logger.info(f"{model_name} [{month_id}] Train Full Date")
-                model.fit(X_full, y_full)
+                
+                if model_name == 'xgboost':
+                    best_round = getattr(model, "best_iteration_", None)
+                    if best_round is not None:
+                        # keep only the useful number of trees
+                        model.set_params(n_estimators=best_round + 1)
+                    model.set_params(early_stopping_rounds=None)
+                    model.set_params(verbosity=3)
 
+                # Train on full data without early stopping
+                model.fit(X_full, y_full)
+                
                 # --- 4) Save updated model for next month ---
                 joblib.dump(model, model_path)
                 logger.info(f"💾 Saved {model_name} model to {model_path}")
+
+                # Free memory
+                del X_full, y_full
+                gc.collect()
 
             except Exception as e:
                 logger.error(f"{model_name} training failed: {e}")
@@ -221,8 +255,6 @@ class TimeSeriesForecastPipeline:
         logger.info("✅ Pipeline artifacts saved successfully")
 
 
-
-
     def save_feature_importance(self, model_name="xgboost"):
         """
         Save feature importances of the trained XGBoost model to CSV,
@@ -263,7 +295,7 @@ class TimeSeriesForecastPipeline:
             os.makedirs(results_dir, exist_ok=True)
 
             # Use current month as filename → overrides each month
-            csv_path = os.path.join(results_dir, f"feature_importances.csv")
+            csv_path = os.path.join(results_dir, "feature_importances.csv")
 
             # Save CSV (overwrite each month)
             importance_df.to_csv(csv_path, index=False)

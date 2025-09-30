@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 import calendar
 from airflow import DAG
 from airflow.operators.python import PythonOperator
@@ -6,16 +6,7 @@ from airflow.operators.bash import BashOperator
 from ingestion.logger import setup_logging
 from ingestion import main_run_ingestion
 from ingestion.db_utils import format_monthly_filename
-import sys
-import os
-from pathlib import Path
 
-# Add demand_prediction/model_dev to sys.path
-sys.path.append("/opt/airflow/demand_prediction/model_dev")
-
-# Import your pipeline
-from pipeline import TimeSeriesForecastPipeline
-from config import CLICKHOUSE_CONFIG
 
 # Initialize logger once
 logger = setup_logging()
@@ -27,32 +18,6 @@ def ingest_task_fn(dataset_type, **kwargs):
 
     logger.info(f"Starting ingestion for dataset_type={dataset_type}, ds={ds_str}")
     main_run_ingestion.run_ingestion_for_date(file_name, ingestion_date_obj)
-
-
-def run_pipeline_task_fn(**kwargs):
-    # import calendar
-    # from datetime import datetime, date
-
-    # ds_str = kwargs['ds']
-    # exec_date = datetime.strptime(ds_str, "%Y-%m-%d")
-
-    # # Month start & end (only that month’s window)
-    # # start_date = exec_date.replace(day=1).date()
-    # start_date = date(2019,1,1)
-    # last_day = calendar.monthrange(exec_date.year, exec_date.month)[1]
-    # end_date = exec_date.replace(day=last_day).date()
-
-    # logger.info(f"Running TimeSeriesForecastPipeline for {start_date} → {end_date}")
-
-    # pipeline = TimeSeriesForecastPipeline()
-    # pipeline.run_pipeline(
-    #     table_name=CLICKHOUSE_CONFIG["default_table"],
-    #     start_date=start_date,
-    #     end_date=end_date,
-    #     train= True
-    # )
-
-    logger.info("✅ Pipeline run completed!")
 
 
 # Default DAG arguments
@@ -114,12 +79,6 @@ with DAG(
     ]
     mart_tasks = [create_dbt_task(m) for m in mart_models]
 
-    run_forecast_pipeline = PythonOperator(
-        task_id="run_forecast_pipeline",
-        python_callable=run_pipeline_task_fn,
-        provide_context=True
-    )
-
     # Dependencies
     ingest_yellow >> dbt_run_stg_yellow
     ingest_green >> dbt_run_stg_green
@@ -131,6 +90,3 @@ with DAG(
 
     for mart_task in mart_tasks:
         dbt_run_intermediate >> mart_task
-
-    # Run pipeline after marts are built
-    mart_tasks >> run_forecast_pipeline

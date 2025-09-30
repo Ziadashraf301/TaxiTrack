@@ -1,52 +1,36 @@
-import os
-import joblib
 import pandas as pd
-import logging
 from clickhouse_connect import get_client
-from config import DATA_CONFIG,PATH_CONFIG
+from config import DATA_CONFIG,PATH_CONFIG,CLICKHOUSE_CONFIG
+from logger import setup_logger
+from pathlib import Path
+
+log_dir = Path(PATH_CONFIG["logs_dir"])
+logger = setup_logger(__name__, f"{log_dir}/pipeline.log")
 
 class ClickHouseDataLoader:
     def __init__(self):
-        self.config = DATA_CONFIG
-        self.connection_params_docker = {
-            "host": "clickhouse",
-            "port": 8123,
-            "username": "ziadashraf98765", 
-            "password": "x5x6x7x8",
-            "database": "data_warehouse"
-        }
-        
-        self.connection_params_local = {
-            "host": "localhost",
-            "port": 8123,
-            "username": "ziadashraf98765", 
-            "password": "x5x6x7x8",
-            "database": "data_warehouse"
-        }
+        logger.info("Initializing ClickHouseDataLoader")
 
+        self.data_config = DATA_CONFIG
+        self.connection_params = CLICKHOUSE_CONFIG
         self.chunk_size = 500000
         self.encoder_dir = PATH_CONFIG["encoder_dir"]
         
-    def connect_to_db(self,train = True):
+    def connect_to_db(self):
         """Establish connection to ClickHouse database"""
         try:
-            if not train:
-                client = get_client(**self.connection_params_local)
-                logging.info("Successfully connected to ClickHouse Locally")
-                return client
-            else:
-                client = get_client(**self.connection_params_docker)
-                logging.info("Successfully connected to ClickHouse Docker")
+                client = get_client(**self.connection_params)
+                logger.info("Successfully connected to ClickHouse")
                 return client
 
         except Exception as e:
-            logging.error(f"Error connecting to ClickHouse: {e}")
+            logger.error(f"Error connecting to ClickHouse: {e}")
             raise
     
-    def fetch_timeseries_data(self, table_name, start_date=None, end_date=None, groups=None, train = True):
+    def fetch_timeseries_data(self, table_name, start_date=None, end_date=None, groups=None):
         """Fetch time series data from ClickHouse - ONLY ESSENTIAL COLUMNS, optionally filter by groups"""
         try:
-            client = self.connect_to_db(train = train)
+            client = self.connect_to_db()
             
             # Base query - only needed columns
             base_query = f"""
@@ -88,7 +72,7 @@ class ClickHouseDataLoader:
             
             base_query += " ORDER BY pickup_zone, pickup_borough, service_type, pickup_date, pickup_hour"
 
-            logging.info(base_query)
+            # logger.info(base_query)
             
             # Fetch data in chunks
             df = pd.DataFrame()
@@ -102,15 +86,15 @@ class ClickHouseDataLoader:
                     break
                     
                 df = pd.concat([df, chunk], ignore_index=True)
-                logging.info(f"Fetched {len(chunk)} rows (total: {len(df)})")
+                logger.info(f"Fetched {len(chunk)} rows (total: {len(df)})")
                 offset += self.chunk_size
             
             client.close()
-            logging.info(f"Total data fetched: {len(df)} rows")
+            logger.info(f"Total data fetched: {len(df)} rows")
             return df
             
         except Exception as e:
-            logging.error(f"Error fetching data: {e}")
+            logger.error(f"Error fetching data: {e}")
             raise
 
     
@@ -118,25 +102,26 @@ class ClickHouseDataLoader:
         """Merge pickup_date and pickup_hour to create proper datetime"""
         df['pickup_date'] = pd.to_datetime(df['pickup_date'])
         df['pickup_datetime'] = df['pickup_date'] + pd.to_timedelta(df['pickup_hour'], unit='h')
-        df[self.config['timestamp_col']] = df['pickup_datetime']
+        df[self.data_config['timestamp_col']] = df['pickup_datetime']
         return df
     
     def validate_data(self, df):
         """Validate data quality and structure"""
-        required_cols = self.config["group_cols"] + [self.config["timestamp_col"], self.config["target_col"]]
+        required_cols = self.data_config["group_cols"] + [self.data_config["timestamp_col"], self.data_config["target_col"]]
         
         missing_cols = set(required_cols) - set(df.columns)
         if missing_cols:
             raise ValueError(f"Missing required columns: {missing_cols}")
         
+        logger.info(f"Successfully Data Validation")
         return True
     
     def interpolate_missing_hours_per_group(self, df):
         """Interpolate missing hours for each group separately - ONLY TARGET VARIABLE"""
-        timestamp_col = self.config["timestamp_col"]
-        group_cols = self.config["group_cols"]
-        target_col = self.config["target_col"]
-        frequency = self.config["frequency"]
+        timestamp_col = self.data_config["timestamp_col"]
+        group_cols = self.data_config["group_cols"]
+        target_col = self.data_config["target_col"]
+        frequency = self.data_config["frequency"]
         
         # Create complete hourly range for the entire dataset
         min_date = df[timestamp_col].min()
@@ -182,20 +167,18 @@ class ClickHouseDataLoader:
             interpolate_group
         ).reset_index(drop=True)
         
-        logging.info(f"Data after interpolation: {len(interpolated_df)} rows")
-        logging.info(f"Number of groups: {len(unique_groups)}")
-        logging.info(f"Hours per group: {len(full_date_range)}")
+        logger.info(f"Successfully Data interpolation")
+        logger.info(f"Data after interpolation: {len(interpolated_df)} rows")
+        logger.info(f"Number of groups: {len(unique_groups)}")
+        logger.info(f"Hours per group: {len(full_date_range)}")
         
         return interpolated_df
     
-    def get_processed_data(self, table_name, start_date=None, end_date=None, groups = None , calculate_zones_freq=True, train = True):
+    def get_processed_data(self, table_name, start_date=None, end_date=None, groups = None):
         """Main method to get processed and interpolated data"""
         # Fetch raw data (only essential columns)
-        df = self.fetch_timeseries_data(table_name = table_name, start_date = start_date, end_date = end_date, groups = groups, train = train)
+        df = self.fetch_timeseries_data(table_name = table_name, start_date = start_date, end_date = end_date, groups = groups)
         
-        if calculate_zones_freq:
-            self._calc_zones_freq(df)
-
         # Merge date and hour
         df = self.merge_date_hour(df)
         
@@ -206,10 +189,3 @@ class ClickHouseDataLoader:
         df_processed = self.interpolate_missing_hours_per_group(df)
         
         return df_processed
-    
-
-    def _calc_zones_freq(self, raw_data):
-        """Calculate frequency encoding for pickup zones"""
-        zone_freq = raw_data['pickup_zone'].value_counts()
-        os.makedirs(self.encoder_dir, exist_ok=True)
-        joblib.dump(zone_freq, os.path.join(self.encoder_dir, "zone_freq.pkl"))
