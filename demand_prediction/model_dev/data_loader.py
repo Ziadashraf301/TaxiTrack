@@ -187,5 +187,5 @@ class ClickHouseDataLoader:
         
         # Interpolate missing hours for each group
         df_processed = self.interpolate_missing_hours_per_group(df)
-        
+
         return df_processed

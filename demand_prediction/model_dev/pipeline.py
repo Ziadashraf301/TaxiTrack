@@ -51,98 +51,22 @@ class TimeSeriesForecastPipeline:
         logger.info(f"Date range: {df[self.config['timestamp_col']].min()} to {df[self.config['timestamp_col']].max()}")
         
         # 2. Feature engineering
-        df_features = self.feature_engineer.fit_transform(df)
-        logger.info(f"🔧 Feature engineering completed. Shape: {df_features.shape}")
+        X_train, X_test, y_train, y_test, train_times, test_times = self.feature_engineer.fit_transform(df)
         
-        # Delete to free memory
-        del df
-        gc.collect()
-        logger.debug("🧹 GC: Deleted raw df after feature engineering")
-
-        # 3. Prepare data for modeling
-        X, y, timestamps, groups = self._prepare_features_target(df_features)
-        del df_features
-        gc.collect()
-        logger.debug("🧹 GC: Deleted engineered df after preparing features/target")
-
-        # 4. Time-based split ensuring equal time periods for all groups
-        X_train, X_test, y_train, y_test, train_times, test_times = self._group_aware_time_split(X, y, timestamps, groups)
-        del X, y, timestamps, groups
-        gc.collect()
-        logger.debug("🧹 GC: Deleted full dataset after time split")
-
-        # 5. Train models
+        # 3. Train models
         self._train_models_simple(X_train, X_test, y_train, y_test, train_times, test_times)
         del X_test, y_train, y_test, train_times, test_times
         gc.collect()
         logger.debug("🧹 GC: Deleted train/test sets after training")
 
-        # 6. Save pipeline artifacts
+        # 4. Save pipeline artifacts
         self._save_pipeline_artifacts(X_train.columns.tolist())
 
-        # 7. Save feature_importance
+        # 5. Save feature_importance
         self.save_feature_importance()
         
         logger.info("🎉 Pipeline completed successfully!")
         
-    def _prepare_features_target(self, df):
-        """Prepare features and target variable - NO NaN HANDLING"""
-        timestamp_col = self.config["timestamp_col"]
-        target_col = self.config["target_col"]
-        group_cols = self.config["group_cols"]
-        
-        # Feature columns - exclude timestamp, target, and group columns
-        exclude_cols = [timestamp_col, target_col, "pickup_date", "pickup_hour"] + group_cols
-        feature_cols = [col for col in df.columns if col not in exclude_cols]
-
-        if not feature_cols:
-            logger.error("❌ No feature columns left after exclusion!")
-            raise ValueError("No feature columns for training")
-
-        # Get features, target, timestamps, and groups
-        X = df[feature_cols]
-        y = df[target_col]
-        timestamps = df[timestamp_col]
-        groups = df[group_cols].astype(str).agg('_'.join, axis=1)
-        
-        # Ensure all arrays have the same length
-        assert len(X) == len(y) == len(timestamps) == len(groups), \
-            f"Length mismatch: X={len(X)}, y={len(y)}, timestamps={len(timestamps)}, groups={len(groups)}"
-        
-        logger.info(f"📊 Final dataset - X: {X.shape}, y: {len(y)}, timestamps: {len(timestamps)}, groups: {groups.nunique()}")
-        
-        return X, y, timestamps, groups
-
-
-    def _group_aware_time_split(self, X, y, timestamps, groups):
-        """Split each month: train on all but last 3 months, test on last 3 months"""
-        # Ensure timestamps are datetime
-        timestamps = pd.to_datetime(timestamps)
-
-        # Get month boundaries
-        month_end = timestamps.max().normalize()
-        test_months = DATA_CONFIG['test_months']
-
-        # Cutoff 
-        cutoff_date = month_end - pd.DateOffset(months=test_months)
-
-        # Train = everything before or equal cutoff
-        train_mask = timestamps <= cutoff_date
-        test_mask = timestamps > cutoff_date
-
-        # Apply masks
-        X_train, X_test = X[train_mask], X[test_mask]
-        y_train, y_test = y[train_mask], y[test_mask]
-        train_times, test_times = timestamps[train_mask], timestamps[test_mask]
-        train_groups, test_groups = groups[train_mask], groups[test_mask]
-
-        # Logging
-        logger.info(f"Train set: {len(X_train)} samples ({train_times.min()} → {train_times.max()})")
-        logger.info(f"Test set: {len(X_test)} samples ({test_times.min()} → {test_times.max()})")
-        logger.info(f"Train groups: {train_groups.nunique()}, Test groups: {test_groups.nunique()}")
-
-        return X_train, X_test, y_train, y_test, train_times, test_times
-
     
     def _train_models_simple(self, X_train, X_test, y_train, y_test, train_times=None, test_times=None):
         """Train models with simple train-test split, evaluate, 
@@ -194,7 +118,7 @@ class TimeSeriesForecastPipeline:
                     'mape': mape,
                     'test_size': len(y_test)
                 }
-                logger.info(f"{model_name} [{month_id}] Train RMSE: {train_rmse:.4f} - Test RMSE: {test_rmse:.4f}")
+                logger.info(f"{model_name} [{month_id}] Train RMSE: {train_rmse:.4f} - Test RMSE: {test_rmse:.4f} - MAPE: {mape}")
 
                 # --- 3) Retrain on full month (train + test) ---
                 X_full = pd.concat([X_train, X_test])

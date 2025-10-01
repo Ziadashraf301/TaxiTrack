@@ -1,7 +1,13 @@
 pickup_datetime,pickup_zone,pickup_borough,service_type,prediction,model_used,prediction_timestamp,prediction_lower,prediction_upper,forecast_step
-2025-01-07 00:00:00,Bloomingdale,Manhattan,yellow_trip,10,Ridge,2025-09-30 23:30:23.440293,8,12,1
-2025-01-07 01:00:00,Bloomingdale,Manhattan,yellow_trip,10,Ridge,2025-09-30 23:30:23.533895,8,12,2
-2025-01-07 02:00:00,Bloomingdale,Manhattan,yellow_trip,10,Ridge,2025-09-30 23:30:23.618082,8,12,3
-2025-01-07 03:00:00,Bloomingdale,Manhattan,yellow_trip,10,Ridge,2025-09-30 23:30:23.803129,8,12,4
-2025-01-07 04:00:00,Bloomingdale,Manhattan,yellow_trip,11,Ridge,2025-09-30 23:30:23.886721,8,13,5
-2025-01-07 05:00:00,Bloomingdale,Manhattan,yellow_trip,11,Ridge,2025-09-30 23:30:24.001574,8,13,6
+2025-09-01 00:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:38.951084,16,25,1
+2025-09-01 01:00:00,East Harlem North,Manhattan,yellow_trip,22,Ridge,2025-10-01 09:33:39.151175,17,26,2
+2025-09-01 02:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:39.526113,16,25,3
+2025-09-01 03:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:39.717617,16,25,4
+2025-09-01 04:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:40.192855,16,25,5
+2025-09-01 05:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:40.481364,16,25,6
+2025-09-01 06:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:40.973197,16,25,7
+2025-09-01 07:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:41.109478,16,25,8
+2025-09-01 08:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:41.221883,16,25,9
+2025-09-01 09:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:41.589975,16,25,10
+2025-09-01 10:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:42.015577,16,25,11
+2025-09-01 11:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:42.207387,16,25,12

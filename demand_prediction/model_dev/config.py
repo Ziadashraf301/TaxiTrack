@@ -11,7 +11,7 @@ DATA_CONFIG = {
     
     # Time series configuration
     "frequency": "h",
-    "test_months": 3,
+    "test_months": 1,
     
     # Feature engineering
     "lag_features": [1, 2, 3, 24, 168],

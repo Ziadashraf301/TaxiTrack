@@ -192,6 +192,7 @@ class TimeSeriesForecaster:
             # Apply feature engineering (only transform, no fit)
             try:
                 transformed = self.feature_engineer.transform(temp_df)
+                transformed.to_csv("results/transformed.csv", index=False)
             except Exception as e:
                 logger.error(f"❌ Feature engineering failed for {group_dict} at step {step}: {e}")
                 # Use fallback prediction
