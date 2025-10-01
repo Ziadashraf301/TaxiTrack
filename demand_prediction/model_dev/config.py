@@ -11,7 +11,7 @@ DATA_CONFIG = {
     
     # Time series configuration
     "frequency": "h",
-    "test_months": 8,
+    "test_months": 3,
     
     # Feature engineering
     "lag_features": [1, 2, 3, 24, 168],
@@ -27,27 +27,42 @@ DATA_CONFIG = {
 # Model Configuration - Enhanced with time series specific settings
 MODEL_CONFIG = {
     "models": {
-        "xgboost": {
-            "n_estimators": 10000, 
-            "max_depth": 8,
-            "learning_rate": 0.1,
-            "random_state": 42,
-            "subsample": 0.8,
-            "colsample_bytree": 0.4,
-            "tree_method":"hist", 
-            "device":"cuda",
-            "verbosity": 2,
-            "early_stopping_rounds": 100,
-            "reg_lambda": 50,
-            "reg_alpha": 20,
-        },
-        "decision_tree": {
-            "max_depth": 15,                
-            "ccp_alpha": 0.001,          
-            "random_state": 42
-        }
+            "xgboost": {
+                "n_estimators": 10000, 
+                "max_depth": 8,
+                "learning_rate": 0.1,
+                "random_state": 42,
+                "subsample": 0.8,
+                "colsample_bytree": 0.4,
+                "tree_method":"hist", 
+                "device":"cuda",
+                "verbosity": 2,
+                "early_stopping_rounds": 100,
+                "reg_lambda": 50,
+                "reg_alpha": 20,
+            },
+            "decision_tree": {
+                "max_depth": 15,                
+                "ccp_alpha": 0.001,          
+                "random_state": 42
+            },
+            "LIGHTGBM": {
+                    "n_estimators": 500,
+                    "learning_rate": 0.05,
+                    "max_depth": 8,
+                    "num_leaves": 31,
+                    "min_child_samples": 20,
+                    "subsample": 0.8,
+                    "colsample_bytree": 0.8,
+                    "reg_alpha": 0.1,
+                    "reg_lambda": 0.1,
+                    "random_state": 42
+            },
+            "ridge": {
+                    "alpha": 1.0
+            }
     }
-}
+}   
 
 # Path Configuration - Updated for our project structure
 PATH_CONFIG = {

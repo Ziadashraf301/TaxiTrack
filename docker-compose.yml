@@ -1,14 +1,13 @@
 services:
-  # PostgreSQL Database for Airflow
   postgres_airflow:
     image: postgres:16
     container_name: postgres_airflow
     environment:
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
-      POSTGRES_DB: airflow
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - ./postgres_airflow:/var/lib/postgresql/data
 
@@ -18,47 +17,44 @@ services:
     hostname: minio
     mem_limit: 2g
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${MINIO_PORT}:9000"
+      - "${MINIO_CONSOLE_PORT}:9001"
     environment:
-      MINIO_ROOT_USER: "ziadashraf98765"
-      MINIO_ROOT_PASSWORD: "x5x6x7x8"
-    command: server /data --console-address ":9001"
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    command: server /data --console-address ":${MINIO_CONSOLE_PORT}"
     volumes:
       - ./minio_storage:/data
-
 
   clickhouse:
     image: clickhouse/clickhouse-server:24.3.8
     container_name: clickhouse
     hostname: clickhouse
     ports:
-      - "8123:8123"
-      - "9005:9000"
+      - "${CLICKHOUSE_HTTP_PORT}:8123"
+      - "${CLICKHOUSE_TCP_PORT}:9000"
     environment:
-      CLICKHOUSE_USER: 'ziadashraf98765'
-      CLICKHOUSE_PASSWORD: 'x5x6x7x8'
-      CLICKHOUSE_DB: 'data_warehouse'
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB}
     volumes:
       - clickhouse_data_warehouse:/var/lib/clickhouse
 
-  # Metabase for data visualization
   metabase:
     image: metabase/metabase:latest
     container_name: metabase
     ports:
       - "3000:3000"
     environment:
-      MB_DB_TYPE: postgres
-      MB_DB_DBNAME: airflow
-      MB_DB_PORT: 5432
-      MB_DB_USER: airflow
-      MB_DB_PASS: airflow
-      MB_DB_HOST: postgres_airflow
+      MB_DB_TYPE: ${MB_DB_TYPE}
+      MB_DB_DBNAME: ${MB_DB_DBNAME}
+      MB_DB_PORT: ${MB_DB_PORT}
+      MB_DB_USER: ${MB_DB_USER}
+      MB_DB_PASS: ${MB_DB_PASS}
+      MB_DB_HOST: ${MB_DB_HOST}
     volumes:
       - metabase_data:/metabase-data
 
-  # Airflow Initialization Service
   airflow-init:
     build:       
       context: .
@@ -66,38 +62,30 @@ services:
     depends_on:
       - postgres_airflow
     environment:
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres_airflow:5432/airflow
-      AIRFLOW__CORE__FERNET_KEY: '3012001'
-      AIRFLOW__CORE__DEFAULT_TIMEZONE: utc
-      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
-      AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
-      AIRFLOW__SMTP__SMTP_PORT: 587
-      AIRFLOW__SMTP__SMTP_STARTTLS: True
-      AIRFLOW__SMTP__SMTP_SSL: False
-      AIRFLOW__SMTP__SMTP_USER: ziadashraf98765@gmail.com
-      AIRFLOW__SMTP__SMTP_PASSWORD: bqdv sxlf txat hfqs
-      AIRFLOW__SMTP__SMTP_MAIL_FROM: ziadashraf98765@gmail.com
-    entrypoint: >
-      bash -c "
-        airflow db migrate &&
-        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email ziadashraf98765@gmail.com
-      "
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/src/ingestion:/opt/airflow/src/ingestion
-      - ./demand_prediction:/opt/airflow/demand_prediction
-      - ./airflow/airflow_logs:/opt/airflow/logs
-      - ./airflow/models:/opt/airflow/models
-      - ./airflow/results:/opt/airflow/results
+      AIRFLOW__CORE__EXECUTOR: ${AIRFLOW_EXECUTOR}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW_SQL_ALCHEMY_CONN}
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: ${AIRFLOW_DEFAULT_TIMEZONE}
+      AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW_LOAD_EXAMPLES}
+      AIRFLOW__SMTP__SMTP_HOST: ${SMTP_HOST}
+      AIRFLOW__SMTP__SMTP_PORT: ${SMTP_PORT}
+      AIRFLOW__SMTP__SMTP_STARTTLS: ${SMTP_STARTTLS}
+      AIRFLOW__SMTP__SMTP_SSL: ${SMTP_SSL}
+      AIRFLOW__SMTP__SMTP_USER: ${SMTP_USER}
+      AIRFLOW__SMTP__SMTP_PASSWORD: ${SMTP_PASSWORD}
+      AIRFLOW__SMTP__SMTP_MAIL_FROM: ${SMTP_MAIL_FROM}
+    entrypoint: > 
+      bash -c " 
+      airflow db migrate && 
+      airflow users create --username admin --password admin --
+      firstname Admin --lastname User --role Admin --email 
+      ziadashraf98765@gmail.com 
+      " 
+    volumes: 
+      - ./airflow/dags:/opt/airflow/dags 
+      - ./airflow/src/ingestion:/opt/airflow/src/ingestion 
       - /var/run/docker.sock:/var/run/docker.sock
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+
   # Airflow Webserver
   airflow-webserver:
     build:       
@@ -111,36 +99,25 @@ services:
     ports:
       - "8080:8080"
     environment:
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres_airflow:5432/airflow
-      AIRFLOW__CORE__FERNET_KEY: '3012001'
-      AIRFLOW__CORE__DEFAULT_TIMEZONE: utc
-      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
-      AIRFLOW__WEBSERVER__SESSION_BACKEND: securecookie
-      AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
-      AIRFLOW__SMTP__SMTP_PORT: 587
-      AIRFLOW__SMTP__SMTP_STARTTLS: True
-      AIRFLOW__SMTP__SMTP_SSL: False
-      AIRFLOW__SMTP__SMTP_USER: ziadashraf98765@gmail.com
-      AIRFLOW__SMTP__SMTP_PASSWORD: bqdv sxlf txat hfqs
-      AIRFLOW__SMTP__SMTP_MAIL_FROM: ziadashraf98765@gmail.com
+      AIRFLOW__CORE__EXECUTOR: ${AIRFLOW_EXECUTOR}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW_SQL_ALCHEMY_CONN}
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: ${AIRFLOW_DEFAULT_TIMEZONE}
+      AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW_LOAD_EXAMPLES}
+      AIRFLOW__SMTP__SMTP_HOST: ${SMTP_HOST}
+      AIRFLOW__SMTP__SMTP_PORT: ${SMTP_PORT}
+      AIRFLOW__SMTP__SMTP_STARTTLS: ${SMTP_STARTTLS}
+      AIRFLOW__SMTP__SMTP_SSL: ${SMTP_SSL}
+      AIRFLOW__SMTP__SMTP_USER: ${SMTP_USER}
+      AIRFLOW__SMTP__SMTP_PASSWORD: ${SMTP_PASSWORD}
+      AIRFLOW__SMTP__SMTP_MAIL_FROM: ${SMTP_MAIL_FROM}
       PYTHONPATH: /opt/airflow/src:/opt/airflow/src
     command: webserver
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/src/ingestion:/opt/airflow/src/ingestion
-      - ./demand_prediction:/opt/airflow/demand_prediction
-      - ./airflow/airflow_logs:/opt/airflow/logs
-      - ./airflow/models:/opt/airflow/models
-      - ./airflow/results:/opt/airflow/results
       - /var/run/docker.sock:/var/run/docker.sock
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+
   # Airflow Scheduler
   airflow-scheduler:
     build: 
@@ -151,35 +128,25 @@ services:
     depends_on:
       - airflow-webserver
     environment:
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres_airflow:5432/airflow
-      AIRFLOW__CORE__FERNET_KEY: '3012001'
-      AIRFLOW__CORE__DEFAULT_TIMEZONE: utc
-      AIRFLOW__CORE__LOAD_EXAMPLES: 'False' 
-      AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
-      AIRFLOW__SMTP__SMTP_PORT: 587
-      AIRFLOW__SMTP__SMTP_STARTTLS: True
-      AIRFLOW__SMTP__SMTP_SSL: False
-      AIRFLOW__SMTP__SMTP_USER: ziadashraf98765@gmail.com
-      AIRFLOW__SMTP__SMTP_PASSWORD: bqdv sxlf txat hfqs
-      AIRFLOW__SMTP__SMTP_MAIL_FROM: ziadashraf98765@gmail.com
+      AIRFLOW__CORE__EXECUTOR: ${AIRFLOW_EXECUTOR}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW_SQL_ALCHEMY_CONN}
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: ${AIRFLOW_DEFAULT_TIMEZONE}
+      AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW_LOAD_EXAMPLES}
+      AIRFLOW__SMTP__SMTP_HOST: ${SMTP_HOST}
+      AIRFLOW__SMTP__SMTP_PORT: ${SMTP_PORT}
+      AIRFLOW__SMTP__SMTP_STARTTLS: ${SMTP_STARTTLS}
+      AIRFLOW__SMTP__SMTP_SSL: ${SMTP_SSL}
+      AIRFLOW__SMTP__SMTP_USER: ${SMTP_USER}
+      AIRFLOW__SMTP__SMTP_PASSWORD: ${SMTP_PASSWORD}
+      AIRFLOW__SMTP__SMTP_MAIL_FROM: ${SMTP_MAIL_FROM}
       PYTHONPATH: /opt/airflow/src:/opt/airflow/src
     command: scheduler
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/src/ingestion:/opt/airflow/src/ingestion
-      - ./demand_prediction:/opt/airflow/demand_prediction
-      - ./airflow/airflow_logs:/opt/airflow/logs
-      - ./airflow/models:/opt/airflow/models
-      - ./airflow/results:/opt/airflow/results
       - /var/run/docker.sock:/var/run/docker.sock
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+
 
 
   # dbt (Data Build Tool

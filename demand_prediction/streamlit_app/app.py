@@ -140,7 +140,7 @@ forecast_horizon = st.sidebar.slider(
 
 model_choice = st.sidebar.selectbox(
     "Choose Model", 
-    ["decision_tree"],
+    ["ridge" , "LIGHTGBM"],
     help="Select the machine learning model for forecasting"
 )
 

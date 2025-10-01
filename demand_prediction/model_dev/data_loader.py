@@ -155,11 +155,11 @@ class ClickHouseDataLoader:
             group = group.sort_values(timestamp_col)
             
             # Interpolate only the target variable
-            group[target_col] = group[target_col].interpolate(method='linear', limit_direction='both')
+            group[target_col] = group[target_col].fillna(group[target_col].ewm(span=24, adjust=False).mean())
             
-            # Fill remaining NaN with 0 for target variable
-            group[target_col] = group[target_col].fillna(0)
-            
+            # Fill remaining NaN with ffill, then bfill then 0 for target variable
+            group[target_col] = group[target_col].ffill().fillna(0).astype('int')
+
             return group
         
         # Apply interpolation to each group

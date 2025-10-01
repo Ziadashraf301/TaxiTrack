@@ -1,13 +1,7 @@
 pickup_datetime,pickup_zone,pickup_borough,service_type,prediction,model_used,prediction_timestamp,prediction_lower,prediction_upper,forecast_step
-2024-12-31 00:00:00,SoHo,Manhattan,yellow_trip,31,DecisionTreeRegressor,2025-09-30 16:54:24.929897,24,37,1
-2024-12-31 01:00:00,SoHo,Manhattan,yellow_trip,36,DecisionTreeRegressor,2025-09-30 16:54:25.177453,28,43,2
-2024-12-31 02:00:00,SoHo,Manhattan,yellow_trip,34,DecisionTreeRegressor,2025-09-30 16:54:25.331729,27,40,3
-2024-12-31 03:00:00,SoHo,Manhattan,yellow_trip,34,DecisionTreeRegressor,2025-09-30 16:54:25.531598,27,40,4
-2024-12-31 04:00:00,SoHo,Manhattan,yellow_trip,34,DecisionTreeRegressor,2025-09-30 16:54:25.648429,27,40,5
-2024-12-31 05:00:00,SoHo,Manhattan,yellow_trip,34,DecisionTreeRegressor,2025-09-30 16:54:25.825694,27,40,6
-2024-12-31 06:00:00,SoHo,Manhattan,yellow_trip,34,DecisionTreeRegressor,2025-09-30 16:54:25.903850,27,40,7
-2024-12-31 07:00:00,SoHo,Manhattan,yellow_trip,34,DecisionTreeRegressor,2025-09-30 16:54:25.990540,27,40,8
-2024-12-31 08:00:00,SoHo,Manhattan,yellow_trip,34,DecisionTreeRegressor,2025-09-30 16:54:26.083846,27,40,9
-2024-12-31 09:00:00,SoHo,Manhattan,yellow_trip,34,DecisionTreeRegressor,2025-09-30 16:54:26.309290,27,40,10
-2024-12-31 10:00:00,SoHo,Manhattan,yellow_trip,34,DecisionTreeRegressor,2025-09-30 16:54:26.495190,27,40,11
-2024-12-31 11:00:00,SoHo,Manhattan,yellow_trip,34,DecisionTreeRegressor,2025-09-30 16:54:26.622198,27,40,12
+2025-01-07 00:00:00,Bloomingdale,Manhattan,yellow_trip,10,Ridge,2025-09-30 23:30:23.440293,8,12,1
+2025-01-07 01:00:00,Bloomingdale,Manhattan,yellow_trip,10,Ridge,2025-09-30 23:30:23.533895,8,12,2
+2025-01-07 02:00:00,Bloomingdale,Manhattan,yellow_trip,10,Ridge,2025-09-30 23:30:23.618082,8,12,3
+2025-01-07 03:00:00,Bloomingdale,Manhattan,yellow_trip,10,Ridge,2025-09-30 23:30:23.803129,8,12,4
+2025-01-07 04:00:00,Bloomingdale,Manhattan,yellow_trip,11,Ridge,2025-09-30 23:30:23.886721,8,13,5
+2025-01-07 05:00:00,Bloomingdale,Manhattan,yellow_trip,11,Ridge,2025-09-30 23:30:24.001574,8,13,6

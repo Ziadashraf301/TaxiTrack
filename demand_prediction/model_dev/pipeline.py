@@ -9,6 +9,9 @@ from pathlib import Path
 import os
 from xgboost import XGBRegressor
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.linear_model import Ridge
+from sklearn.ensemble import GradientBoostingRegressor
+from lightgbm import LGBMRegressor
 import gc
 from logger import setup_logger
 
@@ -146,8 +149,10 @@ class TimeSeriesForecastPipeline:
         then retrain incrementally on full month data."""
 
         self.models = {
-            # 'xgboost': XGBRegressor(**self.model_config["models"]["xgboost"]),
-            'decision_tree': DecisionTreeRegressor(**self.model_config["models"]["decision_tree"]),
+             'ridge' : Ridge(**self.model_config["models"]["ridge"])
+             ,'LIGHTGBM' : LGBMRegressor(**self.model_config["models"]["LIGHTGBM"])
+            # ,'xgboost': XGBRegressor(**self.model_config["models"]["xgboost"]),
+            # ,'decision_tree': DecisionTreeRegressor(**self.model_config["models"]["decision_tree"]),
         }
 
         results = {}
@@ -169,6 +174,9 @@ class TimeSeriesForecastPipeline:
                 y_pred = model.predict(X_test)
                 train_rmse = np.sqrt(mean_squared_error(y_train, model.predict(X_train)))
                 test_rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+                
+                # Calculate MAPE for better interpretability
+                mape = np.mean(np.abs((y_test - y_pred) / (y_test + 1))) * 100
 
                 # --- 2.5) Record time period ---
                 train_start = str(train_times.min().date()) if train_times is not None else None
@@ -183,6 +191,7 @@ class TimeSeriesForecastPipeline:
                     'test_period': f"{test_start} → {test_end}",
                     'train_rmse': train_rmse,
                     'test_rmse': test_rmse,
+                    'mape': mape,
                     'test_size': len(y_test)
                 }
                 logger.info(f"{model_name} [{month_id}] Train RMSE: {train_rmse:.4f} - Test RMSE: {test_rmse:.4f}")

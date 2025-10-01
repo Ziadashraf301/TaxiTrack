@@ -60,8 +60,8 @@ def test_small_pipeline():
         
         pipeline.run_pipeline(
             table_name=TABLE_CONFIG["table"],
-            start_date="2024-01-01",
-            end_date="2024-12-31",
+            start_date="2024-07-01",
+            end_date="2025-01-01",
         )
         
         logger.info("✅ Pipeline completed successfully!")

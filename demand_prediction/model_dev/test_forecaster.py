@@ -174,10 +174,10 @@ if __name__ == "__main__":
     # Option 1: Single group forecast
     results = run_forecast_pipeline()
     
-    # Option 2: Multiple groups (uncomment to use)
+    # #Option 2: Multiple groups (uncomment to use)
     # results = run_multi_group_forecast()
     
-    # Option 3: With validation (uncomment to use)
+    # #Option 3: With validation (uncomment to use)
     # results = run_forecast_with_validation()
     
     if results is not None:

@@ -82,12 +82,6 @@ class TimeSeriesFeatureEngineer(BaseEstimator, TransformerMixin):
         joblib.dump(self.preprocessor, os.path.join(self.encoder_dir, "categorical_encoder.pkl"))
         logger.info("Saved categorical encoder to %s", self.encoder_dir)
         
-        # Generate feature names by transforming a sample
-        sample_transformed = self.transform(X.head(100))
-        self.feature_names = [col for col in sample_transformed.columns 
-                             if col not in [self.config["timestamp_col"], self.config["target_col"]] + group_cols]
-        
-        logger.info("Fitted with %d features: %s", len(self.feature_names), self.feature_names[:10])
         self._is_fitted = True
         
         return self
@@ -292,27 +286,21 @@ class TimeSeriesFeatureEngineer(BaseEstimator, TransformerMixin):
         
         # Get all feature columns (exclude target, timestamp, and group columns)
         feature_cols = [col for col in df.columns 
-                       if col not in [target_col, self.config["timestamp_col"]] + group_cols + self.config['categorical_features']]
+                       if col not in [target_col, self.config["timestamp_col"]] + group_cols + 
+                       self.config['categorical_features'] + 'pickup_date' + 'pickup_hour' ]
         
         # Fill NaN values
         for col in feature_cols:
             if df[col].isna().any():
                 nan_count = df[col].isna().sum()
-                logger.debug(f"Filling {nan_count} NaN values in {col}")
+                logger.info(f"Filling {nan_count} NaN values in {col}")
                 
                 # Strategy: forward fill within groups, then backward fill, then use 0
                 if 'lag' in col or 'rolling' in col or 'ema' in col:
-                    # For temporal features, use group-specific forward/backward fill
+                    # For temporal features, use group-specific forward
                     df[col] = df.groupby(group_cols)[col].ffill()
-                    df[col] = df.groupby(group_cols)[col].bfill()
                 
                 # Final fallback: fill remaining NaNs with 0
                 df[col] = df[col].fillna(0)
         
         return df
-
-    def get_feature_names(self):
-        """Get list of all feature names after transformation"""
-        if not self._is_fitted:
-            logger.warning("FeatureEngineer not fitted yet. Feature names may be incomplete.")
-        return self.feature_names
