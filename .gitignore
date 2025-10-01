@@ -26,3 +26,6 @@ postgres_airflow/
 logs/
 
 .env
+
+results/
+results

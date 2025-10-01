@@ -1,56 +1,101 @@
-Feature,Importance
-ema_3h,0.54122734
-rolling_mean_3h,0.17084861
-rolling_max_3h,0.1330885
-lag_168h,0.07416646
-rolling_min_3h,0.02361892
-ema_6h,0.02171841
-rolling_mean_6h,0.0043131565
-is_night,0.003664048
-rolling_max_24h,0.003248518
-lag_2h,0.0030399596
-lag_3h,0.0025353858
-lag_24h,0.0022827755
-hour_cos,0.0021566295
-rolling_min_6h,0.0021426848
-rolling_max_12h,0.0015324668
-hour,0.0014172079
-lag_1h,0.001269133
-rolling_std_3h,0.00095700007
-rolling_mean_12h,0.0008755588
-rolling_max_6h,0.0006466172
-pickup_borough_Queens,0.00054498576
-rolling_std_12h,0.00047476907
-hour_sin,0.00046847112
-pickup_borough_Manhattan,0.00039706114
-rolling_min_12h,0.00039056598
-rolling_std_6h,0.00031309333
-ema_24h,0.00029999542
-rolling_max_168h,0.00020277982
-zone_encoded,0.00019205395
-rolling_std_24h,0.00019154302
-is_weekend,0.00016104909
-is_rush_hour,0.0001467598
-ema_12h,0.00013098003
-ema_168h,0.00011039673
-dayofweek_sin,0.0001073393
-dayofweek_cos,0.00010282903
-rolling_mean_168h,9.6981625e-05
-rolling_std_168h,9.683438e-05
-dayofweek,9.008816e-05
-service_type_green_trip,7.666108e-05
-rolling_min_168h,7.143375e-05
-rolling_mean_24h,6.860302e-05
-weekofyear,6.8198584e-05
-rolling_min_24h,6.655915e-05
-weekofyear_cos,6.488905e-05
-dayofmonth_sin,5.922477e-05
-weekofyear_sin,5.797572e-05
-dayofmonth_cos,5.783751e-05
-dayofmonth,5.604108e-05
-service_type_yellow_trip,4.5949175e-05
-pickup_borough_Brooklyn,3.4046665e-05
-pickup_borough_Unknown,3.4124948e-06
-pickup_borough_Staten Island,6.478564e-07
-pickup_borough_Bronx,5.5848074e-07
-pickup_borough_EWR,1.2318118e-08
+Model,Feature,Importance,Saved_At
+lightgbm,rolling_mean_3h,4758.0,2025-10-01 16:57:07
+lightgbm,lag_1h,4695.0,2025-10-01 16:57:07
+lightgbm,lag_2h,4089.0,2025-10-01 16:57:07
+lightgbm,ema_3h,3096.0,2025-10-01 16:57:07
+lightgbm,lag_168h,1545.0,2025-10-01 16:57:07
+lightgbm,rolling_mean_6h,852.0,2025-10-01 16:57:07
+lightgbm,lag_3h,849.0,2025-10-01 16:57:07
+lightgbm,lag_24h,794.0,2025-10-01 16:57:07
+lightgbm,hour_cos_x_peak,458.0,2025-10-01 16:57:07
+lightgbm,rolling_mean_12h,416.0,2025-10-01 16:57:07
+lightgbm,ema_6h,404.0,2025-10-01 16:57:07
+lightgbm,hour,263.0,2025-10-01 16:57:07
+lightgbm,hour_cos,250.0,2025-10-01 16:57:07
+lightgbm,hour_sin,243.0,2025-10-01 16:57:07
+lightgbm,dayofmonth,217.0,2025-10-01 16:57:07
+lightgbm,hour_sin_x_peak,192.0,2025-10-01 16:57:07
+lightgbm,dayofweek,119.0,2025-10-01 16:57:07
+lightgbm,zone_cv,106.0,2025-10-01 16:57:07
+lightgbm,dayofweek_sin,92.0,2025-10-01 16:57:07
+lightgbm,ema_12h,80.0,2025-10-01 16:57:07
+lightgbm,weekend_zone_effect,76.0,2025-10-01 16:57:07
+lightgbm,zone_off_peak_demand,75.0,2025-10-01 16:57:07
+lightgbm,rolling_mean_168h,72.0,2025-10-01 16:57:07
+lightgbm,zone_peak_hour,66.0,2025-10-01 16:57:07
+lightgbm,zone_rush_hour_ratio,64.0,2025-10-01 16:57:07
+lightgbm,dayofweek_cos,61.0,2025-10-01 16:57:07
+lightgbm,zone_weekend_ratio,52.0,2025-10-01 16:57:07
+lightgbm,is_zone_peak_hour,48.0,2025-10-01 16:57:07
+lightgbm,rolling_mean_24h,47.0,2025-10-01 16:57:07
+lightgbm,ema_168h,45.0,2025-10-01 16:57:07
+lightgbm,rush_zone_effect,42.0,2025-10-01 16:57:07
+lightgbm,zone_mean,40.0,2025-10-01 16:57:07
+lightgbm,time_volatility,39.0,2025-10-01 16:57:07
+lightgbm,zone_weekend_mean,37.0,2025-10-01 16:57:07
+lightgbm,is_pickup_manhattan,34.0,2025-10-01 16:57:07
+lightgbm,zone_off_peak_hour,31.0,2025-10-01 16:57:07
+lightgbm,ema_24h,25.0,2025-10-01 16:57:07
+lightgbm,zone_peak_demand,24.0,2025-10-01 16:57:07
+lightgbm,zone_weekday_mean,23.0,2025-10-01 16:57:07
+lightgbm,zone_hour_variance,23.0,2025-10-01 16:57:07
+lightgbm,time_of_day_morning,20.0,2025-10-01 16:57:07
+lightgbm,time_of_day_night,19.0,2025-10-01 16:57:07
+lightgbm,zone_median,11.0,2025-10-01 16:57:07
+lightgbm,is_rush_hour,3.0,2025-10-01 16:57:07
+lightgbm,time_of_day_evening,3.0,2025-10-01 16:57:07
+lightgbm,time_of_day_midday,2.0,2025-10-01 16:57:07
+lightgbm,is_zone_off_peak_hour,0.0,2025-10-01 16:57:07
+lightgbm,is_weekend,0.0,2025-10-01 16:57:07
+lightgbm,service_type_green_trip,0.0,2025-10-01 16:57:07
+lightgbm,service_type_yellow_trip,0.0,2025-10-01 16:57:07
+ridge,ema_3h,106.8633612944056,2025-10-01 16:57:07
+ridge,ema_12h,7.7180951151756,2025-10-01 16:57:07
+ridge,rolling_mean_12h,1.161129299430979,2025-10-01 16:57:07
+ridge,ema_168h,0.20122795151569467,2025-10-01 16:57:07
+ridge,lag_24h,0.011468988082273463,2025-10-01 16:57:07
+ridge,lag_168h,0.0060580333368005015,2025-10-01 16:57:07
+ridge,time_volatility,0.001897099143975305,2025-10-01 16:57:07
+ridge,time_of_day_evening,0.0016045090193073969,2025-10-01 16:57:07
+ridge,time_of_day_morning,0.0009661309856583637,2025-10-01 16:57:07
+ridge,zone_weekday_mean,0.0005847066700190132,2025-10-01 16:57:07
+ridge,dayofweek_cos,0.000419519358507602,2025-10-01 16:57:07
+ridge,zone_rush_hour_ratio,0.00040792984359460716,2025-10-01 16:57:07
+ridge,zone_mean,0.0003005443842955957,2025-10-01 16:57:07
+ridge,zone_weekend_ratio,0.0002807396696112437,2025-10-01 16:57:07
+ridge,is_weekend,0.00026488642946392795,2025-10-01 16:57:07
+ridge,is_zone_off_peak_hour,0.0002314866951668453,2025-10-01 16:57:07
+ridge,dayofweek,0.00021816646836983884,2025-10-01 16:57:07
+ridge,hour,0.00015583291984017919,2025-10-01 16:57:07
+ridge,hour_sin,8.63925579470277e-05,2025-10-01 16:57:07
+ridge,dayofmonth,6.623020518657806e-05,2025-10-01 16:57:07
+ridge,service_type_green_trip,5.0812538509221286e-05,2025-10-01 16:57:07
+ridge,zone_median,3.8459880465940884e-05,2025-10-01 16:57:07
+ridge,time_of_day_night,2.164499464048228e-05,2025-10-01 16:57:07
+ridge,zone_off_peak_hour,-1.0259199008259227e-06,2025-10-01 16:57:07
+ridge,zone_peak_hour,-2.862217407639965e-06,2025-10-01 16:57:07
+ridge,is_pickup_manhattan,-1.4741987467447648e-05,2025-10-01 16:57:07
+ridge,zone_off_peak_demand,-4.6160554598622145e-05,2025-10-01 16:57:07
+ridge,service_type_yellow_trip,-5.081253850642682e-05,2025-10-01 16:57:07
+ridge,zone_hour_variance,-0.00023304949607352109,2025-10-01 16:57:07
+ridge,zone_peak_demand,-0.0003739995097433548,2025-10-01 16:57:07
+ridge,zone_weekend_mean,-0.00043635605815644266,2025-10-01 16:57:07
+ridge,dayofweek_sin,-0.000497484355418871,2025-10-01 16:57:07
+ridge,is_zone_peak_hour,-0.0005099775063918898,2025-10-01 16:57:07
+ridge,zone_cv,-0.0006817792953448617,2025-10-01 16:57:07
+ridge,weekend_zone_effect,-0.0012826494395466724,2025-10-01 16:57:07
+ridge,hour_cos_x_peak,-0.0015136019580999558,2025-10-01 16:57:07
+ridge,hour_sin_x_peak,-0.0017279511309800264,2025-10-01 16:57:07
+ridge,rush_zone_effect,-0.0018156542559095248,2025-10-01 16:57:07
+ridge,hour_cos,-0.0021415065832716814,2025-10-01 16:57:07
+ridge,is_rush_hour,-0.0021695052917065295,2025-10-01 16:57:07
+ridge,time_of_day_midday,-0.002350839599382897,2025-10-01 16:57:07
+ridge,rolling_mean_168h,-0.10602827700714135,2025-10-01 16:57:07
+ridge,rolling_mean_24h,-0.27524907137943494,2025-10-01 16:57:07
+ridge,lag_2h,-0.70409873907313,2025-10-01 16:57:07
+ridge,ema_24h,-1.4215912028693138,2025-10-01 16:57:07
+ridge,lag_3h,-3.4228394905081894,2025-10-01 16:57:07
+ridge,rolling_mean_6h,-6.53439867784445,2025-10-01 16:57:07
+ridge,lag_1h,-12.787580155185868,2025-10-01 16:57:07
+ridge,rolling_mean_3h,-24.072726096962736,2025-10-01 16:57:07
+ridge,ema_6h,-29.940603149187055,2025-10-01 16:57:07

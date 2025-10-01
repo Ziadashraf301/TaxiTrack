@@ -5,6 +5,7 @@ import joblib
 from datetime import datetime, timedelta 
 from data_loader import ClickHouseDataLoader 
 from feature_engineer import TimeSeriesFeatureEngineer 
+from encoder import TimeSeriesEncoder
 from config import DATA_CONFIG, PATH_CONFIG, CLICKHOUSE_CONFIG, TABLE_CONFIG
 from pathlib import Path
 from logger import setup_logger
@@ -19,7 +20,9 @@ class TimeSeriesForecaster:
         self.CLICKHOUSE_CONFIG = CLICKHOUSE_CONFIG
         self.data_loader = ClickHouseDataLoader() 
         self.feature_engineer = TimeSeriesFeatureEngineer()
+        self.encoder = TimeSeriesEncoder()
         self.feature_engineer.Training = False 
+        self.encoder.Training = False
         self.models = {} 
         self.pipeline_artifacts = None 
         self.encoders = {}
@@ -191,8 +194,9 @@ class TimeSeriesForecaster:
             
             # Apply feature engineering (only transform, no fit)
             try:
-                transformed = self.feature_engineer.transform(temp_df)
-                transformed.to_csv("results/transformed.csv", index=False)
+                X, y, timestamps = self.feature_engineer.transform(temp_df)
+                transformed = self.encoder.transform(X)
+
             except Exception as e:
                 logger.error(f"❌ Feature engineering failed for {group_dict} at step {step}: {e}")
                 # Use fallback prediction

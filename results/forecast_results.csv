@@ -1,13 +1,49 @@
 pickup_datetime,pickup_zone,pickup_borough,service_type,prediction,model_used,prediction_timestamp,prediction_lower,prediction_upper,forecast_step
-2025-09-01 00:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:38.951084,16,25,1
-2025-09-01 01:00:00,East Harlem North,Manhattan,yellow_trip,22,Ridge,2025-10-01 09:33:39.151175,17,26,2
-2025-09-01 02:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:39.526113,16,25,3
-2025-09-01 03:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:39.717617,16,25,4
-2025-09-01 04:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:40.192855,16,25,5
-2025-09-01 05:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:40.481364,16,25,6
-2025-09-01 06:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:40.973197,16,25,7
-2025-09-01 07:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:41.109478,16,25,8
-2025-09-01 08:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:41.221883,16,25,9
-2025-09-01 09:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:41.589975,16,25,10
-2025-09-01 10:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:42.015577,16,25,11
-2025-09-01 11:00:00,East Harlem North,Manhattan,yellow_trip,21,Ridge,2025-10-01 09:33:42.207387,16,25,12
+2025-09-01 00:00:00,East Chelsea,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-01 17:12:33.138628,112,168,1
+2025-09-01 01:00:00,East Chelsea,Manhattan,yellow_trip,138,LGBMRegressor,2025-10-01 17:12:33.262916,110,165,2
+2025-09-01 02:00:00,East Chelsea,Manhattan,yellow_trip,139,LGBMRegressor,2025-10-01 17:12:33.385317,111,166,3
+2025-09-01 03:00:00,East Chelsea,Manhattan,yellow_trip,138,LGBMRegressor,2025-10-01 17:12:33.492791,110,165,4
+2025-09-01 04:00:00,East Chelsea,Manhattan,yellow_trip,133,LGBMRegressor,2025-10-01 17:12:33.601190,106,159,5
+2025-09-01 05:00:00,East Chelsea,Manhattan,yellow_trip,133,LGBMRegressor,2025-10-01 17:12:33.712770,106,159,6
+2025-09-01 06:00:00,East Chelsea,Manhattan,yellow_trip,135,LGBMRegressor,2025-10-01 17:12:33.818515,108,162,7
+2025-09-01 07:00:00,East Chelsea,Manhattan,yellow_trip,135,LGBMRegressor,2025-10-01 17:12:33.918637,108,162,8
+2025-09-01 08:00:00,East Chelsea,Manhattan,yellow_trip,136,LGBMRegressor,2025-10-01 17:12:34.028511,108,163,9
+2025-09-01 09:00:00,East Chelsea,Manhattan,yellow_trip,137,LGBMRegressor,2025-10-01 17:12:34.128501,109,164,10
+2025-09-01 10:00:00,East Chelsea,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-01 17:12:34.227846,112,168,11
+2025-09-01 11:00:00,East Chelsea,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-01 17:12:34.332663,112,169,12
+2025-09-01 12:00:00,East Chelsea,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-01 17:12:34.430831,112,168,13
+2025-09-01 13:00:00,East Chelsea,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-01 17:12:34.535363,112,169,14
+2025-09-01 14:00:00,East Chelsea,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-01 17:12:34.633720,112,169,15
+2025-09-01 15:00:00,East Chelsea,Manhattan,yellow_trip,143,LGBMRegressor,2025-10-01 17:12:34.735521,114,171,16
+2025-09-01 16:00:00,East Chelsea,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-01 17:12:34.833566,112,169,17
+2025-09-01 17:00:00,East Chelsea,Manhattan,yellow_trip,143,LGBMRegressor,2025-10-01 17:12:34.931854,114,171,18
+2025-09-01 18:00:00,East Chelsea,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-01 17:12:35.036420,112,169,19
+2025-09-01 19:00:00,East Chelsea,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-01 17:12:35.135906,112,168,20
+2025-09-01 20:00:00,East Chelsea,Manhattan,yellow_trip,135,LGBMRegressor,2025-10-01 17:12:35.235503,108,162,21
+2025-09-01 21:00:00,East Chelsea,Manhattan,yellow_trip,137,LGBMRegressor,2025-10-01 17:12:35.335183,109,164,22
+2025-09-01 22:00:00,East Chelsea,Manhattan,yellow_trip,134,LGBMRegressor,2025-10-01 17:12:35.437117,107,160,23
+2025-09-01 23:00:00,East Chelsea,Manhattan,yellow_trip,134,LGBMRegressor,2025-10-01 17:12:35.536228,107,160,24
+2025-09-02 00:00:00,East Chelsea,Manhattan,yellow_trip,137,LGBMRegressor,2025-10-01 17:12:35.635021,109,164,25
+2025-09-02 01:00:00,East Chelsea,Manhattan,yellow_trip,137,LGBMRegressor,2025-10-01 17:12:35.737847,109,164,26
+2025-09-02 02:00:00,East Chelsea,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-01 17:12:35.835140,112,169,27
+2025-09-02 03:00:00,East Chelsea,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-01 17:12:35.934443,112,169,28
+2025-09-02 04:00:00,East Chelsea,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-01 17:12:36.037221,112,168,29
+2025-09-02 05:00:00,East Chelsea,Manhattan,yellow_trip,138,LGBMRegressor,2025-10-01 17:12:36.133463,110,165,30
+2025-09-02 06:00:00,East Chelsea,Manhattan,yellow_trip,142,LGBMRegressor,2025-10-01 17:12:36.232218,113,170,31
+2025-09-02 07:00:00,East Chelsea,Manhattan,yellow_trip,143,LGBMRegressor,2025-10-01 17:12:36.332819,114,171,32
+2025-09-02 08:00:00,East Chelsea,Manhattan,yellow_trip,142,LGBMRegressor,2025-10-01 17:12:36.428541,113,170,33
+2025-09-02 09:00:00,East Chelsea,Manhattan,yellow_trip,144,LGBMRegressor,2025-10-01 17:12:36.531437,115,172,34
+2025-09-02 10:00:00,East Chelsea,Manhattan,yellow_trip,144,LGBMRegressor,2025-10-01 17:12:36.633145,115,172,35
+2025-09-02 11:00:00,East Chelsea,Manhattan,yellow_trip,145,LGBMRegressor,2025-10-01 17:12:36.735848,116,174,36
+2025-09-02 12:00:00,East Chelsea,Manhattan,yellow_trip,146,LGBMRegressor,2025-10-01 17:12:36.844168,116,175,37
+2025-09-02 13:00:00,East Chelsea,Manhattan,yellow_trip,148,LGBMRegressor,2025-10-01 17:12:36.946573,118,177,38
+2025-09-02 14:00:00,East Chelsea,Manhattan,yellow_trip,147,LGBMRegressor,2025-10-01 17:12:37.050675,117,176,39
+2025-09-02 15:00:00,East Chelsea,Manhattan,yellow_trip,147,LGBMRegressor,2025-10-01 17:12:37.148330,117,176,40
+2025-09-02 16:00:00,East Chelsea,Manhattan,yellow_trip,147,LGBMRegressor,2025-10-01 17:12:37.250961,117,176,41
+2025-09-02 17:00:00,East Chelsea,Manhattan,yellow_trip,147,LGBMRegressor,2025-10-01 17:12:37.351661,117,176,42
+2025-09-02 18:00:00,East Chelsea,Manhattan,yellow_trip,147,LGBMRegressor,2025-10-01 17:12:37.452500,117,176,43
+2025-09-02 19:00:00,East Chelsea,Manhattan,yellow_trip,142,LGBMRegressor,2025-10-01 17:12:37.552865,113,170,44
+2025-09-02 20:00:00,East Chelsea,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-01 17:12:37.649119,112,168,45
+2025-09-02 21:00:00,East Chelsea,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-01 17:12:37.755202,112,168,46
+2025-09-02 22:00:00,East Chelsea,Manhattan,yellow_trip,138,LGBMRegressor,2025-10-01 17:12:37.853052,110,165,47
+2025-09-02 23:00:00,East Chelsea,Manhattan,yellow_trip,136,LGBMRegressor,2025-10-01 17:12:37.953021,108,163,48

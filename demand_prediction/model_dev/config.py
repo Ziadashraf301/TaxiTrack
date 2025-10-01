@@ -11,7 +11,7 @@ DATA_CONFIG = {
     
     # Time series configuration
     "frequency": "h",
-    "test_months": 1,
+    "test_months": 8,
     
     # Feature engineering
     "lag_features": [1, 2, 3, 24, 168],
@@ -49,17 +49,17 @@ MODEL_CONFIG = {
             "LIGHTGBM": {
                     "n_estimators": 500,
                     "learning_rate": 0.05,
-                    "max_depth": 8,
-                    "num_leaves": 31,
+                    "max_depth": 15,
+                    "num_leaves": 80,
                     "min_child_samples": 20,
                     "subsample": 0.8,
                     "colsample_bytree": 0.8,
-                    "reg_alpha": 0.1,
-                    "reg_lambda": 0.1,
+                    "reg_alpha": 4,
+                    "reg_lambda": 3,
                     "random_state": 42
             },
             "ridge": {
-                    "alpha": 1.0
+                    "alpha": 10
             }
     }
 }   

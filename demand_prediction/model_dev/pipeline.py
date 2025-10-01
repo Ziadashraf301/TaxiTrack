@@ -4,16 +4,17 @@ import joblib
 from sklearn.metrics import mean_squared_error
 from data_loader import ClickHouseDataLoader
 from feature_engineer import TimeSeriesFeatureEngineer
+from encoder import TimeSeriesEncoder
 from config import DATA_CONFIG, MODEL_CONFIG, PATH_CONFIG
 from pathlib import Path
 import os
 from xgboost import XGBRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import Ridge
-from sklearn.ensemble import GradientBoostingRegressor
 from lightgbm import LGBMRegressor
 import gc
 from logger import setup_logger
+from datetime import datetime
 
 log_dir = Path(PATH_CONFIG["logs_dir"])
 logger = setup_logger(__name__, f"{log_dir}/pipeline.log")
@@ -25,9 +26,10 @@ class TimeSeriesForecastPipeline:
         self.path_config = PATH_CONFIG
         
         self.data_loader = ClickHouseDataLoader()
-
         self.feature_engineer = TimeSeriesFeatureEngineer()
+        self.encoder = TimeSeriesEncoder()
         self.feature_engineer.Training = True
+        self.encoder.Training = True
 
         self.models = {}
         self.feature_names = []
@@ -51,18 +53,32 @@ class TimeSeriesForecastPipeline:
         logger.info(f"Date range: {df[self.config['timestamp_col']].min()} to {df[self.config['timestamp_col']].max()}")
         
         # 2. Feature engineering
-        X_train, X_test, y_train, y_test, train_times, test_times = self.feature_engineer.fit_transform(df)
+        X_train, X_test, y_train, y_test, train_times, test_times = self.feature_engineer.transform(df)
         
-        # 3. Train models
-        self._train_models_simple(X_train, X_test, y_train, y_test, train_times, test_times)
-        del X_test, y_train, y_test, train_times, test_times
+        del df
         gc.collect()
+
+        # 3. Encoding
+        X_train_scaled = self.encoder.fit_transform(X_train)
+        X_test_scaled = self.encoder.transform(X_test)
+
+        del X_train, X_test
+        gc.collect()
+
+        # 4. Train models
+        self._train_models_simple(X_train_scaled, X_test_scaled, y_train, y_test, train_times, test_times)
+
+        del X_test_scaled, y_train, y_test, train_times, test_times
+        gc.collect()
+
         logger.debug("🧹 GC: Deleted train/test sets after training")
 
-        # 4. Save pipeline artifacts
-        self._save_pipeline_artifacts(X_train.columns.tolist())
+        # 5. Save pipeline artifacts
+        self._save_pipeline_artifacts(X_train_scaled.columns.tolist())
 
-        # 5. Save feature_importance
+        del X_train_scaled
+
+        # 6. Save feature_importance
         self.save_feature_importance()
         
         logger.info("🎉 Pipeline completed successfully!")
@@ -188,53 +204,79 @@ class TimeSeriesForecastPipeline:
         logger.info("✅ Pipeline artifacts saved successfully")
 
 
-    def save_feature_importance(self, model_name="xgboost"):
+    def save_feature_importance(self, model_name=None):
         """
-        Save feature importances of the trained XGBoost model to CSV,
-        overwrite monthly, and also log the results.
+        Save feature importances or coefficients for all trained models in models_dir.
+        - If model_name is provided, only that model is processed.
+        - Works with tree-based models (XGB, LightGBM, RF, GBDT) and linear models (Ridge, LogisticRegression).
+        - Adds timestamp for when importances were saved.
         """
         try:
-            # Build model path
-            model_path = os.path.join(self.path_config["models_dir"], f"{model_name}_model.pkl")
+            model_files = []
+            if model_name:
+                model_files = [f"{model_name}_model.pkl"]
+            else:
+                model_files = [f for f in os.listdir(self.path_config["models_dir"]) if f.endswith("_model.pkl")]
 
-            # Load model
-            if not os.path.exists(model_path):
-                logger.warning(f"⚠️ Model file not found at {model_path}")
+            if not model_files:
+                logger.warning("⚠️ No model files found to extract feature importances.")
                 return None
 
-            model = joblib.load(model_path)
+            all_importances = []
+            now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            # Ensure it's XGBoost with importances
-            if not hasattr(model, "feature_importances_"):
-                logger.warning(f"⚠️ Model {model_name} does not have feature_importances_ attribute.")
+            for mf in model_files:
+                model_path = os.path.join(self.path_config["models_dir"], mf)
+                name = mf.replace("_model.pkl", "")
+
+                if not os.path.exists(model_path):
+                    logger.warning(f"⚠️ Model file not found at {model_path}")
+                    continue
+
+                model = joblib.load(model_path)
+
+                # --- Tree-based models ---
+                if hasattr(model, "feature_importances_"):
+                    importances = model.feature_importances_
+                    feature_names = getattr(model, "feature_names_in_", None)
+                    if feature_names is None:
+                        feature_names = [f"feature_{i}" for i in range(len(importances))]
+
+                # --- Linear models (Ridge, LogisticRegression, etc.) ---
+                elif hasattr(model, "coef_"):
+                    importances = model.coef_.ravel() if hasattr(model.coef_, "ravel") else model.coef_
+                    feature_names = getattr(model, "feature_names_in_", None)
+                    if feature_names is None:
+                        feature_names = [f"feature_{i}" for i in range(len(importances))]
+
+                else:
+                    logger.warning(f"⚠️ Model {name} has no importances or coefficients.")
+                    continue
+
+                # Build DataFrame (with timestamp)
+                importance_df = pd.DataFrame({
+                    "Model": name,
+                    "Feature": feature_names,
+                    "Importance": importances,
+                    "Saved_At": now_str
+                }).sort_values(by="Importance", ascending=False)
+
+                all_importances.append(importance_df)
+
+            if not all_importances:
+                logger.warning("⚠️ No importances extracted from any model.")
                 return None
 
-            # Extract importances
-            importances = model.feature_importances_
-            feature_names = (
-                model.get_booster().feature_names
-                if hasattr(model, "get_booster") and model.get_booster().feature_names is not None
-                else [f"feature_{i}" for i in range(len(importances))]
-            )
+            final_df = pd.concat(all_importances, ignore_index=True)
 
-            # Create DataFrame
-            importance_df = pd.DataFrame({
-                "Feature": feature_names,
-                "Importance": importances
-            }).sort_values(by="Importance", ascending=False)
-
-            # Ensure results dir exists
+            # Save results
             results_dir = os.path.join(self.path_config["results_dir"], "feature_importances")
             os.makedirs(results_dir, exist_ok=True)
-
-            # Use current month as filename → overrides each month
             csv_path = os.path.join(results_dir, "feature_importances.csv")
-
-            # Save CSV (overwrite each month)
-            importance_df.to_csv(csv_path, index=False)
+            final_df.to_csv(csv_path, index=False)
 
             logger.info(f"✅ Feature importances saved to {csv_path}")
-            return importance_df
+            return final_df
 
         except Exception as e:
             logger.error(f"❌ Failed to save feature importances: {e}", exc_info=True)

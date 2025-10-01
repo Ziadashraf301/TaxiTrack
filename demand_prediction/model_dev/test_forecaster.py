@@ -24,7 +24,7 @@ def run_forecast_pipeline():
         forecast_params = {
             "groups": groups,
             "horizon_hours": 12,
-            "model_name": "decision_tree",  # Options: xgboost, decision_tree, random_forest, etc.
+            "model_name": "ridge",  # Options: xgboost, decision_tree, random_forest, etc.
             "start_date": "2024-12-23",
             "end_date": "2024-12-30"
         }
