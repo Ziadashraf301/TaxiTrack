@@ -1,49 +1,384 @@
 pickup_datetime,pickup_zone,pickup_borough,service_type,prediction,model_used,prediction_timestamp,prediction_lower,prediction_upper,forecast_step
-2025-02-01 00:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:02.634819,19,28,1
-2025-02-01 01:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:02.739206,19,28,2
-2025-02-01 02:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:02.841356,19,28,3
-2025-02-01 03:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:02.930379,19,28,4
-2025-02-01 04:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.033810,19,28,5
-2025-02-01 05:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.137091,19,28,6
-2025-02-01 06:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.237728,19,28,7
-2025-02-01 07:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.338568,19,28,8
-2025-02-01 08:00:00,Bloomingdale,Manhattan,yellow_trip,25,LGBMRegressor,2025-10-02 13:13:03.438727,20,30,9
-2025-02-01 09:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.540728,19,28,10
-2025-02-01 10:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.640744,19,28,11
-2025-02-01 11:00:00,Bloomingdale,Manhattan,yellow_trip,25,LGBMRegressor,2025-10-02 13:13:03.730077,20,30,12
-2025-02-01 12:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.812907,19,28,13
-2025-02-01 13:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.894439,19,28,14
-2025-02-01 14:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.978287,19,28,15
-2025-02-01 15:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.062137,19,28,16
-2025-02-01 16:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.142084,19,28,17
-2025-02-01 17:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.226131,19,28,18
-2025-02-01 18:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.307811,19,28,19
-2025-02-01 19:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.391941,19,28,20
-2025-02-01 20:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.479291,19,28,21
-2025-02-01 21:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.568694,19,28,22
-2025-02-01 22:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.654374,19,28,23
-2025-02-01 23:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.738539,19,28,24
-2025-02-02 00:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.826407,19,28,25
-2025-02-02 01:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.912399,19,28,26
-2025-02-02 02:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.997438,19,28,27
-2025-02-02 03:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.089839,19,28,28
-2025-02-02 04:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.172815,19,28,29
-2025-02-02 05:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.255183,19,28,30
-2025-02-02 06:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.336683,19,28,31
-2025-02-02 07:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.423003,19,28,32
-2025-02-02 08:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.504098,19,28,33
-2025-02-02 09:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.584493,19,28,34
-2025-02-02 10:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.670392,19,28,35
-2025-02-02 11:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.756221,19,28,36
-2025-02-02 12:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.843144,19,28,37
-2025-02-02 13:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.927975,19,28,38
-2025-02-02 14:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.004664,19,28,39
-2025-02-02 15:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.094499,19,28,40
-2025-02-02 16:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.180207,19,28,41
-2025-02-02 17:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.272449,19,28,42
-2025-02-02 18:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.356402,19,28,43
-2025-02-02 19:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.437209,19,28,44
-2025-02-02 20:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.524046,19,28,45
-2025-02-02 21:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.608755,19,28,46
-2025-02-02 22:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.694914,19,28,47
-2025-02-02 23:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.781482,19,28,48
+2025-09-01 00:00:00,Lower East Side,Manhattan,yellow_trip,112,LGBMRegressor,2025-10-02 22:33:58.569030,89,134,1
+2025-09-01 01:00:00,Lower East Side,Manhattan,yellow_trip,114,LGBMRegressor,2025-10-02 22:33:58.661020,91,136,2
+2025-09-01 02:00:00,Lower East Side,Manhattan,yellow_trip,113,LGBMRegressor,2025-10-02 22:33:58.732989,90,135,3
+2025-09-01 03:00:00,Lower East Side,Manhattan,yellow_trip,114,LGBMRegressor,2025-10-02 22:33:58.804615,91,136,4
+2025-09-01 04:00:00,Lower East Side,Manhattan,yellow_trip,116,LGBMRegressor,2025-10-02 22:33:58.883174,92,139,5
+2025-09-01 05:00:00,Lower East Side,Manhattan,yellow_trip,113,LGBMRegressor,2025-10-02 22:33:58.948480,90,135,6
+2025-09-01 06:00:00,Lower East Side,Manhattan,yellow_trip,117,LGBMRegressor,2025-10-02 22:33:59.029036,93,140,7
+2025-09-01 07:00:00,Lower East Side,Manhattan,yellow_trip,124,LGBMRegressor,2025-10-02 22:33:59.101262,99,148,8
+2025-09-01 08:00:00,Lower East Side,Manhattan,yellow_trip,120,LGBMRegressor,2025-10-02 22:33:59.176234,96,144,9
+2025-09-01 09:00:00,Lower East Side,Manhattan,yellow_trip,111,LGBMRegressor,2025-10-02 22:33:59.243487,88,133,10
+2025-09-01 10:00:00,Lower East Side,Manhattan,yellow_trip,113,LGBMRegressor,2025-10-02 22:33:59.316894,90,135,11
+2025-09-01 11:00:00,Lower East Side,Manhattan,yellow_trip,108,LGBMRegressor,2025-10-02 22:33:59.393923,86,129,12
+2025-09-01 12:00:00,Lower East Side,Manhattan,yellow_trip,115,LGBMRegressor,2025-10-02 22:33:59.459342,92,138,13
+2025-09-01 13:00:00,Lower East Side,Manhattan,yellow_trip,115,LGBMRegressor,2025-10-02 22:33:59.515640,92,138,14
+2025-09-01 14:00:00,Lower East Side,Manhattan,yellow_trip,108,LGBMRegressor,2025-10-02 22:33:59.573179,86,129,15
+2025-09-01 15:00:00,Lower East Side,Manhattan,yellow_trip,110,LGBMRegressor,2025-10-02 22:33:59.627732,88,132,16
+2025-09-01 16:00:00,Lower East Side,Manhattan,yellow_trip,110,LGBMRegressor,2025-10-02 22:33:59.684169,88,132,17
+2025-09-01 17:00:00,Lower East Side,Manhattan,yellow_trip,112,LGBMRegressor,2025-10-02 22:33:59.738323,89,134,18
+2025-09-01 18:00:00,Lower East Side,Manhattan,yellow_trip,110,LGBMRegressor,2025-10-02 22:33:59.803199,88,132,19
+2025-09-01 19:00:00,Lower East Side,Manhattan,yellow_trip,110,LGBMRegressor,2025-10-02 22:33:59.860617,88,132,20
+2025-09-01 20:00:00,Lower East Side,Manhattan,yellow_trip,110,LGBMRegressor,2025-10-02 22:33:59.926426,88,132,21
+2025-09-01 21:00:00,Lower East Side,Manhattan,yellow_trip,111,LGBMRegressor,2025-10-02 22:33:59.996904,88,133,22
+2025-09-01 22:00:00,Lower East Side,Manhattan,yellow_trip,115,LGBMRegressor,2025-10-02 22:34:00.062100,92,138,23
+2025-09-01 23:00:00,Lower East Side,Manhattan,yellow_trip,118,LGBMRegressor,2025-10-02 22:34:00.117435,94,141,24
+2025-09-02 00:00:00,Lower East Side,Manhattan,yellow_trip,117,LGBMRegressor,2025-10-02 22:34:00.171487,93,140,25
+2025-09-02 01:00:00,Lower East Side,Manhattan,yellow_trip,116,LGBMRegressor,2025-10-02 22:34:00.224187,92,139,26
+2025-09-02 02:00:00,Lower East Side,Manhattan,yellow_trip,115,LGBMRegressor,2025-10-02 22:34:00.276078,92,138,27
+2025-09-02 03:00:00,Lower East Side,Manhattan,yellow_trip,119,LGBMRegressor,2025-10-02 22:34:00.336270,95,142,28
+2025-09-02 04:00:00,Lower East Side,Manhattan,yellow_trip,117,LGBMRegressor,2025-10-02 22:34:00.398384,93,140,29
+2025-09-02 05:00:00,Lower East Side,Manhattan,yellow_trip,118,LGBMRegressor,2025-10-02 22:34:00.457433,94,141,30
+2025-09-02 06:00:00,Lower East Side,Manhattan,yellow_trip,136,LGBMRegressor,2025-10-02 22:34:00.515911,108,163,31
+2025-09-02 07:00:00,Lower East Side,Manhattan,yellow_trip,144,LGBMRegressor,2025-10-02 22:34:00.574684,115,172,32
+2025-09-02 08:00:00,Lower East Side,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-02 22:34:00.634292,112,168,33
+2025-09-02 09:00:00,Lower East Side,Manhattan,yellow_trip,144,LGBMRegressor,2025-10-02 22:34:00.694323,115,172,34
+2025-09-02 10:00:00,Lower East Side,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-02 22:34:00.754578,112,168,35
+2025-09-02 11:00:00,Lower East Side,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-02 22:34:00.814100,112,168,36
+2025-09-02 12:00:00,Lower East Side,Manhattan,yellow_trip,142,LGBMRegressor,2025-10-02 22:34:00.873957,113,170,37
+2025-09-02 13:00:00,Lower East Side,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-02 22:34:00.929422,112,169,38
+2025-09-02 14:00:00,Lower East Side,Manhattan,yellow_trip,142,LGBMRegressor,2025-10-02 22:34:00.980774,113,170,39
+2025-09-02 15:00:00,Lower East Side,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-02 22:34:01.030583,112,168,40
+2025-09-02 16:00:00,Lower East Side,Manhattan,yellow_trip,142,LGBMRegressor,2025-10-02 22:34:01.081951,113,170,41
+2025-09-02 17:00:00,Lower East Side,Manhattan,yellow_trip,139,LGBMRegressor,2025-10-02 22:34:01.134252,111,166,42
+2025-09-02 18:00:00,Lower East Side,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-02 22:34:01.190535,112,169,43
+2025-09-02 19:00:00,Lower East Side,Manhattan,yellow_trip,143,LGBMRegressor,2025-10-02 22:34:01.247873,114,171,44
+2025-09-02 20:00:00,Lower East Side,Manhattan,yellow_trip,139,LGBMRegressor,2025-10-02 22:34:01.303826,111,166,45
+2025-09-02 21:00:00,Lower East Side,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-02 22:34:01.359277,112,168,46
+2025-09-02 22:00:00,Lower East Side,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-02 22:34:01.411838,112,169,47
+2025-09-02 23:00:00,Lower East Side,Manhattan,yellow_trip,142,LGBMRegressor,2025-10-02 22:34:01.462332,113,170,48
+2025-09-03 00:00:00,Lower East Side,Manhattan,yellow_trip,133,LGBMRegressor,2025-10-02 22:34:01.512546,106,159,49
+2025-09-03 01:00:00,Lower East Side,Manhattan,yellow_trip,134,LGBMRegressor,2025-10-02 22:34:01.568155,107,160,50
+2025-09-03 02:00:00,Lower East Side,Manhattan,yellow_trip,130,LGBMRegressor,2025-10-02 22:34:01.627174,104,156,51
+2025-09-03 03:00:00,Lower East Side,Manhattan,yellow_trip,124,LGBMRegressor,2025-10-02 22:34:01.681824,99,148,52
+2025-09-03 04:00:00,Lower East Side,Manhattan,yellow_trip,136,LGBMRegressor,2025-10-02 22:34:01.736975,108,163,53
+2025-09-03 05:00:00,Lower East Side,Manhattan,yellow_trip,128,LGBMRegressor,2025-10-02 22:34:01.793459,102,153,54
+2025-09-03 06:00:00,Lower East Side,Manhattan,yellow_trip,143,LGBMRegressor,2025-10-02 22:34:01.847518,114,171,55
+2025-09-03 07:00:00,Lower East Side,Manhattan,yellow_trip,150,LGBMRegressor,2025-10-02 22:34:01.915140,120,180,56
+2025-09-03 08:00:00,Lower East Side,Manhattan,yellow_trip,150,LGBMRegressor,2025-10-02 22:34:01.979224,120,180,57
+2025-09-03 09:00:00,Lower East Side,Manhattan,yellow_trip,149,LGBMRegressor,2025-10-02 22:34:02.063428,119,178,58
+2025-09-03 10:00:00,Lower East Side,Manhattan,yellow_trip,150,LGBMRegressor,2025-10-02 22:34:02.139354,120,180,59
+2025-09-03 11:00:00,Lower East Side,Manhattan,yellow_trip,150,LGBMRegressor,2025-10-02 22:34:02.193437,120,180,60
+2025-09-03 12:00:00,Lower East Side,Manhattan,yellow_trip,149,LGBMRegressor,2025-10-02 22:34:02.251698,119,178,61
+2025-09-03 13:00:00,Lower East Side,Manhattan,yellow_trip,149,LGBMRegressor,2025-10-02 22:34:02.329479,119,178,62
+2025-09-03 14:00:00,Lower East Side,Manhattan,yellow_trip,147,LGBMRegressor,2025-10-02 22:34:02.430768,117,176,63
+2025-09-03 15:00:00,Lower East Side,Manhattan,yellow_trip,148,LGBMRegressor,2025-10-02 22:34:02.543413,118,177,64
+2025-09-03 16:00:00,Lower East Side,Manhattan,yellow_trip,148,LGBMRegressor,2025-10-02 22:34:02.638486,118,177,65
+2025-09-03 17:00:00,Lower East Side,Manhattan,yellow_trip,150,LGBMRegressor,2025-10-02 22:34:02.724547,120,180,66
+2025-09-03 18:00:00,Lower East Side,Manhattan,yellow_trip,150,LGBMRegressor,2025-10-02 22:34:02.819703,120,180,67
+2025-09-03 19:00:00,Lower East Side,Manhattan,yellow_trip,151,LGBMRegressor,2025-10-02 22:34:02.912252,120,181,68
+2025-09-03 20:00:00,Lower East Side,Manhattan,yellow_trip,148,LGBMRegressor,2025-10-02 22:34:03.001614,118,177,69
+2025-09-03 21:00:00,Lower East Side,Manhattan,yellow_trip,152,LGBMRegressor,2025-10-02 22:34:03.079454,121,182,70
+2025-09-03 22:00:00,Lower East Side,Manhattan,yellow_trip,145,LGBMRegressor,2025-10-02 22:34:03.153492,116,174,71
+2025-09-03 23:00:00,Lower East Side,Manhattan,yellow_trip,149,LGBMRegressor,2025-10-02 22:34:03.232020,119,178,72
+2025-09-04 00:00:00,Lower East Side,Manhattan,yellow_trip,157,LGBMRegressor,2025-10-02 22:34:03.283889,125,188,73
+2025-09-04 01:00:00,Lower East Side,Manhattan,yellow_trip,149,LGBMRegressor,2025-10-02 22:34:03.343253,119,178,74
+2025-09-04 02:00:00,Lower East Side,Manhattan,yellow_trip,151,LGBMRegressor,2025-10-02 22:34:03.395128,120,181,75
+2025-09-04 03:00:00,Lower East Side,Manhattan,yellow_trip,156,LGBMRegressor,2025-10-02 22:34:03.452134,124,187,76
+2025-09-04 04:00:00,Lower East Side,Manhattan,yellow_trip,145,LGBMRegressor,2025-10-02 22:34:03.528331,116,174,77
+2025-09-04 05:00:00,Lower East Side,Manhattan,yellow_trip,151,LGBMRegressor,2025-10-02 22:34:03.597020,120,181,78
+2025-09-04 06:00:00,Lower East Side,Manhattan,yellow_trip,143,LGBMRegressor,2025-10-02 22:34:03.659129,114,171,79
+2025-09-04 07:00:00,Lower East Side,Manhattan,yellow_trip,150,LGBMRegressor,2025-10-02 22:34:03.733946,120,180,80
+2025-09-04 08:00:00,Lower East Side,Manhattan,yellow_trip,160,LGBMRegressor,2025-10-02 22:34:03.798017,128,192,81
+2025-09-04 09:00:00,Lower East Side,Manhattan,yellow_trip,162,LGBMRegressor,2025-10-02 22:34:03.861597,129,194,82
+2025-09-04 10:00:00,Lower East Side,Manhattan,yellow_trip,163,LGBMRegressor,2025-10-02 22:34:03.932784,130,195,83
+2025-09-04 11:00:00,Lower East Side,Manhattan,yellow_trip,166,LGBMRegressor,2025-10-02 22:34:03.998488,132,199,84
+2025-09-04 12:00:00,Lower East Side,Manhattan,yellow_trip,164,LGBMRegressor,2025-10-02 22:34:04.057427,131,196,85
+2025-09-04 13:00:00,Lower East Side,Manhattan,yellow_trip,164,LGBMRegressor,2025-10-02 22:34:04.128965,131,196,86
+2025-09-04 14:00:00,Lower East Side,Manhattan,yellow_trip,158,LGBMRegressor,2025-10-02 22:34:04.205114,126,189,87
+2025-09-04 15:00:00,Lower East Side,Manhattan,yellow_trip,169,LGBMRegressor,2025-10-02 22:34:04.280508,135,202,88
+2025-09-04 16:00:00,Lower East Side,Manhattan,yellow_trip,172,LGBMRegressor,2025-10-02 22:34:04.338154,137,206,89
+2025-09-04 17:00:00,Lower East Side,Manhattan,yellow_trip,169,LGBMRegressor,2025-10-02 22:34:04.393817,135,202,90
+2025-09-04 18:00:00,Lower East Side,Manhattan,yellow_trip,170,LGBMRegressor,2025-10-02 22:34:04.463578,136,204,91
+2025-09-04 19:00:00,Lower East Side,Manhattan,yellow_trip,174,LGBMRegressor,2025-10-02 22:34:04.554886,139,208,92
+2025-09-04 20:00:00,Lower East Side,Manhattan,yellow_trip,166,LGBMRegressor,2025-10-02 22:34:04.626655,132,199,93
+2025-09-04 21:00:00,Lower East Side,Manhattan,yellow_trip,164,LGBMRegressor,2025-10-02 22:34:04.696605,131,196,94
+2025-09-04 22:00:00,Lower East Side,Manhattan,yellow_trip,167,LGBMRegressor,2025-10-02 22:34:04.798248,133,200,95
+2025-09-04 23:00:00,Lower East Side,Manhattan,yellow_trip,171,LGBMRegressor,2025-10-02 22:34:04.870386,136,205,96
+2025-09-05 00:00:00,Lower East Side,Manhattan,yellow_trip,169,LGBMRegressor,2025-10-02 22:34:04.939287,135,202,97
+2025-09-05 01:00:00,Lower East Side,Manhattan,yellow_trip,180,LGBMRegressor,2025-10-02 22:34:05.005184,144,216,98
+2025-09-05 02:00:00,Lower East Side,Manhattan,yellow_trip,186,LGBMRegressor,2025-10-02 22:34:05.077702,148,223,99
+2025-09-05 03:00:00,Lower East Side,Manhattan,yellow_trip,189,LGBMRegressor,2025-10-02 22:34:05.143963,151,226,100
+2025-09-05 04:00:00,Lower East Side,Manhattan,yellow_trip,186,LGBMRegressor,2025-10-02 22:34:05.202165,148,223,101
+2025-09-05 05:00:00,Lower East Side,Manhattan,yellow_trip,195,LGBMRegressor,2025-10-02 22:34:05.262952,156,234,102
+2025-09-05 06:00:00,Lower East Side,Manhattan,yellow_trip,182,LGBMRegressor,2025-10-02 22:34:05.324325,145,218,103
+2025-09-05 07:00:00,Lower East Side,Manhattan,yellow_trip,188,LGBMRegressor,2025-10-02 22:34:05.382838,150,225,104
+2025-09-05 08:00:00,Lower East Side,Manhattan,yellow_trip,192,LGBMRegressor,2025-10-02 22:34:05.444026,153,230,105
+2025-09-05 09:00:00,Lower East Side,Manhattan,yellow_trip,194,LGBMRegressor,2025-10-02 22:34:05.503063,155,232,106
+2025-09-05 10:00:00,Lower East Side,Manhattan,yellow_trip,192,LGBMRegressor,2025-10-02 22:34:05.563916,153,230,107
+2025-09-05 11:00:00,Lower East Side,Manhattan,yellow_trip,192,LGBMRegressor,2025-10-02 22:34:05.615631,153,230,108
+2025-09-05 12:00:00,Lower East Side,Manhattan,yellow_trip,190,LGBMRegressor,2025-10-02 22:34:05.673268,152,228,109
+2025-09-05 13:00:00,Lower East Side,Manhattan,yellow_trip,193,LGBMRegressor,2025-10-02 22:34:05.726477,154,231,110
+2025-09-05 14:00:00,Lower East Side,Manhattan,yellow_trip,189,LGBMRegressor,2025-10-02 22:34:05.778956,151,226,111
+2025-09-05 15:00:00,Lower East Side,Manhattan,yellow_trip,197,LGBMRegressor,2025-10-02 22:34:05.847144,157,236,112
+2025-09-05 16:00:00,Lower East Side,Manhattan,yellow_trip,189,LGBMRegressor,2025-10-02 22:34:05.902191,151,226,113
+2025-09-05 17:00:00,Lower East Side,Manhattan,yellow_trip,195,LGBMRegressor,2025-10-02 22:34:05.967013,156,234,114
+2025-09-05 18:00:00,Lower East Side,Manhattan,yellow_trip,190,LGBMRegressor,2025-10-02 22:34:06.030001,152,228,115
+2025-09-05 19:00:00,Lower East Side,Manhattan,yellow_trip,193,LGBMRegressor,2025-10-02 22:34:06.093531,154,231,116
+2025-09-05 20:00:00,Lower East Side,Manhattan,yellow_trip,192,LGBMRegressor,2025-10-02 22:34:06.148130,153,230,117
+2025-09-05 21:00:00,Lower East Side,Manhattan,yellow_trip,196,LGBMRegressor,2025-10-02 22:34:06.203745,156,235,118
+2025-09-05 22:00:00,Lower East Side,Manhattan,yellow_trip,195,LGBMRegressor,2025-10-02 22:34:06.262079,156,234,119
+2025-09-05 23:00:00,Lower East Side,Manhattan,yellow_trip,198,LGBMRegressor,2025-10-02 22:34:06.322709,158,237,120
+2025-09-06 00:00:00,Lower East Side,Manhattan,yellow_trip,201,LGBMRegressor,2025-10-02 22:34:06.378487,160,241,121
+2025-09-06 01:00:00,Lower East Side,Manhattan,yellow_trip,207,LGBMRegressor,2025-10-02 22:34:06.432938,165,248,122
+2025-09-06 02:00:00,Lower East Side,Manhattan,yellow_trip,203,LGBMRegressor,2025-10-02 22:34:06.491184,162,243,123
+2025-09-06 03:00:00,Lower East Side,Manhattan,yellow_trip,208,LGBMRegressor,2025-10-02 22:34:06.547939,166,249,124
+2025-09-06 04:00:00,Lower East Side,Manhattan,yellow_trip,211,LGBMRegressor,2025-10-02 22:34:06.608372,168,253,125
+2025-09-06 05:00:00,Lower East Side,Manhattan,yellow_trip,217,LGBMRegressor,2025-10-02 22:34:06.664116,173,260,126
+2025-09-06 06:00:00,Lower East Side,Manhattan,yellow_trip,216,LGBMRegressor,2025-10-02 22:34:06.723162,172,259,127
+2025-09-06 07:00:00,Lower East Side,Manhattan,yellow_trip,221,LGBMRegressor,2025-10-02 22:34:06.780371,176,265,128
+2025-09-06 08:00:00,Lower East Side,Manhattan,yellow_trip,221,LGBMRegressor,2025-10-02 22:34:06.834438,176,265,129
+2025-09-06 09:00:00,Lower East Side,Manhattan,yellow_trip,219,LGBMRegressor,2025-10-02 22:34:06.892130,175,262,130
+2025-09-06 10:00:00,Lower East Side,Manhattan,yellow_trip,216,LGBMRegressor,2025-10-02 22:34:06.959428,172,259,131
+2025-09-06 11:00:00,Lower East Side,Manhattan,yellow_trip,217,LGBMRegressor,2025-10-02 22:34:07.018919,173,260,132
+2025-09-06 12:00:00,Lower East Side,Manhattan,yellow_trip,213,LGBMRegressor,2025-10-02 22:34:07.074142,170,255,133
+2025-09-06 13:00:00,Lower East Side,Manhattan,yellow_trip,214,LGBMRegressor,2025-10-02 22:34:07.127409,171,256,134
+2025-09-06 14:00:00,Lower East Side,Manhattan,yellow_trip,215,LGBMRegressor,2025-10-02 22:34:07.192628,172,258,135
+2025-09-06 15:00:00,Lower East Side,Manhattan,yellow_trip,214,LGBMRegressor,2025-10-02 22:34:07.261295,171,256,136
+2025-09-06 16:00:00,Lower East Side,Manhattan,yellow_trip,212,LGBMRegressor,2025-10-02 22:34:07.329391,169,254,137
+2025-09-06 17:00:00,Lower East Side,Manhattan,yellow_trip,219,LGBMRegressor,2025-10-02 22:34:07.408908,175,262,138
+2025-09-06 18:00:00,Lower East Side,Manhattan,yellow_trip,216,LGBMRegressor,2025-10-02 22:34:07.502815,172,259,139
+2025-09-06 19:00:00,Lower East Side,Manhattan,yellow_trip,221,LGBMRegressor,2025-10-02 22:34:07.587365,176,265,140
+2025-09-06 20:00:00,Lower East Side,Manhattan,yellow_trip,215,LGBMRegressor,2025-10-02 22:34:07.657656,172,258,141
+2025-09-06 21:00:00,Lower East Side,Manhattan,yellow_trip,218,LGBMRegressor,2025-10-02 22:34:07.731736,174,261,142
+2025-09-06 22:00:00,Lower East Side,Manhattan,yellow_trip,216,LGBMRegressor,2025-10-02 22:34:07.814592,172,259,143
+2025-09-06 23:00:00,Lower East Side,Manhattan,yellow_trip,212,LGBMRegressor,2025-10-02 22:34:07.923389,169,254,144
+2025-09-07 00:00:00,Lower East Side,Manhattan,yellow_trip,232,LGBMRegressor,2025-10-02 22:34:08.009497,185,278,145
+2025-09-07 01:00:00,Lower East Side,Manhattan,yellow_trip,227,LGBMRegressor,2025-10-02 22:34:08.097404,181,272,146
+2025-09-07 02:00:00,Lower East Side,Manhattan,yellow_trip,220,LGBMRegressor,2025-10-02 22:34:08.186326,176,264,147
+2025-09-07 03:00:00,Lower East Side,Manhattan,yellow_trip,217,LGBMRegressor,2025-10-02 22:34:08.279020,173,260,148
+2025-09-07 04:00:00,Lower East Side,Manhattan,yellow_trip,216,LGBMRegressor,2025-10-02 22:34:08.388273,172,259,149
+2025-09-07 05:00:00,Lower East Side,Manhattan,yellow_trip,220,LGBMRegressor,2025-10-02 22:34:08.471310,176,264,150
+2025-09-07 06:00:00,Lower East Side,Manhattan,yellow_trip,217,LGBMRegressor,2025-10-02 22:34:08.546428,173,260,151
+2025-09-07 07:00:00,Lower East Side,Manhattan,yellow_trip,222,LGBMRegressor,2025-10-02 22:34:08.624831,177,266,152
+2025-09-07 08:00:00,Lower East Side,Manhattan,yellow_trip,217,LGBMRegressor,2025-10-02 22:34:08.699601,173,260,153
+2025-09-07 09:00:00,Lower East Side,Manhattan,yellow_trip,220,LGBMRegressor,2025-10-02 22:34:08.771085,176,264,154
+2025-09-07 10:00:00,Lower East Side,Manhattan,yellow_trip,218,LGBMRegressor,2025-10-02 22:34:08.851687,174,261,155
+2025-09-07 11:00:00,Lower East Side,Manhattan,yellow_trip,217,LGBMRegressor,2025-10-02 22:34:08.918543,173,260,156
+2025-09-07 12:00:00,Lower East Side,Manhattan,yellow_trip,215,LGBMRegressor,2025-10-02 22:34:08.975060,172,258,157
+2025-09-07 13:00:00,Lower East Side,Manhattan,yellow_trip,213,LGBMRegressor,2025-10-02 22:34:09.032745,170,255,158
+2025-09-07 14:00:00,Lower East Side,Manhattan,yellow_trip,218,LGBMRegressor,2025-10-02 22:34:09.106879,174,261,159
+2025-09-07 15:00:00,Lower East Side,Manhattan,yellow_trip,214,LGBMRegressor,2025-10-02 22:34:09.177118,171,256,160
+2025-09-07 16:00:00,Lower East Side,Manhattan,yellow_trip,215,LGBMRegressor,2025-10-02 22:34:09.234396,172,258,161
+2025-09-07 17:00:00,Lower East Side,Manhattan,yellow_trip,212,LGBMRegressor,2025-10-02 22:34:09.294723,169,254,162
+2025-09-07 18:00:00,Lower East Side,Manhattan,yellow_trip,218,LGBMRegressor,2025-10-02 22:34:09.352105,174,261,163
+2025-09-07 19:00:00,Lower East Side,Manhattan,yellow_trip,207,LGBMRegressor,2025-10-02 22:34:09.426525,165,248,164
+2025-09-07 20:00:00,Lower East Side,Manhattan,yellow_trip,206,LGBMRegressor,2025-10-02 22:34:09.491991,164,247,165
+2025-09-07 21:00:00,Lower East Side,Manhattan,yellow_trip,202,LGBMRegressor,2025-10-02 22:34:09.549606,161,242,166
+2025-09-07 22:00:00,Lower East Side,Manhattan,yellow_trip,214,LGBMRegressor,2025-10-02 22:34:09.614313,171,256,167
+2025-09-07 23:00:00,Lower East Side,Manhattan,yellow_trip,209,LGBMRegressor,2025-10-02 22:34:09.671443,167,250,168
+2025-09-08 00:00:00,Lower East Side,Manhattan,yellow_trip,215,LGBMRegressor,2025-10-02 22:34:09.740237,172,258,169
+2025-09-08 01:00:00,Lower East Side,Manhattan,yellow_trip,226,LGBMRegressor,2025-10-02 22:34:09.807984,180,271,170
+2025-09-08 02:00:00,Lower East Side,Manhattan,yellow_trip,210,LGBMRegressor,2025-10-02 22:34:09.867740,168,252,171
+2025-09-08 03:00:00,Lower East Side,Manhattan,yellow_trip,229,LGBMRegressor,2025-10-02 22:34:09.926040,183,274,172
+2025-09-08 04:00:00,Lower East Side,Manhattan,yellow_trip,223,LGBMRegressor,2025-10-02 22:34:09.991206,178,267,173
+2025-09-08 05:00:00,Lower East Side,Manhattan,yellow_trip,223,LGBMRegressor,2025-10-02 22:34:10.072283,178,267,174
+2025-09-08 06:00:00,Lower East Side,Manhattan,yellow_trip,231,LGBMRegressor,2025-10-02 22:34:10.148337,184,277,175
+2025-09-08 07:00:00,Lower East Side,Manhattan,yellow_trip,238,LGBMRegressor,2025-10-02 22:34:10.223577,190,285,176
+2025-09-08 08:00:00,Lower East Side,Manhattan,yellow_trip,244,LGBMRegressor,2025-10-02 22:34:10.291736,195,292,177
+2025-09-08 09:00:00,Lower East Side,Manhattan,yellow_trip,240,LGBMRegressor,2025-10-02 22:34:10.346114,192,288,178
+2025-09-08 10:00:00,Lower East Side,Manhattan,yellow_trip,237,LGBMRegressor,2025-10-02 22:34:10.405888,189,284,179
+2025-09-08 11:00:00,Lower East Side,Manhattan,yellow_trip,238,LGBMRegressor,2025-10-02 22:34:10.478233,190,285,180
+2025-09-08 12:00:00,Lower East Side,Manhattan,yellow_trip,234,LGBMRegressor,2025-10-02 22:34:10.538843,187,280,181
+2025-09-08 13:00:00,Lower East Side,Manhattan,yellow_trip,232,LGBMRegressor,2025-10-02 22:34:10.598376,185,278,182
+2025-09-08 14:00:00,Lower East Side,Manhattan,yellow_trip,229,LGBMRegressor,2025-10-02 22:34:10.657199,183,274,183
+2025-09-08 15:00:00,Lower East Side,Manhattan,yellow_trip,235,LGBMRegressor,2025-10-02 22:34:10.718466,188,282,184
+2025-09-08 16:00:00,Lower East Side,Manhattan,yellow_trip,235,LGBMRegressor,2025-10-02 22:34:10.778419,188,282,185
+2025-09-08 17:00:00,Lower East Side,Manhattan,yellow_trip,237,LGBMRegressor,2025-10-02 22:34:10.839863,189,284,186
+2025-09-08 18:00:00,Lower East Side,Manhattan,yellow_trip,240,LGBMRegressor,2025-10-02 22:34:10.897400,192,288,187
+2025-09-08 19:00:00,Lower East Side,Manhattan,yellow_trip,245,LGBMRegressor,2025-10-02 22:34:10.954266,196,294,188
+2025-09-08 20:00:00,Lower East Side,Manhattan,yellow_trip,240,LGBMRegressor,2025-10-02 22:34:11.017563,192,288,189
+2025-09-08 21:00:00,Lower East Side,Manhattan,yellow_trip,238,LGBMRegressor,2025-10-02 22:34:11.074424,190,285,190
+2025-09-08 22:00:00,Lower East Side,Manhattan,yellow_trip,235,LGBMRegressor,2025-10-02 22:34:11.126835,188,282,191
+2025-09-08 23:00:00,Lower East Side,Manhattan,yellow_trip,224,LGBMRegressor,2025-10-02 22:34:11.178291,179,268,192
+2025-09-09 00:00:00,Lower East Side,Manhattan,yellow_trip,226,LGBMRegressor,2025-10-02 22:34:11.230915,180,271,193
+2025-09-09 01:00:00,Lower East Side,Manhattan,yellow_trip,227,LGBMRegressor,2025-10-02 22:34:11.285862,181,272,194
+2025-09-09 02:00:00,Lower East Side,Manhattan,yellow_trip,214,LGBMRegressor,2025-10-02 22:34:11.339054,171,256,195
+2025-09-09 03:00:00,Lower East Side,Manhattan,yellow_trip,235,LGBMRegressor,2025-10-02 22:34:11.393604,188,282,196
+2025-09-09 04:00:00,Lower East Side,Manhattan,yellow_trip,229,LGBMRegressor,2025-10-02 22:34:11.445864,183,274,197
+2025-09-09 05:00:00,Lower East Side,Manhattan,yellow_trip,218,LGBMRegressor,2025-10-02 22:34:11.499957,174,261,198
+2025-09-09 06:00:00,Lower East Side,Manhattan,yellow_trip,235,LGBMRegressor,2025-10-02 22:34:11.551964,188,282,199
+2025-09-09 07:00:00,Lower East Side,Manhattan,yellow_trip,236,LGBMRegressor,2025-10-02 22:34:11.607043,188,283,200
+2025-09-09 08:00:00,Lower East Side,Manhattan,yellow_trip,250,LGBMRegressor,2025-10-02 22:34:11.658788,200,300,201
+2025-09-09 09:00:00,Lower East Side,Manhattan,yellow_trip,249,LGBMRegressor,2025-10-02 22:34:11.713840,199,298,202
+2025-09-09 10:00:00,Lower East Side,Manhattan,yellow_trip,254,LGBMRegressor,2025-10-02 22:34:11.766765,203,304,203
+2025-09-09 11:00:00,Lower East Side,Manhattan,yellow_trip,255,LGBMRegressor,2025-10-02 22:34:11.818480,204,306,204
+2025-09-09 12:00:00,Lower East Side,Manhattan,yellow_trip,260,LGBMRegressor,2025-10-02 22:34:11.870969,208,312,205
+2025-09-09 13:00:00,Lower East Side,Manhattan,yellow_trip,249,LGBMRegressor,2025-10-02 22:34:11.923852,199,298,206
+2025-09-09 14:00:00,Lower East Side,Manhattan,yellow_trip,257,LGBMRegressor,2025-10-02 22:34:11.976966,205,308,207
+2025-09-09 15:00:00,Lower East Side,Manhattan,yellow_trip,259,LGBMRegressor,2025-10-02 22:34:12.029022,207,310,208
+2025-09-09 16:00:00,Lower East Side,Manhattan,yellow_trip,267,LGBMRegressor,2025-10-02 22:34:12.078781,213,320,209
+2025-09-09 17:00:00,Lower East Side,Manhattan,yellow_trip,264,LGBMRegressor,2025-10-02 22:34:12.132022,211,316,210
+2025-09-09 18:00:00,Lower East Side,Manhattan,yellow_trip,258,LGBMRegressor,2025-10-02 22:34:12.185582,206,309,211
+2025-09-09 19:00:00,Lower East Side,Manhattan,yellow_trip,257,LGBMRegressor,2025-10-02 22:34:12.241243,205,308,212
+2025-09-09 20:00:00,Lower East Side,Manhattan,yellow_trip,253,LGBMRegressor,2025-10-02 22:34:12.293575,202,303,213
+2025-09-09 21:00:00,Lower East Side,Manhattan,yellow_trip,240,LGBMRegressor,2025-10-02 22:34:12.346893,192,288,214
+2025-09-09 22:00:00,Lower East Side,Manhattan,yellow_trip,243,LGBMRegressor,2025-10-02 22:34:12.400412,194,291,215
+2025-09-09 23:00:00,Lower East Side,Manhattan,yellow_trip,248,LGBMRegressor,2025-10-02 22:34:12.454095,198,297,216
+2025-09-10 00:00:00,Lower East Side,Manhattan,yellow_trip,234,LGBMRegressor,2025-10-02 22:34:12.503700,187,280,217
+2025-09-10 01:00:00,Lower East Side,Manhattan,yellow_trip,236,LGBMRegressor,2025-10-02 22:34:12.560307,188,283,218
+2025-09-10 02:00:00,Lower East Side,Manhattan,yellow_trip,232,LGBMRegressor,2025-10-02 22:34:12.620860,185,278,219
+2025-09-10 03:00:00,Lower East Side,Manhattan,yellow_trip,234,LGBMRegressor,2025-10-02 22:34:12.690689,187,280,220
+2025-09-10 04:00:00,Lower East Side,Manhattan,yellow_trip,236,LGBMRegressor,2025-10-02 22:34:12.768788,188,283,221
+2025-09-10 05:00:00,Lower East Side,Manhattan,yellow_trip,231,LGBMRegressor,2025-10-02 22:34:12.846755,184,277,222
+2025-09-10 06:00:00,Lower East Side,Manhattan,yellow_trip,239,LGBMRegressor,2025-10-02 22:34:12.910938,191,286,223
+2025-09-10 07:00:00,Lower East Side,Manhattan,yellow_trip,261,LGBMRegressor,2025-10-02 22:34:12.992580,208,313,224
+2025-09-10 08:00:00,Lower East Side,Manhattan,yellow_trip,235,LGBMRegressor,2025-10-02 22:34:13.062983,188,282,225
+2025-09-10 09:00:00,Lower East Side,Manhattan,yellow_trip,254,LGBMRegressor,2025-10-02 22:34:13.137423,203,304,226
+2025-09-10 10:00:00,Lower East Side,Manhattan,yellow_trip,253,LGBMRegressor,2025-10-02 22:34:13.215723,202,303,227
+2025-09-10 11:00:00,Lower East Side,Manhattan,yellow_trip,247,LGBMRegressor,2025-10-02 22:34:13.288630,197,296,228
+2025-09-10 12:00:00,Lower East Side,Manhattan,yellow_trip,256,LGBMRegressor,2025-10-02 22:34:13.373379,204,307,229
+2025-09-10 13:00:00,Lower East Side,Manhattan,yellow_trip,249,LGBMRegressor,2025-10-02 22:34:13.459444,199,298,230
+2025-09-10 14:00:00,Lower East Side,Manhattan,yellow_trip,259,LGBMRegressor,2025-10-02 22:34:13.544863,207,310,231
+2025-09-10 15:00:00,Lower East Side,Manhattan,yellow_trip,251,LGBMRegressor,2025-10-02 22:34:13.641923,200,301,232
+2025-09-10 16:00:00,Lower East Side,Manhattan,yellow_trip,252,LGBMRegressor,2025-10-02 22:34:13.734183,201,302,233
+2025-09-10 17:00:00,Lower East Side,Manhattan,yellow_trip,242,LGBMRegressor,2025-10-02 22:34:13.840253,193,290,234
+2025-09-10 18:00:00,Lower East Side,Manhattan,yellow_trip,246,LGBMRegressor,2025-10-02 22:34:13.924626,196,295,235
+2025-09-10 19:00:00,Lower East Side,Manhattan,yellow_trip,244,LGBMRegressor,2025-10-02 22:34:14.000956,195,292,236
+2025-09-10 20:00:00,Lower East Side,Manhattan,yellow_trip,247,LGBMRegressor,2025-10-02 22:34:14.080557,197,296,237
+2025-09-10 21:00:00,Lower East Side,Manhattan,yellow_trip,250,LGBMRegressor,2025-10-02 22:34:14.153991,200,300,238
+2025-09-10 22:00:00,Lower East Side,Manhattan,yellow_trip,251,LGBMRegressor,2025-10-02 22:34:14.231041,200,301,239
+2025-09-10 23:00:00,Lower East Side,Manhattan,yellow_trip,251,LGBMRegressor,2025-10-02 22:34:14.298912,200,301,240
+2025-09-11 00:00:00,Lower East Side,Manhattan,yellow_trip,236,LGBMRegressor,2025-10-02 22:34:14.360743,188,283,241
+2025-09-11 01:00:00,Lower East Side,Manhattan,yellow_trip,234,LGBMRegressor,2025-10-02 22:34:14.431632,187,280,242
+2025-09-11 02:00:00,Lower East Side,Manhattan,yellow_trip,229,LGBMRegressor,2025-10-02 22:34:14.498626,183,274,243
+2025-09-11 03:00:00,Lower East Side,Manhattan,yellow_trip,235,LGBMRegressor,2025-10-02 22:34:14.585425,188,282,244
+2025-09-11 04:00:00,Lower East Side,Manhattan,yellow_trip,234,LGBMRegressor,2025-10-02 22:34:14.680498,187,280,245
+2025-09-11 05:00:00,Lower East Side,Manhattan,yellow_trip,236,LGBMRegressor,2025-10-02 22:34:14.759122,188,283,246
+2025-09-11 06:00:00,Lower East Side,Manhattan,yellow_trip,240,LGBMRegressor,2025-10-02 22:34:14.832099,192,288,247
+2025-09-11 07:00:00,Lower East Side,Manhattan,yellow_trip,256,LGBMRegressor,2025-10-02 22:34:14.905046,204,307,248
+2025-09-11 08:00:00,Lower East Side,Manhattan,yellow_trip,254,LGBMRegressor,2025-10-02 22:34:14.985926,203,304,249
+2025-09-11 09:00:00,Lower East Side,Manhattan,yellow_trip,252,LGBMRegressor,2025-10-02 22:34:15.072450,201,302,250
+2025-09-11 10:00:00,Lower East Side,Manhattan,yellow_trip,242,LGBMRegressor,2025-10-02 22:34:15.154001,193,290,251
+2025-09-11 11:00:00,Lower East Side,Manhattan,yellow_trip,244,LGBMRegressor,2025-10-02 22:34:15.228964,195,292,252
+2025-09-11 12:00:00,Lower East Side,Manhattan,yellow_trip,248,LGBMRegressor,2025-10-02 22:34:15.305537,198,297,253
+2025-09-11 13:00:00,Lower East Side,Manhattan,yellow_trip,247,LGBMRegressor,2025-10-02 22:34:15.388259,197,296,254
+2025-09-11 14:00:00,Lower East Side,Manhattan,yellow_trip,252,LGBMRegressor,2025-10-02 22:34:15.478656,201,302,255
+2025-09-11 15:00:00,Lower East Side,Manhattan,yellow_trip,251,LGBMRegressor,2025-10-02 22:34:15.549683,200,301,256
+2025-09-11 16:00:00,Lower East Side,Manhattan,yellow_trip,245,LGBMRegressor,2025-10-02 22:34:15.611115,196,294,257
+2025-09-11 17:00:00,Lower East Side,Manhattan,yellow_trip,247,LGBMRegressor,2025-10-02 22:34:15.666255,197,296,258
+2025-09-11 18:00:00,Lower East Side,Manhattan,yellow_trip,241,LGBMRegressor,2025-10-02 22:34:15.796672,192,289,259
+2025-09-11 19:00:00,Lower East Side,Manhattan,yellow_trip,242,LGBMRegressor,2025-10-02 22:34:16.014439,193,290,260
+2025-09-11 20:00:00,Lower East Side,Manhattan,yellow_trip,245,LGBMRegressor,2025-10-02 22:34:16.077547,196,294,261
+2025-09-11 21:00:00,Lower East Side,Manhattan,yellow_trip,244,LGBMRegressor,2025-10-02 22:34:16.132813,195,292,262
+2025-09-11 22:00:00,Lower East Side,Manhattan,yellow_trip,241,LGBMRegressor,2025-10-02 22:34:16.188682,192,289,263
+2025-09-11 23:00:00,Lower East Side,Manhattan,yellow_trip,241,LGBMRegressor,2025-10-02 22:34:16.242437,192,289,264
+2025-09-12 00:00:00,Lower East Side,Manhattan,yellow_trip,236,LGBMRegressor,2025-10-02 22:34:16.299308,188,283,265
+2025-09-12 01:00:00,Lower East Side,Manhattan,yellow_trip,242,LGBMRegressor,2025-10-02 22:34:16.355238,193,290,266
+2025-09-12 02:00:00,Lower East Side,Manhattan,yellow_trip,237,LGBMRegressor,2025-10-02 22:34:16.416072,189,284,267
+2025-09-12 03:00:00,Lower East Side,Manhattan,yellow_trip,248,LGBMRegressor,2025-10-02 22:34:16.487132,198,297,268
+2025-09-12 04:00:00,Lower East Side,Manhattan,yellow_trip,242,LGBMRegressor,2025-10-02 22:34:16.551123,193,290,269
+2025-09-12 05:00:00,Lower East Side,Manhattan,yellow_trip,242,LGBMRegressor,2025-10-02 22:34:16.619911,193,290,270
+2025-09-12 06:00:00,Lower East Side,Manhattan,yellow_trip,248,LGBMRegressor,2025-10-02 22:34:16.691845,198,297,271
+2025-09-12 07:00:00,Lower East Side,Manhattan,yellow_trip,250,LGBMRegressor,2025-10-02 22:34:16.771883,200,300,272
+2025-09-12 08:00:00,Lower East Side,Manhattan,yellow_trip,251,LGBMRegressor,2025-10-02 22:34:16.846056,200,301,273
+2025-09-12 09:00:00,Lower East Side,Manhattan,yellow_trip,251,LGBMRegressor,2025-10-02 22:34:16.912263,200,301,274
+2025-09-12 10:00:00,Lower East Side,Manhattan,yellow_trip,244,LGBMRegressor,2025-10-02 22:34:16.993041,195,292,275
+2025-09-12 11:00:00,Lower East Side,Manhattan,yellow_trip,244,LGBMRegressor,2025-10-02 22:34:17.079678,195,292,276
+2025-09-12 12:00:00,Lower East Side,Manhattan,yellow_trip,249,LGBMRegressor,2025-10-02 22:34:17.166354,199,298,277
+2025-09-12 13:00:00,Lower East Side,Manhattan,yellow_trip,245,LGBMRegressor,2025-10-02 22:34:17.237635,196,294,278
+2025-09-12 14:00:00,Lower East Side,Manhattan,yellow_trip,249,LGBMRegressor,2025-10-02 22:34:17.312603,199,298,279
+2025-09-12 15:00:00,Lower East Side,Manhattan,yellow_trip,246,LGBMRegressor,2025-10-02 22:34:17.375985,196,295,280
+2025-09-12 16:00:00,Lower East Side,Manhattan,yellow_trip,246,LGBMRegressor,2025-10-02 22:34:17.435584,196,295,281
+2025-09-12 17:00:00,Lower East Side,Manhattan,yellow_trip,245,LGBMRegressor,2025-10-02 22:34:17.494933,196,294,282
+2025-09-12 18:00:00,Lower East Side,Manhattan,yellow_trip,246,LGBMRegressor,2025-10-02 22:34:17.554502,196,295,283
+2025-09-12 19:00:00,Lower East Side,Manhattan,yellow_trip,241,LGBMRegressor,2025-10-02 22:34:17.614160,192,289,284
+2025-09-12 20:00:00,Lower East Side,Manhattan,yellow_trip,245,LGBMRegressor,2025-10-02 22:34:17.674475,196,294,285
+2025-09-12 21:00:00,Lower East Side,Manhattan,yellow_trip,247,LGBMRegressor,2025-10-02 22:34:17.746172,197,296,286
+2025-09-12 22:00:00,Lower East Side,Manhattan,yellow_trip,245,LGBMRegressor,2025-10-02 22:34:17.824304,196,294,287
+2025-09-12 23:00:00,Lower East Side,Manhattan,yellow_trip,245,LGBMRegressor,2025-10-02 22:34:17.905221,196,294,288
+2025-09-13 00:00:00,Lower East Side,Manhattan,yellow_trip,252,LGBMRegressor,2025-10-02 22:34:17.989762,201,302,289
+2025-09-13 01:00:00,Lower East Side,Manhattan,yellow_trip,253,LGBMRegressor,2025-10-02 22:34:18.068700,202,303,290
+2025-09-13 02:00:00,Lower East Side,Manhattan,yellow_trip,242,LGBMRegressor,2025-10-02 22:34:18.135359,193,290,291
+2025-09-13 03:00:00,Lower East Side,Manhattan,yellow_trip,241,LGBMRegressor,2025-10-02 22:34:18.196573,192,289,292
+2025-09-13 04:00:00,Lower East Side,Manhattan,yellow_trip,246,LGBMRegressor,2025-10-02 22:34:18.299684,196,295,293
+2025-09-13 05:00:00,Lower East Side,Manhattan,yellow_trip,250,LGBMRegressor,2025-10-02 22:34:18.402405,200,300,294
+2025-09-13 06:00:00,Lower East Side,Manhattan,yellow_trip,252,LGBMRegressor,2025-10-02 22:34:18.481214,201,302,295
+2025-09-13 07:00:00,Lower East Side,Manhattan,yellow_trip,253,LGBMRegressor,2025-10-02 22:34:18.573494,202,303,296
+2025-09-13 08:00:00,Lower East Side,Manhattan,yellow_trip,248,LGBMRegressor,2025-10-02 22:34:18.663319,198,297,297
+2025-09-13 09:00:00,Lower East Side,Manhattan,yellow_trip,247,LGBMRegressor,2025-10-02 22:34:18.722044,197,296,298
+2025-09-13 10:00:00,Lower East Side,Manhattan,yellow_trip,249,LGBMRegressor,2025-10-02 22:34:18.786011,199,298,299
+2025-09-13 11:00:00,Lower East Side,Manhattan,yellow_trip,254,LGBMRegressor,2025-10-02 22:34:18.848944,203,304,300
+2025-09-13 12:00:00,Lower East Side,Manhattan,yellow_trip,250,LGBMRegressor,2025-10-02 22:34:18.914913,200,300,301
+2025-09-13 13:00:00,Lower East Side,Manhattan,yellow_trip,238,LGBMRegressor,2025-10-02 22:34:18.979415,190,285,302
+2025-09-13 14:00:00,Lower East Side,Manhattan,yellow_trip,253,LGBMRegressor,2025-10-02 22:34:19.060946,202,303,303
+2025-09-13 15:00:00,Lower East Side,Manhattan,yellow_trip,247,LGBMRegressor,2025-10-02 22:34:19.169388,197,296,304
+2025-09-13 16:00:00,Lower East Side,Manhattan,yellow_trip,250,LGBMRegressor,2025-10-02 22:34:19.278765,200,300,305
+2025-09-13 17:00:00,Lower East Side,Manhattan,yellow_trip,248,LGBMRegressor,2025-10-02 22:34:19.382287,198,297,306
+2025-09-13 18:00:00,Lower East Side,Manhattan,yellow_trip,257,LGBMRegressor,2025-10-02 22:34:19.486094,205,308,307
+2025-09-13 19:00:00,Lower East Side,Manhattan,yellow_trip,246,LGBMRegressor,2025-10-02 22:34:19.567978,196,295,308
+2025-09-13 20:00:00,Lower East Side,Manhattan,yellow_trip,244,LGBMRegressor,2025-10-02 22:34:19.657208,195,292,309
+2025-09-13 21:00:00,Lower East Side,Manhattan,yellow_trip,244,LGBMRegressor,2025-10-02 22:34:19.752205,195,292,310
+2025-09-13 22:00:00,Lower East Side,Manhattan,yellow_trip,249,LGBMRegressor,2025-10-02 22:34:19.856032,199,298,311
+2025-09-13 23:00:00,Lower East Side,Manhattan,yellow_trip,244,LGBMRegressor,2025-10-02 22:34:19.981325,195,292,312
+2025-09-14 00:00:00,Lower East Side,Manhattan,yellow_trip,250,LGBMRegressor,2025-10-02 22:34:20.111854,200,300,313
+2025-09-14 01:00:00,Lower East Side,Manhattan,yellow_trip,249,LGBMRegressor,2025-10-02 22:34:20.289018,199,298,314
+2025-09-14 02:00:00,Lower East Side,Manhattan,yellow_trip,250,LGBMRegressor,2025-10-02 22:34:20.391322,200,300,315
+2025-09-14 03:00:00,Lower East Side,Manhattan,yellow_trip,246,LGBMRegressor,2025-10-02 22:34:20.482684,196,295,316
+2025-09-14 04:00:00,Lower East Side,Manhattan,yellow_trip,253,LGBMRegressor,2025-10-02 22:34:20.576094,202,303,317
+2025-09-14 05:00:00,Lower East Side,Manhattan,yellow_trip,248,LGBMRegressor,2025-10-02 22:34:20.661941,198,297,318
+2025-09-14 06:00:00,Lower East Side,Manhattan,yellow_trip,246,LGBMRegressor,2025-10-02 22:34:20.748714,196,295,319
+2025-09-14 07:00:00,Lower East Side,Manhattan,yellow_trip,248,LGBMRegressor,2025-10-02 22:34:20.844921,198,297,320
+2025-09-14 08:00:00,Lower East Side,Manhattan,yellow_trip,251,LGBMRegressor,2025-10-02 22:34:20.907096,200,301,321
+2025-09-14 09:00:00,Lower East Side,Manhattan,yellow_trip,252,LGBMRegressor,2025-10-02 22:34:20.973372,201,302,322
+2025-09-14 10:00:00,Lower East Side,Manhattan,yellow_trip,254,LGBMRegressor,2025-10-02 22:34:21.034693,203,304,323
+2025-09-14 11:00:00,Lower East Side,Manhattan,yellow_trip,248,LGBMRegressor,2025-10-02 22:34:21.094529,198,297,324
+2025-09-14 12:00:00,Lower East Side,Manhattan,yellow_trip,249,LGBMRegressor,2025-10-02 22:34:21.177957,199,298,325
+2025-09-14 13:00:00,Lower East Side,Manhattan,yellow_trip,247,LGBMRegressor,2025-10-02 22:34:21.258663,197,296,326
+2025-09-14 14:00:00,Lower East Side,Manhattan,yellow_trip,254,LGBMRegressor,2025-10-02 22:34:21.327641,203,304,327
+2025-09-14 15:00:00,Lower East Side,Manhattan,yellow_trip,246,LGBMRegressor,2025-10-02 22:34:21.411301,196,295,328
+2025-09-14 16:00:00,Lower East Side,Manhattan,yellow_trip,248,LGBMRegressor,2025-10-02 22:34:21.494587,198,297,329
+2025-09-14 17:00:00,Lower East Side,Manhattan,yellow_trip,241,LGBMRegressor,2025-10-02 22:34:21.586015,192,289,330
+2025-09-14 18:00:00,Lower East Side,Manhattan,yellow_trip,251,LGBMRegressor,2025-10-02 22:34:21.671653,200,301,331
+2025-09-14 19:00:00,Lower East Side,Manhattan,yellow_trip,240,LGBMRegressor,2025-10-02 22:34:21.742346,192,288,332
+2025-09-14 20:00:00,Lower East Side,Manhattan,yellow_trip,243,LGBMRegressor,2025-10-02 22:34:21.822613,194,291,333
+2025-09-14 21:00:00,Lower East Side,Manhattan,yellow_trip,245,LGBMRegressor,2025-10-02 22:34:21.893615,196,294,334
+2025-09-14 22:00:00,Lower East Side,Manhattan,yellow_trip,248,LGBMRegressor,2025-10-02 22:34:21.963711,198,297,335
+2025-09-14 23:00:00,Lower East Side,Manhattan,yellow_trip,251,LGBMRegressor,2025-10-02 22:34:22.041088,200,301,336
+2025-09-15 00:00:00,Lower East Side,Manhattan,yellow_trip,252,LGBMRegressor,2025-10-02 22:34:22.116618,201,302,337
+2025-09-15 01:00:00,Lower East Side,Manhattan,yellow_trip,253,LGBMRegressor,2025-10-02 22:34:22.194828,202,303,338
+2025-09-15 02:00:00,Lower East Side,Manhattan,yellow_trip,239,LGBMRegressor,2025-10-02 22:34:22.262788,191,286,339
+2025-09-15 03:00:00,Lower East Side,Manhattan,yellow_trip,247,LGBMRegressor,2025-10-02 22:34:22.346194,197,296,340
+2025-09-15 04:00:00,Lower East Side,Manhattan,yellow_trip,248,LGBMRegressor,2025-10-02 22:34:22.421675,198,297,341
+2025-09-15 05:00:00,Lower East Side,Manhattan,yellow_trip,248,LGBMRegressor,2025-10-02 22:34:22.494873,198,297,342
+2025-09-15 06:00:00,Lower East Side,Manhattan,yellow_trip,255,LGBMRegressor,2025-10-02 22:34:22.568938,204,306,343
+2025-09-15 07:00:00,Lower East Side,Manhattan,yellow_trip,256,LGBMRegressor,2025-10-02 22:34:22.632724,204,307,344
+2025-09-15 08:00:00,Lower East Side,Manhattan,yellow_trip,251,LGBMRegressor,2025-10-02 22:34:22.691964,200,301,345
+2025-09-15 09:00:00,Lower East Side,Manhattan,yellow_trip,251,LGBMRegressor,2025-10-02 22:34:22.750571,200,301,346
+2025-09-15 10:00:00,Lower East Side,Manhattan,yellow_trip,250,LGBMRegressor,2025-10-02 22:34:22.808088,200,300,347
+2025-09-15 11:00:00,Lower East Side,Manhattan,yellow_trip,249,LGBMRegressor,2025-10-02 22:34:22.865543,199,298,348
+2025-09-15 12:00:00,Lower East Side,Manhattan,yellow_trip,252,LGBMRegressor,2025-10-02 22:34:22.926117,201,302,349
+2025-09-15 13:00:00,Lower East Side,Manhattan,yellow_trip,249,LGBMRegressor,2025-10-02 22:34:22.994734,199,298,350
+2025-09-15 14:00:00,Lower East Side,Manhattan,yellow_trip,244,LGBMRegressor,2025-10-02 22:34:23.075743,195,292,351
+2025-09-15 15:00:00,Lower East Side,Manhattan,yellow_trip,244,LGBMRegressor,2025-10-02 22:34:23.153235,195,292,352
+2025-09-15 16:00:00,Lower East Side,Manhattan,yellow_trip,248,LGBMRegressor,2025-10-02 22:34:23.220789,198,297,353
+2025-09-15 17:00:00,Lower East Side,Manhattan,yellow_trip,255,LGBMRegressor,2025-10-02 22:34:23.286872,204,306,354
+2025-09-15 18:00:00,Lower East Side,Manhattan,yellow_trip,253,LGBMRegressor,2025-10-02 22:34:23.355124,202,303,355
+2025-09-15 19:00:00,Lower East Side,Manhattan,yellow_trip,243,LGBMRegressor,2025-10-02 22:34:23.426621,194,291,356
+2025-09-15 20:00:00,Lower East Side,Manhattan,yellow_trip,249,LGBMRegressor,2025-10-02 22:34:23.490985,199,298,357
+2025-09-15 21:00:00,Lower East Side,Manhattan,yellow_trip,243,LGBMRegressor,2025-10-02 22:34:23.563022,194,291,358
+2025-09-15 22:00:00,Lower East Side,Manhattan,yellow_trip,244,LGBMRegressor,2025-10-02 22:34:23.641475,195,292,359
+2025-09-15 23:00:00,Lower East Side,Manhattan,yellow_trip,247,LGBMRegressor,2025-10-02 22:34:23.714893,197,296,360
+2025-09-16 00:00:00,Lower East Side,Manhattan,yellow_trip,253,LGBMRegressor,2025-10-02 22:34:23.786515,202,303,361
+2025-09-16 01:00:00,Lower East Side,Manhattan,yellow_trip,256,LGBMRegressor,2025-10-02 22:34:23.849523,204,307,362
+2025-09-16 02:00:00,Lower East Side,Manhattan,yellow_trip,240,LGBMRegressor,2025-10-02 22:34:23.906977,192,288,363
+2025-09-16 03:00:00,Lower East Side,Manhattan,yellow_trip,254,LGBMRegressor,2025-10-02 22:34:23.969529,203,304,364
+2025-09-16 04:00:00,Lower East Side,Manhattan,yellow_trip,247,LGBMRegressor,2025-10-02 22:34:24.039940,197,296,365
+2025-09-16 05:00:00,Lower East Side,Manhattan,yellow_trip,246,LGBMRegressor,2025-10-02 22:34:24.098815,196,295,366
+2025-09-16 06:00:00,Lower East Side,Manhattan,yellow_trip,245,LGBMRegressor,2025-10-02 22:34:24.160178,196,294,367
+2025-09-16 07:00:00,Lower East Side,Manhattan,yellow_trip,252,LGBMRegressor,2025-10-02 22:34:24.224927,201,302,368
+2025-09-16 08:00:00,Lower East Side,Manhattan,yellow_trip,256,LGBMRegressor,2025-10-02 22:34:24.283306,204,307,369
+2025-09-16 09:00:00,Lower East Side,Manhattan,yellow_trip,251,LGBMRegressor,2025-10-02 22:34:24.351371,200,301,370
+2025-09-16 10:00:00,Lower East Side,Manhattan,yellow_trip,247,LGBMRegressor,2025-10-02 22:34:24.417990,197,296,371
+2025-09-16 11:00:00,Lower East Side,Manhattan,yellow_trip,253,LGBMRegressor,2025-10-02 22:34:24.483749,202,303,372
+2025-09-16 12:00:00,Lower East Side,Manhattan,yellow_trip,251,LGBMRegressor,2025-10-02 22:34:24.543312,200,301,373
+2025-09-16 13:00:00,Lower East Side,Manhattan,yellow_trip,244,LGBMRegressor,2025-10-02 22:34:24.603760,195,292,374
+2025-09-16 14:00:00,Lower East Side,Manhattan,yellow_trip,240,LGBMRegressor,2025-10-02 22:34:24.673379,192,288,375
+2025-09-16 15:00:00,Lower East Side,Manhattan,yellow_trip,252,LGBMRegressor,2025-10-02 22:34:24.742363,201,302,376
+2025-09-16 16:00:00,Lower East Side,Manhattan,yellow_trip,253,LGBMRegressor,2025-10-02 22:34:24.804385,202,303,377
+2025-09-16 17:00:00,Lower East Side,Manhattan,yellow_trip,256,LGBMRegressor,2025-10-02 22:34:24.869148,204,307,378
+2025-09-16 18:00:00,Lower East Side,Manhattan,yellow_trip,252,LGBMRegressor,2025-10-02 22:34:24.933210,201,302,379
+2025-09-16 19:00:00,Lower East Side,Manhattan,yellow_trip,244,LGBMRegressor,2025-10-02 22:34:24.997883,195,292,380
+2025-09-16 20:00:00,Lower East Side,Manhattan,yellow_trip,246,LGBMRegressor,2025-10-02 22:34:25.060924,196,295,381
+2025-09-16 21:00:00,Lower East Side,Manhattan,yellow_trip,247,LGBMRegressor,2025-10-02 22:34:25.124005,197,296,382
+2025-09-16 22:00:00,Lower East Side,Manhattan,yellow_trip,245,LGBMRegressor,2025-10-02 22:34:25.194002,196,294,383

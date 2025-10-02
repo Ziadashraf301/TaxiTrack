@@ -29,9 +29,9 @@ class TimeSeriesForecastPipeline:
         self.data_loader = ClickHouseDataLoader()
         self.feature_engineer = TimeSeriesFeatureEngineer()
         self.encoder = TimeSeriesEncoder()
-        self.feature_engineer.Training = False
+        self.feature_engineer.Training = True
         self.feature_engineer.Split = True
-        self.encoder.Training = False
+        self.encoder.Training = True
 
         self.models = {}
         self.feature_names = []
@@ -61,7 +61,7 @@ class TimeSeriesForecastPipeline:
         gc.collect()
 
         # 3. Encoding
-        X_train_scaled = self.encoder.transform(X_train)
+        X_train_scaled = self.encoder.fit_transform(X_train)
         X_test_scaled = self.encoder.transform(X_test)
 
         del X_train, X_test
@@ -112,12 +112,17 @@ class TimeSeriesForecastPipeline:
                     model.fit(X_train, y_train)
 
                 # --- 2) Evaluate on test split ---
-                y_pred = model.predict(X_test)
-                train_rmse = np.sqrt(mean_squared_error(y_train, model.predict(X_train)))
-                test_rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+                # After training, LightGBM stores evaluation results
+
+                y_train_pred= model.predict(X_train)
+                y_test_pred = model.predict(X_test)
+
+                train_rmse = np.sqrt(mean_squared_error(y_train, y_train_pred))
+                test_rmse = np.sqrt(mean_squared_error(y_test, y_test_pred))
                 
                 # Calculate MAPE for better interpretability
-                mape = np.mean(np.abs((y_test - y_pred) / (y_test + 1))) * 100
+                train_mape = np.mean(np.abs((y_test - y_train_pred) / (y_test + 1))) * 100
+                test_mape = np.mean(np.abs((y_test - y_test_pred) / (y_test + 1))) * 100
 
                 # --- 2.5) Record time period ---
                 train_start = str(train_times.min().date()) if train_times is not None else None
@@ -132,10 +137,11 @@ class TimeSeriesForecastPipeline:
                     'test_period': f"{test_start} → {test_end}",
                     'train_rmse': train_rmse,
                     'test_rmse': test_rmse,
-                    'mape': mape,
+                    'test_mape': test_mape,
+                    'train_mape':train_mape,
                     'test_size': len(y_test)
                 }
-                logger.info(f"{model_name} [{month_id}] Train RMSE: {train_rmse:.4f} - Test RMSE: {test_rmse:.4f} - MAPE: {mape}")
+                logger.info(f"{model_name} [{month_id}] Train MAPE: {train_mape:.4f} - Test MAPE: {test_mape:.4f} - train_rmse: {train_rmse} - test_rmse: {test_rmse}")
 
                 # --- 3) Retrain on full month (train + test) ---
                 X_full = pd.concat([X_train, X_test])

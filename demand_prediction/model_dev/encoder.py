@@ -2,13 +2,11 @@ import os
 import joblib
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.compose import ColumnTransformer
-from config import PATH_CONFIG
+from sklearn.preprocessing import StandardScaler
+from config import PATH_CONFIG, DATA_CONFIG
 from logger import setup_logger
 from pathlib import Path
 import gc
-from sklearn.preprocessing import OrdinalEncoder
 
 log_dir = Path(PATH_CONFIG["logs_dir"])
 logger = setup_logger(__name__, f"{log_dir}/pipeline.log")
@@ -17,8 +15,6 @@ class TimeSeriesEncoder:
     def __init__(self):
         self.encoder_dir = PATH_CONFIG["encoder_dir"]
         self.training = True
-        self.encoded_feature_names = []
-        self.preprocessor = None
         self.scaler = None
 
     def fit(self, X):
@@ -51,7 +47,7 @@ class TimeSeriesEncoder:
     def _encode_categorical_features(self, df):
         """Encode categorical features for LightGBM using native categorical support."""
         
-        cat_cols = ['service_type', 'time_of_day', 'pickup_borough', 'pickup_zone']
+        cat_cols = ['time_of_day',  DATA_CONFIG["group_col"]]
         
         if self.training:
             logger.info("Preparing categorical features for LightGBM")

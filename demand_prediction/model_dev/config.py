@@ -3,15 +3,16 @@ DATA_CONFIG = {
     "timestamp_col": "pickup_datetime",
     "target_col": "total_trips", 
     "group_cols": ["pickup_zone", "pickup_borough", "service_type"],
+    "group_col":  "group_id",
     "hour_col": "pickup_hour",
     
     # Feature columns
     "numeric_features": [], 
-    "categorical_features": ["time_of_day", "service_type"],
+    "categorical_features": ["time_of_day", "group_id"],
     
     # Time series configuration
     "frequency": "h",
-    "test_months": 1,
+    "test_months": 8,
     
     # Feature engineering
     "lag_features": [1, 2, 3, 24, 168],
@@ -48,10 +49,10 @@ MODEL_CONFIG = {
             },
             "LIGHTGBM": {
             # Core parameters
-            "n_estimators": 100,
+            "n_estimators": 3000,
             "learning_rate": 0.2,
-            "num_leaves": 250,
-            "min_child_samples": 1000,
+            "num_leaves": 10000,
+            "min_child_samples": 10,
             "subsample": 1,
             "colsample_bytree": 0.5,
             "random_state": 42,
@@ -60,7 +61,7 @@ MODEL_CONFIG = {
             "device": "cpu",
             "n_jobs": -1,  # Use all CPU cores (-1 means all available)
 
-            "categorical_feature": ['service_type', 'time_of_day', 'pickup_borough', 'pickup_zone'],
+            "categorical_feature": ['time_of_day','group_id'],
 
             
             # Performance optimization

@@ -16,7 +16,6 @@ class TimeSeriesFeatureEngineer:
         self.Training = True
         self.Split = True
         self._is_fitted = False
-        self.zone_stats = {}
 
     def fit(self, X):
         """Fit the feature engineer on training data"""
@@ -27,7 +26,7 @@ class TimeSeriesFeatureEngineer:
 
     def transform(self, df):
         """Transform data with zone-aware features"""
-        logger.info("Starting zone-aware feature engineering with %d rows", len(df))
+        logger.info("Starting feature engineering with %d rows", len(df))
         engineered_data = self._engineer_features(df)
         X, y, timestamps = self._prepare_features_target(engineered_data)
 
@@ -43,28 +42,16 @@ class TimeSeriesFeatureEngineer:
         self.fit(X)
         return self.transform(X)
     
-
     def _engineer_features(self, df):
         df = df.copy()
-        ts, tgt, groups = self.config["timestamp_col"], self.config["target_col"], self.config["group_cols"]
+        ts, tgt, groups = self.config["timestamp_col"], self.config["target_col"], self.config["group_col"]
 
-        df[ts] = pd.to_datetime(df[ts])
-        df = df.sort_values(groups + [ts]).reset_index(drop=True)
+        df = df.sort_values([groups , ts]).reset_index(drop=True)
 
         df = self._create_time_features(df, ts)
         df = self._create_lag_features(df, tgt, groups)
         df = self._create_rolling_features(df, tgt, groups)
         df = self._create_seasonal_features(df)
-
-        # remove not tomorow
-        if self.Training:
-            if not self.zone_stats:  # if not already set
-                self.zone_stats = self._compute_zone_statistics(df, tgt)
-        else:
-            self._load_artifacts()
-
-        df = self._create_zone_features(df)
-        df = self._create_zone_interaction_features(df)
         df = self._handle_missing_values(df, tgt, groups)
         return df
 
@@ -150,7 +137,7 @@ class TimeSeriesFeatureEngineer:
         return df
 
 
-    def _create_lag_features(self, df, target_col, group_cols):
+    def _create_lag_features(self, df, target_col, group_col):
         logger.info("Creating lag features: %s", self.config["lag_features"])
         
         if target_col not in df.columns:
@@ -159,18 +146,18 @@ class TimeSeriesFeatureEngineer:
         
         for lag in self.config["lag_features"]:
             col_name = f'lag_{lag}h'
-            df[col_name] = df.groupby(group_cols)[target_col].shift(lag)
+            df[col_name] = df.groupby(group_col)[target_col].shift(lag)
             
             if not self.Training:
-                df[col_name] = df.groupby(group_cols)[col_name].ffill()
+                df[col_name] = df.groupby(group_col)[col_name].ffill()
                 if df[col_name].isna().any():
-                    group_means = df.groupby(group_cols)[target_col].transform('mean')
+                    group_means = df.groupby(group_col)[target_col].transform('mean')
                     df[col_name] = df[col_name].fillna(group_means).fillna(0)
                     
         return df
 
 
-    def _create_rolling_features(self, df, target_col, group_cols):
+    def _create_rolling_features(self, df, target_col, group_col):
         """Create rolling window features with proper handling of missing values"""
         logger.info("Creating rolling features: %s", self.config["rolling_windows"])
         
@@ -181,12 +168,12 @@ class TimeSeriesFeatureEngineer:
         for window in self.config["rolling_windows"]:
             # Rolling mean
             col_name = f'rolling_mean_{window}h'
-            df[col_name] = df.groupby(group_cols)[target_col].transform(
+            df[col_name] = df.groupby(group_col)[target_col].transform(
                 lambda x: x.rolling(window=window, min_periods=1).mean())            
             
             # Exponential moving average
             col_name = f'ema_{window}h'
-            df[col_name] = df.groupby(group_cols)[target_col].transform(
+            df[col_name] = df.groupby(group_col)[target_col].transform(
                 lambda x: x.ewm(span=window, min_periods=1).mean())
             
         return df
@@ -201,125 +188,16 @@ class TimeSeriesFeatureEngineer:
         return df
 
 
-    def _compute_zone_statistics(self, df, target_col):
-        """Compute comprehensive per-zone statistics"""
-        logger.info("Creating zone statistics")
-
-        zone_stats = {}
-        
-        for zone in df['pickup_zone'].unique():
-            zone_data = df[df['pickup_zone'] == zone].copy()
-            zone_trips = zone_data[target_col]
-            
-            if len(zone_trips) > 0:
-                # Basic statistics
-                zone_stats[zone] = {
-                    'mean': float(zone_trips.mean()),
-                    'median': float(zone_trips.median()),
-                    'cv': float(zone_trips.std() / (zone_trips.mean() + 1)),
-                }
-                
-
-                hourly_avg = zone_data.groupby('hour')[target_col].mean()
-                zone_stats[zone]['peak_hour'] = int(hourly_avg.idxmax())
-                zone_stats[zone]['off_peak_hour'] = int(hourly_avg.idxmin())
-                zone_stats[zone]['peak_demand'] = float(hourly_avg.max())
-                zone_stats[zone]['off_peak_demand'] = float(hourly_avg.min())
-                zone_stats[zone]['hour_variance'] = float(hourly_avg.std())
-                
-                # Weekend patterns
-                weekend_mean = zone_data[zone_data['is_weekend']][target_col].mean()
-                weekday_mean = zone_data[~zone_data['is_weekend']][target_col].mean()
-                zone_stats[zone]['weekend_ratio'] = float(weekend_mean / (weekday_mean + 1))
-                zone_stats[zone]['weekend_mean'] = float(weekend_mean)
-                zone_stats[zone]['weekday_mean'] = float(weekday_mean)
-                
-
-                rush_mean = zone_data[zone_data['is_rush_hour']][target_col].mean()
-                non_rush_mean = zone_data[~zone_data['is_rush_hour']][target_col].mean()
-                zone_stats[zone]['rush_hour_ratio'] = float(rush_mean / (non_rush_mean + 1))
-        
-        logger.info(f"Computed statistics for {len(zone_stats)} zones")
-        
-        joblib.dump(zone_stats, os.path.join(self.encoder_dir, "zone_stats.pkl"))
-        logger.info("Saved Zone Statistics to %s", self.encoder_dir)
-        
-        return zone_stats
-
-
-    def _create_zone_features(self, df):
-        """Create zone-based features using pre-computed statistics"""
-        logger.info("Creating zone features from statistics")
-              
-        # Zone statistics
-        for stat in ['mean', 'cv', 'median', 'peak_hour', 'off_peak_hour',
-                     'peak_demand', 'off_peak_demand', 'hour_variance',
-                     'weekend_ratio', 'weekend_mean', 'weekday_mean', 'rush_hour_ratio']:
-            df[f'zone_{stat}'] = df['pickup_zone'].map(
-                lambda z: self.zone_stats.get(z, {}).get(stat, 0)
-            )
-        
-        return df
-
-
-    def _create_zone_interaction_features(self, df):
-        """Create interaction features between time and zone patterns"""
-        logger.info("Creating zone interaction features")
-        
-        # Is current hour the peak hour for this zone?
-        df['is_zone_peak_hour'] = (df['hour'] == df['zone_peak_hour']).astype(int)
-        df['is_zone_off_peak_hour'] = (df['hour'] == df['zone_off_peak_hour']).astype(int)
-        
-        # Weekend interaction
-        df['weekend_zone_effect'] = df['is_weekend'] * df['zone_weekend_ratio']
-        
-        # Rush hour interaction
-        df['rush_zone_effect'] = df['is_rush_hour'] * df['zone_rush_hour_ratio']
-        
-        # Hour similarity to zone pattern
-        df['hour_sin_x_peak'] = df['hour_sin'] * df['zone_peak_demand']
-        df['hour_cos_x_peak'] = df['hour_cos'] * df['zone_peak_demand']
-        
-        # Volatility interaction
-        df['time_volatility'] = df['is_rush_hour'] * df['zone_cv']
-        
-        return df
-
-
-    def _handle_missing_values(self, df, target_col, group_cols):
+    def _handle_missing_values(self, df, target_col, group_col):
         logger.info("Handling missing values")
         
-        exclude_cols = [target_col, self.config["timestamp_col"], "pickup_date", "pickup_hour", "time_of_day"] + group_cols
+        exclude_cols = [target_col, self.config["timestamp_col"], "time_of_day" + group_col]
         feature_cols = [col for col in df.columns if col not in exclude_cols]
         
         for col in feature_cols:
             if df[col].isna().any():
                 if 'lag' in col or 'rolling' in col or 'ema' in col:
-                    df[col] = df.groupby(group_cols)[col].ffill()
+                    df[col] = df.groupby(group_col)[col].ffill()
                 df[col] = df[col].fillna(0)
-        
-        return df
-
-
-    def _load_artifacts(self):
-        """Load saved artifacts in inference mode"""
-        if not self.zone_stats:
-            zone_stats_path = os.path.join(self.encoder_dir, "zone_stats.pkl")
-            if os.path.exists(zone_stats_path):
-                self.zone_stats = joblib.load(zone_stats_path)
-                logger.info("Loaded zone statistics")
-    
-
-
-    def _is_pickup_borough_Manhattan(self, df):
-
-        logger.info(" Add a binary column 'is_pickup_manhattan' and drop the original 'pickup_borough' column")
-
-        pickup_col = "pickup_borough"
-
-        # Create binary column
-        df["is_pickup_manhattan"] = (df[pickup_col] == "Manhattan").astype(int)
-        # Drop the original column
-        df = df.drop(columns=[pickup_col])
         
         return df

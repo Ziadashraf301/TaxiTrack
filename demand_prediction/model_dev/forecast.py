@@ -18,10 +18,12 @@ class TimeSeriesForecaster:
         self.config = DATA_CONFIG
         self.path_config = PATH_CONFIG 
         self.CLICKHOUSE_CONFIG = CLICKHOUSE_CONFIG
-        self.data_loader = ClickHouseDataLoader() 
+        self.data_loader = ClickHouseDataLoader()
         self.feature_engineer = TimeSeriesFeatureEngineer()
         self.encoder = TimeSeriesEncoder()
+        self.data_loader.Training = False
         self.feature_engineer.Training = False 
+        self.feature_engineer.Split = False
         self.encoder.Training = False
         self.models = {} 
         self.pipeline_artifacts = None 
@@ -149,7 +151,7 @@ class TimeSeriesForecaster:
         results.to_csv("results/forecast_results.csv", index=False)
         logger.info("💾 Results saved to results/forecast_results.csv")
 
-    def _forecast_single_group(self, group_dict, historical_group_df, horizon_hours, model):
+    def _forecast_single_group(self, group_dict, group_id, historical_group_df, horizon_hours, model):
         """Forecast for a single group iteratively"""
         group_predictions = []
         
@@ -173,12 +175,8 @@ class TimeSeriesForecaster:
             # Create next timestep row
             next_row = pd.DataFrame([{
                 self.config["timestamp_col"]: ts,
-                "pickup_zone": group_dict["pickup_zone"],
-                "pickup_borough": group_dict["pickup_borough"],
-                "service_type": group_dict["service_type"],
-                self.config["target_col"]: np.nan,
-                "pickup_date": ts.date(),
-                "pickup_hour": ts.hour,
+                self.config["group_col"]: group_id,
+                self.config["target_col"]: np.nan
             }])
             
             # Combine with historical data for feature engineering
@@ -187,6 +185,7 @@ class TimeSeriesForecaster:
             # Apply feature engineering (only transform, no fit)
             try:
                 X, y, timestamps = self.feature_engineer.transform(temp_df)
+
                 transformed = self.encoder.transform(X)
 
             except Exception as e:
@@ -251,17 +250,19 @@ class TimeSeriesForecaster:
         for i, group_dict in enumerate(groups):
             logger.info(f"🔮 Forecasting group {i+1}/{len(groups)}: {group_dict}")
             
-            # Filter historical data for this group
-            group_mask = (
-                (historical_df["pickup_zone"] == group_dict["pickup_zone"]) &
-                (historical_df["pickup_borough"] == group_dict["pickup_borough"]) &
-                (historical_df["service_type"] == group_dict["service_type"])
-            )
-            historical_group_df = historical_df[group_mask].copy()
+            group_col = DATA_CONFIG["group_col"]
+
+            # Build group_id from dict (zone_borough_service)
+            group_id = f"{group_dict['pickup_zone']}_{group_dict['pickup_borough']}_{group_dict['service_type']}".strip()
+            group_id = group_id.replace(" ", "_").replace("/", "_")
+
+            # Filter historical data by group_id
+            historical_group_df = historical_df[historical_df[group_col] == group_id].copy()
             
             # Forecast for this group
             group_predictions = self._forecast_single_group(
                 group_dict, 
+                group_id,
                 historical_group_df, 
                 horizon_hours, 
                 model
