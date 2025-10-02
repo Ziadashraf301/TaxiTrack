@@ -12,6 +12,7 @@ from xgboost import XGBRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import Ridge
 from lightgbm import LGBMRegressor
+import lightgbm as lgb
 import gc
 from logger import setup_logger
 from datetime import datetime
@@ -28,8 +29,9 @@ class TimeSeriesForecastPipeline:
         self.data_loader = ClickHouseDataLoader()
         self.feature_engineer = TimeSeriesFeatureEngineer()
         self.encoder = TimeSeriesEncoder()
-        self.feature_engineer.Training = True
-        self.encoder.Training = True
+        self.feature_engineer.Training = False
+        self.feature_engineer.Split = True
+        self.encoder.Training = False
 
         self.models = {}
         self.feature_names = []
@@ -59,7 +61,7 @@ class TimeSeriesForecastPipeline:
         gc.collect()
 
         # 3. Encoding
-        X_train_scaled = self.encoder.fit_transform(X_train)
+        X_train_scaled = self.encoder.transform(X_train)
         X_test_scaled = self.encoder.transform(X_test)
 
         del X_train, X_test
@@ -89,10 +91,8 @@ class TimeSeriesForecastPipeline:
         then retrain incrementally on full month data."""
 
         self.models = {
-             'ridge' : Ridge(**self.model_config["models"]["ridge"])
-             ,'LIGHTGBM' : LGBMRegressor(**self.model_config["models"]["LIGHTGBM"])
-            # ,'xgboost': XGBRegressor(**self.model_config["models"]["xgboost"]),
-            # ,'decision_tree': DecisionTreeRegressor(**self.model_config["models"]["decision_tree"]),
+             'LIGHTGBM' : LGBMRegressor(**self.model_config["models"]["LIGHTGBM"])
+
         }
 
         results = {}
@@ -105,8 +105,9 @@ class TimeSeriesForecastPipeline:
                 model_path = f"{self.path_config['models_dir']}/{model_name}_model.pkl"
 
                 # --- 1) Train on train split ---
-                if model_name == 'xgboost':
-                    model.fit(X_train, y_train, eval_set=[(X_test, y_test)])
+                if model_name == 'LIGHTGBM':
+                    model.fit(X_train, y_train, eval_set=[(X_test, y_test)], callbacks=[lgb.early_stopping(stopping_rounds=50),
+                                                                                        lgb.log_evaluation(period=100)])
                 else:
                     model.fit(X_train, y_train)
 
@@ -142,13 +143,12 @@ class TimeSeriesForecastPipeline:
 
                 logger.info(f"{model_name} [{month_id}] Train Full Date")
                 
-                if model_name == 'xgboost':
+                if model_name == 'LIGHTGBM':
                     best_round = getattr(model, "best_iteration_", None)
                     if best_round is not None:
                         # keep only the useful number of trees
                         model.set_params(n_estimators=best_round + 1)
-                    model.set_params(early_stopping_rounds=None)
-                    model.set_params(verbosity=3)
+                    model.set_params(callbacks=None)
 
                 # Train on full data without early stopping
                 model.fit(X_full, y_full)

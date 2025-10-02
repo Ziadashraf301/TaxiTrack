@@ -8,6 +8,7 @@ from config import PATH_CONFIG
 from logger import setup_logger
 from pathlib import Path
 import gc
+from sklearn.preprocessing import OrdinalEncoder
 
 log_dir = Path(PATH_CONFIG["logs_dir"])
 logger = setup_logger(__name__, f"{log_dir}/pipeline.log")
@@ -24,10 +25,9 @@ class TimeSeriesEncoder:
         """Fit encoders + scaler"""
         self.training = True
 
-        logger.info("Fit OneHot Encoders: service_type, time_of_day")
         X_train_encoded = self._encode_categorical_features(X)
-        logger.info("Normlization: numerical features")
-        self._standardize_features(X_train_encoded)
+        # logger.info("Normlization: numerical features")
+        # self._standardize_features(X_train_encoded)
         
         del X_train_encoded
         gc.collect()
@@ -36,59 +36,75 @@ class TimeSeriesEncoder:
         """Transform using fitted encoders + scaler"""
         self.training = False
         
-        logger.info("Encoding categorical features: service_type, time_of_day")
         X_encoded = self._encode_categorical_features(X)
 
-        logger.info("Standardizing numerical features")
-        X_scaled = self._standardize_features(X_encoded)
-        return X_scaled
+        # logger.info("Standardizing numerical features")
+        # X_encoded = self._standardize_features(X_encoded)
+        return X_encoded
 
     def fit_transform(self, X):
         """Fit + transform"""
         self.fit(X)
         return self.transform(X)
 
+
     def _encode_categorical_features(self, df):
-        """Encode service_type, pickup_borough, time_of_day"""
-
-        cat_cols = ['service_type', 'time_of_day']
-
+        """Encode categorical features for LightGBM using native categorical support."""
+        
+        cat_cols = ['service_type', 'time_of_day', 'pickup_borough', 'pickup_zone']
+        
         if self.training:
-            logger.info("Fitting categorical encoder")
+            logger.info("Preparing categorical features for LightGBM")
             os.makedirs(self.encoder_dir, exist_ok=True)
-
-            self.preprocessor = ColumnTransformer(
-                transformers=[
-                    ("service", OneHotEncoder(handle_unknown="ignore", sparse_output=False), ['service_type']),
-                    ("time_of_day", OneHotEncoder(handle_unknown="ignore", sparse_output=False), ['time_of_day'])
-                ],
-                remainder="drop"
-            )
-
-            encoded = self.preprocessor.fit_transform(df[cat_cols])
-            joblib.dump(self.preprocessor, os.path.join(self.encoder_dir, "categorical_encoder.pkl"))
-
+            
+            # Convert to category dtype with explicit categories
+            for col in cat_cols:
+                # Clean: lowercase, strip whitespace
+                df[col] = df[col].astype(str).str.strip().str.lower()
+                
+                # Handle NaN values
+                df[col] = df[col].replace('nan', 'unknown')
+                
+                # Convert to categorical (learn all categories from training data)
+                df[col] = pd.Categorical(df[col])
+                
+                logger.info(f"{col}: {len(df[col].cat.categories)} unique categories")
+            
+            # Save the category mappings
+            category_mappings = {col: df[col].cat.categories.tolist() for col in cat_cols}
+            joblib.dump(category_mappings, os.path.join(self.encoder_dir, "category_mappings.pkl"))
+            
+            logger.info(f"Saved categorical mappings")
+        
         else:
-            encoder_path = os.path.join(self.encoder_dir, "categorical_encoder.pkl")
-            if not os.path.exists(encoder_path):
-                raise FileNotFoundError(f"Encoder not found at {encoder_path}")
-            self.preprocessor = joblib.load(encoder_path)
-            encoded = self.preprocessor.transform(df[cat_cols])
+            # Load the category mappings from training
+            mappings_path = os.path.join(self.encoder_dir, "category_mappings.pkl")
+            if not os.path.exists(mappings_path):
+                raise FileNotFoundError(f"Category mappings not found at {mappings_path}")
+            
+            category_mappings = joblib.load(mappings_path)
+            
+            # Apply the same categories as training
+            for col in cat_cols:
+                # Clean: lowercase, strip whitespace
+                df[col] = df[col].astype(str).str.strip().str.lower()
+                
+                # Handle NaN values
+                df[col] = df[col].replace('nan', 'unknown')
+                
+                # Check for unknown categories
+                unknown = set(df[col].unique()) - set(category_mappings[col])
+                if unknown:
+                    logger.warning(f"Unknown categories in {col}: {len(unknown)} categories")
+                    logger.debug(f"Examples: {list(unknown)[:5]}")
+                    # Map unknown to 'unknown' category
+                    df[col] = df[col].apply(lambda x: x if x in category_mappings[col] else 'unknown')
+                
+                # Set as categorical with the same categories as training
+                df[col] = pd.Categorical(df[col], categories=category_mappings[col])
+        
+        return df
 
-        # Extract encoded feature names
-        service_features = self.preprocessor.named_transformers_['service'].get_feature_names_out(['service_type'])
-        tod_features = self.preprocessor.named_transformers_['time_of_day'].get_feature_names_out(['time_of_day'])
-        self.encoded_feature_names = list(np.concatenate([service_features, tod_features]))
-
-        encoded_df = pd.DataFrame(encoded, columns=self.encoded_feature_names, index=df.index)
-
-        # Drop original categorical cols, keep other features
-        exclude_cols = cat_cols
-        feature_cols = [col for col in df.columns if col not in exclude_cols]
-        df = df[feature_cols].reset_index(drop=True)
-        encoded_df = encoded_df.reset_index(drop=True)
-
-        return pd.concat([df, encoded_df], axis=1)
 
     def _standardize_features(self, df):
         """Standardize all numerical features (after encoding)."""

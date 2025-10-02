@@ -7,11 +7,11 @@ DATA_CONFIG = {
     
     # Feature columns
     "numeric_features": [], 
-    "categorical_features": ["pickup_zone", "pickup_borough", "service_type"],
+    "categorical_features": ["time_of_day", "service_type"],
     
     # Time series configuration
     "frequency": "h",
-    "test_months": 8,
+    "test_months": 1,
     
     # Feature engineering
     "lag_features": [1, 2, 3, 24, 168],
@@ -47,17 +47,33 @@ MODEL_CONFIG = {
                 "random_state": 42
             },
             "LIGHTGBM": {
-                    "n_estimators": 500,
-                    "learning_rate": 0.05,
-                    "max_depth": 15,
-                    "num_leaves": 80,
-                    "min_child_samples": 20,
-                    "subsample": 0.8,
-                    "colsample_bytree": 0.8,
-                    "reg_alpha": 4,
-                    "reg_lambda": 3,
-                    "random_state": 42
-            },
+            # Core parameters
+            "n_estimators": 100,
+            "learning_rate": 0.2,
+            "num_leaves": 250,
+            "min_child_samples": 1000,
+            "subsample": 1,
+            "colsample_bytree": 0.5,
+            "random_state": 42,
+            
+            # Parallel processing (CPU )
+            "device": "cpu",
+            "n_jobs": -1,  # Use all CPU cores (-1 means all available)
+
+            "categorical_feature": ['service_type', 'time_of_day', 'pickup_borough', 'pickup_zone'],
+
+            
+            # Performance optimization
+            "objective": "regression",  # Change based on your task
+            "metric": "rmse",
+            "verbose": 2,
+            
+            # Memory optimization
+            "feature_pre_filter": False,
+            
+            # Additional speed optimizations
+            "force_row_wise": True,  # Faster for datasets with many rows (comment out force_col_wise)
+        },
             "ridge": {
                     "alpha": 10
             }

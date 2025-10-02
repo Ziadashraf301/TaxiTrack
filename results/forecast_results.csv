@@ -1,49 +1,49 @@
 pickup_datetime,pickup_zone,pickup_borough,service_type,prediction,model_used,prediction_timestamp,prediction_lower,prediction_upper,forecast_step
-2025-09-01 00:00:00,East Chelsea,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-01 17:12:33.138628,112,168,1
-2025-09-01 01:00:00,East Chelsea,Manhattan,yellow_trip,138,LGBMRegressor,2025-10-01 17:12:33.262916,110,165,2
-2025-09-01 02:00:00,East Chelsea,Manhattan,yellow_trip,139,LGBMRegressor,2025-10-01 17:12:33.385317,111,166,3
-2025-09-01 03:00:00,East Chelsea,Manhattan,yellow_trip,138,LGBMRegressor,2025-10-01 17:12:33.492791,110,165,4
-2025-09-01 04:00:00,East Chelsea,Manhattan,yellow_trip,133,LGBMRegressor,2025-10-01 17:12:33.601190,106,159,5
-2025-09-01 05:00:00,East Chelsea,Manhattan,yellow_trip,133,LGBMRegressor,2025-10-01 17:12:33.712770,106,159,6
-2025-09-01 06:00:00,East Chelsea,Manhattan,yellow_trip,135,LGBMRegressor,2025-10-01 17:12:33.818515,108,162,7
-2025-09-01 07:00:00,East Chelsea,Manhattan,yellow_trip,135,LGBMRegressor,2025-10-01 17:12:33.918637,108,162,8
-2025-09-01 08:00:00,East Chelsea,Manhattan,yellow_trip,136,LGBMRegressor,2025-10-01 17:12:34.028511,108,163,9
-2025-09-01 09:00:00,East Chelsea,Manhattan,yellow_trip,137,LGBMRegressor,2025-10-01 17:12:34.128501,109,164,10
-2025-09-01 10:00:00,East Chelsea,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-01 17:12:34.227846,112,168,11
-2025-09-01 11:00:00,East Chelsea,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-01 17:12:34.332663,112,169,12
-2025-09-01 12:00:00,East Chelsea,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-01 17:12:34.430831,112,168,13
-2025-09-01 13:00:00,East Chelsea,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-01 17:12:34.535363,112,169,14
-2025-09-01 14:00:00,East Chelsea,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-01 17:12:34.633720,112,169,15
-2025-09-01 15:00:00,East Chelsea,Manhattan,yellow_trip,143,LGBMRegressor,2025-10-01 17:12:34.735521,114,171,16
-2025-09-01 16:00:00,East Chelsea,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-01 17:12:34.833566,112,169,17
-2025-09-01 17:00:00,East Chelsea,Manhattan,yellow_trip,143,LGBMRegressor,2025-10-01 17:12:34.931854,114,171,18
-2025-09-01 18:00:00,East Chelsea,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-01 17:12:35.036420,112,169,19
-2025-09-01 19:00:00,East Chelsea,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-01 17:12:35.135906,112,168,20
-2025-09-01 20:00:00,East Chelsea,Manhattan,yellow_trip,135,LGBMRegressor,2025-10-01 17:12:35.235503,108,162,21
-2025-09-01 21:00:00,East Chelsea,Manhattan,yellow_trip,137,LGBMRegressor,2025-10-01 17:12:35.335183,109,164,22
-2025-09-01 22:00:00,East Chelsea,Manhattan,yellow_trip,134,LGBMRegressor,2025-10-01 17:12:35.437117,107,160,23
-2025-09-01 23:00:00,East Chelsea,Manhattan,yellow_trip,134,LGBMRegressor,2025-10-01 17:12:35.536228,107,160,24
-2025-09-02 00:00:00,East Chelsea,Manhattan,yellow_trip,137,LGBMRegressor,2025-10-01 17:12:35.635021,109,164,25
-2025-09-02 01:00:00,East Chelsea,Manhattan,yellow_trip,137,LGBMRegressor,2025-10-01 17:12:35.737847,109,164,26
-2025-09-02 02:00:00,East Chelsea,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-01 17:12:35.835140,112,169,27
-2025-09-02 03:00:00,East Chelsea,Manhattan,yellow_trip,141,LGBMRegressor,2025-10-01 17:12:35.934443,112,169,28
-2025-09-02 04:00:00,East Chelsea,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-01 17:12:36.037221,112,168,29
-2025-09-02 05:00:00,East Chelsea,Manhattan,yellow_trip,138,LGBMRegressor,2025-10-01 17:12:36.133463,110,165,30
-2025-09-02 06:00:00,East Chelsea,Manhattan,yellow_trip,142,LGBMRegressor,2025-10-01 17:12:36.232218,113,170,31
-2025-09-02 07:00:00,East Chelsea,Manhattan,yellow_trip,143,LGBMRegressor,2025-10-01 17:12:36.332819,114,171,32
-2025-09-02 08:00:00,East Chelsea,Manhattan,yellow_trip,142,LGBMRegressor,2025-10-01 17:12:36.428541,113,170,33
-2025-09-02 09:00:00,East Chelsea,Manhattan,yellow_trip,144,LGBMRegressor,2025-10-01 17:12:36.531437,115,172,34
-2025-09-02 10:00:00,East Chelsea,Manhattan,yellow_trip,144,LGBMRegressor,2025-10-01 17:12:36.633145,115,172,35
-2025-09-02 11:00:00,East Chelsea,Manhattan,yellow_trip,145,LGBMRegressor,2025-10-01 17:12:36.735848,116,174,36
-2025-09-02 12:00:00,East Chelsea,Manhattan,yellow_trip,146,LGBMRegressor,2025-10-01 17:12:36.844168,116,175,37
-2025-09-02 13:00:00,East Chelsea,Manhattan,yellow_trip,148,LGBMRegressor,2025-10-01 17:12:36.946573,118,177,38
-2025-09-02 14:00:00,East Chelsea,Manhattan,yellow_trip,147,LGBMRegressor,2025-10-01 17:12:37.050675,117,176,39
-2025-09-02 15:00:00,East Chelsea,Manhattan,yellow_trip,147,LGBMRegressor,2025-10-01 17:12:37.148330,117,176,40
-2025-09-02 16:00:00,East Chelsea,Manhattan,yellow_trip,147,LGBMRegressor,2025-10-01 17:12:37.250961,117,176,41
-2025-09-02 17:00:00,East Chelsea,Manhattan,yellow_trip,147,LGBMRegressor,2025-10-01 17:12:37.351661,117,176,42
-2025-09-02 18:00:00,East Chelsea,Manhattan,yellow_trip,147,LGBMRegressor,2025-10-01 17:12:37.452500,117,176,43
-2025-09-02 19:00:00,East Chelsea,Manhattan,yellow_trip,142,LGBMRegressor,2025-10-01 17:12:37.552865,113,170,44
-2025-09-02 20:00:00,East Chelsea,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-01 17:12:37.649119,112,168,45
-2025-09-02 21:00:00,East Chelsea,Manhattan,yellow_trip,140,LGBMRegressor,2025-10-01 17:12:37.755202,112,168,46
-2025-09-02 22:00:00,East Chelsea,Manhattan,yellow_trip,138,LGBMRegressor,2025-10-01 17:12:37.853052,110,165,47
-2025-09-02 23:00:00,East Chelsea,Manhattan,yellow_trip,136,LGBMRegressor,2025-10-01 17:12:37.953021,108,163,48
+2025-02-01 00:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:02.634819,19,28,1
+2025-02-01 01:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:02.739206,19,28,2
+2025-02-01 02:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:02.841356,19,28,3
+2025-02-01 03:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:02.930379,19,28,4
+2025-02-01 04:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.033810,19,28,5
+2025-02-01 05:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.137091,19,28,6
+2025-02-01 06:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.237728,19,28,7
+2025-02-01 07:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.338568,19,28,8
+2025-02-01 08:00:00,Bloomingdale,Manhattan,yellow_trip,25,LGBMRegressor,2025-10-02 13:13:03.438727,20,30,9
+2025-02-01 09:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.540728,19,28,10
+2025-02-01 10:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.640744,19,28,11
+2025-02-01 11:00:00,Bloomingdale,Manhattan,yellow_trip,25,LGBMRegressor,2025-10-02 13:13:03.730077,20,30,12
+2025-02-01 12:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.812907,19,28,13
+2025-02-01 13:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.894439,19,28,14
+2025-02-01 14:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:03.978287,19,28,15
+2025-02-01 15:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.062137,19,28,16
+2025-02-01 16:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.142084,19,28,17
+2025-02-01 17:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.226131,19,28,18
+2025-02-01 18:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.307811,19,28,19
+2025-02-01 19:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.391941,19,28,20
+2025-02-01 20:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.479291,19,28,21
+2025-02-01 21:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.568694,19,28,22
+2025-02-01 22:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.654374,19,28,23
+2025-02-01 23:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.738539,19,28,24
+2025-02-02 00:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.826407,19,28,25
+2025-02-02 01:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.912399,19,28,26
+2025-02-02 02:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:04.997438,19,28,27
+2025-02-02 03:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.089839,19,28,28
+2025-02-02 04:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.172815,19,28,29
+2025-02-02 05:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.255183,19,28,30
+2025-02-02 06:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.336683,19,28,31
+2025-02-02 07:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.423003,19,28,32
+2025-02-02 08:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.504098,19,28,33
+2025-02-02 09:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.584493,19,28,34
+2025-02-02 10:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.670392,19,28,35
+2025-02-02 11:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.756221,19,28,36
+2025-02-02 12:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.843144,19,28,37
+2025-02-02 13:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:05.927975,19,28,38
+2025-02-02 14:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.004664,19,28,39
+2025-02-02 15:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.094499,19,28,40
+2025-02-02 16:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.180207,19,28,41
+2025-02-02 17:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.272449,19,28,42
+2025-02-02 18:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.356402,19,28,43
+2025-02-02 19:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.437209,19,28,44
+2025-02-02 20:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.524046,19,28,45
+2025-02-02 21:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.608755,19,28,46
+2025-02-02 22:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.694914,19,28,47
+2025-02-02 23:00:00,Bloomingdale,Manhattan,yellow_trip,24,LGBMRegressor,2025-10-02 13:13:06.781482,19,28,48

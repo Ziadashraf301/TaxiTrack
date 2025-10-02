@@ -14,6 +14,7 @@ class TimeSeriesFeatureEngineer:
         self.config = DATA_CONFIG
         self.encoder_dir = PATH_CONFIG["encoder_dir"]
         self.Training = True
+        self.Split = True
         self._is_fitted = False
         self.zone_stats = {}
 
@@ -30,7 +31,7 @@ class TimeSeriesFeatureEngineer:
         engineered_data = self._engineer_features(df)
         X, y, timestamps = self._prepare_features_target(engineered_data)
 
-        if self.Training:
+        if self.Split:
             X_train, X_test, y_train, y_test, train_times, test_times = self._group_aware_time_split(X, y, timestamps)
             logger.info("✅ Feature engineering completed (training mode)")
             return X_train, X_test, y_train, y_test, train_times, test_times
@@ -55,6 +56,7 @@ class TimeSeriesFeatureEngineer:
         df = self._create_rolling_features(df, tgt, groups)
         df = self._create_seasonal_features(df)
 
+        # remove not tomorow
         if self.Training:
             if not self.zone_stats:  # if not already set
                 self.zone_stats = self._compute_zone_statistics(df, tgt)
@@ -64,7 +66,6 @@ class TimeSeriesFeatureEngineer:
         df = self._create_zone_features(df)
         df = self._create_zone_interaction_features(df)
         df = self._handle_missing_values(df, tgt, groups)
-        df = self._is_pickup_borough_Manhattan(df)
         return df
 
 
@@ -74,7 +75,7 @@ class TimeSeriesFeatureEngineer:
         target_col = self.config["target_col"]
         
         # Feature columns - exclude Dates, timestamp, and target
-        exclude_cols = [timestamp_col, target_col, "pickup_date", "pickup_hour", "pickup_zone"]
+        exclude_cols = [timestamp_col, target_col, "pickup_date", "pickup_hour"] #, "pickup_zone"
         feature_cols = [col for col in df.columns if col not in exclude_cols]
 
         if not feature_cols:

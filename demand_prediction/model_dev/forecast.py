@@ -76,14 +76,6 @@ class TimeSeriesForecaster:
 
         X_pred = future_df[expected_features].copy()
 
-        # Ensure numeric and handle missing values
-        for col in X_pred.columns:
-            if not pd.api.types.is_numeric_dtype(X_pred[col]):
-                X_pred[col] = pd.to_numeric(X_pred[col], errors="coerce")
-            # Fill any remaining NaNs
-            if X_pred[col].isna().any():
-                X_pred[col] = X_pred[col]
-
         return X_pred
 
     def _generate_predictions(self, model, feature_matrix):
