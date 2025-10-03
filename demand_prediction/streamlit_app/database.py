@@ -44,7 +44,7 @@ class DatabaseClient:
                 raise
         return self._client
     
-    def fetch_available_groups(self, min_records: int = 24102) -> pd.DataFrame:
+    def fetch_available_groups(self, min_records: int) -> pd.DataFrame:
         """
         Fetch available forecast groups from database.
         
@@ -60,6 +60,8 @@ class DatabaseClient:
         query = f"""
         SELECT pickup_borough, pickup_zone, service_type
         FROM mart_demand_prediction
+        WHERE pickup_date >= toDate('2022-01-01') 
+        AND pickup_date < toDate('2025-09-01')
         GROUP BY pickup_borough, pickup_zone, service_type
         HAVING count(*) >= {min_records}
         ORDER BY count(*) DESC

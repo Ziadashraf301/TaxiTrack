@@ -19,7 +19,7 @@ class AppConfig:
     MIN_FORECAST_HORIZON: int = 1
     MAX_FORECAST_HORIZON: int = 1500
     DEFAULT_FORECAST_HORIZON: int = 2
-    MIN_RECORD_COUNT: int = 16068
+    MIN_RECORD_COUNT: int = 24102
     RESULTS_DIR: str = "results"
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'

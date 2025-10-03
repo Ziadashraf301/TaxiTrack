@@ -24,8 +24,6 @@ minio_storage/
 postgres_airflow/
 
 logs/
-
 .env
-
 results/
-results
+lib/
