@@ -74,16 +74,16 @@ services:
       AIRFLOW__SMTP__SMTP_USER: ${SMTP_USER}
       AIRFLOW__SMTP__SMTP_PASSWORD: ${SMTP_PASSWORD}
       AIRFLOW__SMTP__SMTP_MAIL_FROM: ${SMTP_MAIL_FROM}
-    entrypoint: > 
-      bash -c " 
-      airflow db migrate && 
-      airflow users create --username admin --password admin --
-      firstname Admin --lastname User --role Admin --email 
-      ziadashraf98765@gmail.com 
-      " 
+    entrypoint: >
+      bash -c "
+        airflow db migrate &&
+        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email ziadashraf98765@gmail.com
+      "
+
     volumes: 
       - ./airflow/dags:/opt/airflow/dags 
       - ./airflow/src/ingestion:/opt/airflow/src/ingestion 
+      - ./airflow/airflow_logs:/opt/airflow/logs
       - /var/run/docker.sock:/var/run/docker.sock
 
   # Airflow Webserver
@@ -104,6 +104,7 @@ services:
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
       AIRFLOW__CORE__DEFAULT_TIMEZONE: ${AIRFLOW_DEFAULT_TIMEZONE}
       AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW_LOAD_EXAMPLES}
+      AIRFLOW__WEBSERVER__SESSION_BACKEND: securecookie
       AIRFLOW__SMTP__SMTP_HOST: ${SMTP_HOST}
       AIRFLOW__SMTP__SMTP_PORT: ${SMTP_PORT}
       AIRFLOW__SMTP__SMTP_STARTTLS: ${SMTP_STARTTLS}
@@ -116,6 +117,7 @@ services:
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/src/ingestion:/opt/airflow/src/ingestion
+      - ./airflow/airflow_logs:/opt/airflow/logs
       - /var/run/docker.sock:/var/run/docker.sock
 
   # Airflow Scheduler
@@ -145,6 +147,7 @@ services:
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/src/ingestion:/opt/airflow/src/ingestion
+      - ./airflow/airflow_logs:/opt/airflow/logs
       - /var/run/docker.sock:/var/run/docker.sock
 
 

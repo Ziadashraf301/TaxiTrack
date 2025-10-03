@@ -14,7 +14,7 @@ class ClickHouseDataLoader:
         self.connection_params = CLICKHOUSE_CONFIG
         self.chunk_size = 500000
         self.encoder_dir = PATH_CONFIG["encoder_dir"]
-        self.min_hours = 16068
+        self.min_hours = 24102
         self.Training = True
         
     def connect_to_db(self):
@@ -251,7 +251,7 @@ class ClickHouseDataLoader:
         logger.info(f"Hours per group: {len(full_date_range)}")        
         return interpolated_df
     
-    def get_processed_data(self, table_name, start_date=None, end_date=None, groups=None, min_hours=16068):
+    def get_processed_data(self, table_name, start_date=None, end_date=None, groups=None, min_hours=None):
         """
         Main method to get processed and interpolated data
         

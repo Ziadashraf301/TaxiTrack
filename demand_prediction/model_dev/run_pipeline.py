@@ -35,8 +35,8 @@ def run_training():
                 logger.info(
                     f"{model_name.upper():<15}: "
                     f"Month={results['month']} | "
-                    f"Train RMSE={results['train_rmse']:.2f} | "
-                    f"Test RMSE={results['test_rmse']:.2f} | "
+                    f"Train mae={results['train_mae']:.2f} | "
+                    f"Test mae={results['test_mae']:.2f} | "
                     f"Test Size={results['test_size']}"
                 )
                 

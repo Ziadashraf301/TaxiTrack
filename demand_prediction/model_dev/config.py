@@ -15,46 +15,22 @@ DATA_CONFIG = {
     "test_months": 8,
     
     # Feature engineering
-    "lag_features": [1, 2, 3, 24, 168],
-    "rolling_windows": [3, 6, 12, 24, 168],
-    "seasonal_periods": {
-        "hourly": 24,
-        "daily": 7,
-        "weekly": 52
-        
-    }
+    "lag_features": [24, 168],
+    "rolling_windows": [3, 6, 9, 12, 15, 18 , 21 , 24, 168]
 }
 
 # Model Configuration - Enhanced with time series specific settings
 MODEL_CONFIG = {
     "models": {
-            "xgboost": {
-                "n_estimators": 10000, 
-                "max_depth": 8,
-                "learning_rate": 0.1,
-                "random_state": 42,
-                "subsample": 0.8,
-                "colsample_bytree": 0.4,
-                "tree_method":"hist", 
-                "device":"cuda",
-                "verbosity": 2,
-                "early_stopping_rounds": 100,
-                "reg_lambda": 50,
-                "reg_alpha": 20,
-            },
-            "decision_tree": {
-                "max_depth": 15,                
-                "ccp_alpha": 0.001,          
-                "random_state": 42
-            },
             "LIGHTGBM": {
+
             # Core parameters
-            "n_estimators": 3000,
-            "learning_rate": 0.2,
-            "num_leaves": 10000,
+            "n_estimators": 5000,
+            "learning_rate": 0.05,
+            "num_leaves": 500,
             "min_child_samples": 10,
             "subsample": 1,
-            "colsample_bytree": 0.5,
+            "colsample_bytree": 1,
             "random_state": 42,
             
             # Parallel processing (CPU )
@@ -63,10 +39,9 @@ MODEL_CONFIG = {
 
             "categorical_feature": ['time_of_day','group_id'],
 
-            
             # Performance optimization
             "objective": "regression",  # Change based on your task
-            "metric": "rmse",
+            "metric": "mae",
             "verbose": 2,
             
             # Memory optimization
@@ -74,9 +49,7 @@ MODEL_CONFIG = {
             
             # Additional speed optimizations
             "force_row_wise": True,  # Faster for datasets with many rows (comment out force_col_wise)
-        },
-            "ridge": {
-                    "alpha": 10
+        
             }
     }
 }   

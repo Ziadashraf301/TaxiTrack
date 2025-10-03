@@ -47,10 +47,11 @@ class TimeSeriesFeatureEngineer:
         ts, tgt, groups = self.config["timestamp_col"], self.config["target_col"], self.config["group_col"]
 
         df = df.sort_values([groups , ts]).reset_index(drop=True)
+        df = self._cluster_density(df)
 
         df = self._create_time_features(df, ts)
         df = self._create_lag_features(df, tgt, groups)
-        df = self._create_rolling_features(df, tgt, groups)
+        # df = self._create_rolling_features(df, tgt, groups)
         df = self._create_seasonal_features(df)
         df = self._handle_missing_values(df, tgt, groups)
         return df
@@ -111,6 +112,20 @@ class TimeSeriesFeatureEngineer:
 
         return X_train, X_test, y_train, y_test, train_times, test_times
 
+    def _cluster_density(self, df):
+        """
+        Cluster groups into 'high_density' or 'low_density' based on mean trip volume.
+        Rule: if group mean(target_col) > 10 => 'high_density', else 'low_density'
+        """
+        logger.info("Create mean trips group feature")
+
+        target_col = self.config["target_col"]
+        group_col = self.config["group_col"]
+
+        # Compute group mean
+        df["group_mean_trips"] = df.groupby(group_col)[target_col].transform("mean")
+
+        return df
 
     def _create_time_features(self, df, timestamp_col):
         logger.info("Creating time features")
@@ -185,6 +200,10 @@ class TimeSeriesFeatureEngineer:
         df['hour_cos'] = np.cos(2 * np.pi * df['hour'] / 24)
         df['dayofweek_sin'] = np.sin(2 * np.pi * df['dayofweek'] / 7)
         df['dayofweek_cos'] = np.cos(2 * np.pi * df['dayofweek'] / 7)
+        df['is_weekend_sin'] = np.sin(2 * np.pi * df['is_weekend'] / 2)
+        df['is_weekend_cos'] = np.sin(2 * np.pi * df['is_weekend'] / 2)
+        df['is_rush_hour_sin'] = np.sin(2 * np.pi * df['is_rush_hour'] / 2)
+        df['is_rush_hour_cos'] = np.sin(2 * np.pi * df['is_rush_hour'] / 2)
         return df
 
 

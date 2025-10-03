@@ -44,7 +44,7 @@ class DatabaseClient:
                 raise
         return self._client
     
-    def fetch_available_groups(self, min_records: int = 16068) -> pd.DataFrame:
+    def fetch_available_groups(self, min_records: int = 24102) -> pd.DataFrame:
         """
         Fetch available forecast groups from database.
         

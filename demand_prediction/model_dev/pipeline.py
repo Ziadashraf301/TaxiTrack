@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import joblib
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, mean_absolute_percentage_error,mean_absolute_error
 from data_loader import ClickHouseDataLoader
 from feature_engineer import TimeSeriesFeatureEngineer
 from encoder import TimeSeriesEncoder
@@ -117,12 +117,9 @@ class TimeSeriesForecastPipeline:
                 y_train_pred= model.predict(X_train)
                 y_test_pred = model.predict(X_test)
 
-                train_rmse = np.sqrt(mean_squared_error(y_train, y_train_pred))
-                test_rmse = np.sqrt(mean_squared_error(y_test, y_test_pred))
-                
-                # Calculate MAPE for better interpretability
-                train_mape = np.mean(np.abs((y_test - y_train_pred) / (y_test + 1))) * 100
-                test_mape = np.mean(np.abs((y_test - y_test_pred) / (y_test + 1))) * 100
+                train_mae = mean_absolute_error(y_train, y_train_pred)
+                test_mae = mean_absolute_error(y_test, y_test_pred)
+            
 
                 # --- 2.5) Record time period ---
                 train_start = str(train_times.min().date()) if train_times is not None else None
@@ -135,13 +132,11 @@ class TimeSeriesForecastPipeline:
                     'month': month_id,
                     'train_period': f"{train_start} → {train_end}",
                     'test_period': f"{test_start} → {test_end}",
-                    'train_rmse': train_rmse,
-                    'test_rmse': test_rmse,
-                    'test_mape': test_mape,
-                    'train_mape':train_mape,
+                    'train_mae': train_mae,
+                    'test_mae': test_mae,
                     'test_size': len(y_test)
                 }
-                logger.info(f"{model_name} [{month_id}] Train MAPE: {train_mape:.4f} - Test MAPE: {test_mape:.4f} - train_rmse: {train_rmse} - test_rmse: {test_rmse}")
+                logger.info(f"{model_name} [{month_id}] train_mae: {train_mae:.4f} - test_mae: {test_mae:.4f} ")
 
                 # --- 3) Retrain on full month (train + test) ---
                 X_full = pd.concat([X_train, X_test])
