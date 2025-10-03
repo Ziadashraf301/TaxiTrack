@@ -1,8 +1,6 @@
 import os
 import joblib
 import pandas as pd
-import numpy as np
-from sklearn.preprocessing import StandardScaler
 from config import PATH_CONFIG, DATA_CONFIG
 from logger import setup_logger
 from pathlib import Path
@@ -22,8 +20,6 @@ class TimeSeriesEncoder:
         self.training = True
 
         X_train_encoded = self._encode_categorical_features(X)
-        # logger.info("Normlization: numerical features")
-        # self._standardize_features(X_train_encoded)
         
         del X_train_encoded
         gc.collect()
@@ -33,9 +29,6 @@ class TimeSeriesEncoder:
         self.training = False
         
         X_encoded = self._encode_categorical_features(X)
-
-        # logger.info("Standardizing numerical features")
-        # X_encoded = self._standardize_features(X_encoded)
         return X_encoded
 
     def fit_transform(self, X):
@@ -100,20 +93,3 @@ class TimeSeriesEncoder:
                 df[col] = pd.Categorical(df[col], categories=category_mappings[col])
         
         return df
-
-
-    def _standardize_features(self, df):
-        """Standardize all numerical features (after encoding)."""
-        if self.training:
-            self.scaler = StandardScaler()
-            self.scaler.fit(df)
-            joblib.dump(self.scaler, os.path.join(self.encoder_dir, "scaler.pkl"))
-            return self
-        else:
-            scaler_path = os.path.join(self.encoder_dir, "scaler.pkl")
-            if not os.path.exists(scaler_path):
-                raise FileNotFoundError(f"Scaler not found at {scaler_path}")
-            self.scaler = joblib.load(scaler_path)
-            scaled = self.scaler.transform(df)
-
-        return pd.DataFrame(scaled, columns=list(df), index=df.index)

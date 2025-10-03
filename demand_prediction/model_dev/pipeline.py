@@ -1,16 +1,12 @@
 import pandas as pd
-import numpy as np
 import joblib
-from sklearn.metrics import mean_squared_error, mean_absolute_percentage_error,mean_absolute_error
+from sklearn.metrics import mean_absolute_error
 from data_loader import ClickHouseDataLoader
 from feature_engineer import TimeSeriesFeatureEngineer
 from encoder import TimeSeriesEncoder
 from config import DATA_CONFIG, MODEL_CONFIG, PATH_CONFIG
 from pathlib import Path
 import os
-from xgboost import XGBRegressor
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.linear_model import Ridge
 from lightgbm import LGBMRegressor
 import lightgbm as lgb
 import gc

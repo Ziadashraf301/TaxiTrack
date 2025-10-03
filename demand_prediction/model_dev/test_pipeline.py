@@ -1,6 +1,3 @@
-import logging
-import sys
-import os
 from pathlib import Path
 from config import PATH_CONFIG, TABLE_CONFIG
 from pipeline import TimeSeriesForecastPipeline
@@ -16,12 +13,13 @@ def test_data_loading():
     
     try:
         pipeline = TimeSeriesForecastPipeline()
-        
+        pipeline.data_loader.min_hours = 100
+
         # Test with a small date range first
         df = pipeline.data_loader.get_processed_data(
             table_name=TABLE_CONFIG["table"],
             start_date="2024-01-01",
-            end_date="2024-06-31"
+            end_date="2024-09-01",
         )
         
         logger.info(f"✅ Data loaded successfully: {len(df)} rows, "
@@ -43,7 +41,7 @@ def test_feature_engineering(df):
         df_features = pipeline.feature_engineer.transform(df)
         
         logger.info(f"✅ Feature engineering successful: "
-                    f"{len(df.columns)} → {len(df_features.columns)} features")
+                    f"{len(df.columns)} → {len(df_features[0].columns)} features")
         return df_features
         
     except Exception as e:
@@ -57,11 +55,12 @@ def test_small_pipeline():
     
     try:
         pipeline = TimeSeriesForecastPipeline()
-        
+        pipeline.data_loader.min_hours = 100
+
         pipeline.run_pipeline(
             table_name=TABLE_CONFIG["table"],
-            start_date="2024-07-01",
-            end_date="2024-09-01",
+            start_date="2024-01-01",
+            end_date="2024-10-01",
         )
         
         logger.info("✅ Pipeline completed successfully!")
@@ -84,15 +83,15 @@ def main():
     logger.info("🚀 Starting Pipeline Tests...")
     logger.info("=" * 50)
     
-    # df = test_data_loading()
-    # if df is None:
-    #     logger.error("❌ Stopping tests - data loading failed")
-    #     return
+    df = test_data_loading()
+    if df is None:
+        logger.error("❌ Stopping tests - data loading failed")
+        return
     
-    # df_features = test_feature_engineering(df)
-    # if df_features is None:
-    #     logger.error("❌ Stopping tests - feature engineering failed")
-    #     return
+    df_features = test_feature_engineering(df)
+    if df_features is None:
+        logger.error("❌ Stopping tests - feature engineering failed")
+        return
     
     pipeline = test_small_pipeline()
     

@@ -24,7 +24,7 @@ def run_forecast_pipeline():
         forecast_params = {
             "groups": groups,
             "horizon_hours": 12,
-            "model_name": "ridge",  # Options: xgboost, decision_tree, random_forest, etc.
+            "model_name": "LIGHTGBM",  
             "start_date": "2024-12-23",
             "end_date": "2024-12-30"
         }
@@ -111,7 +111,7 @@ def run_multi_group_forecast():
         results = forecaster.forecast(
             groups=groups,
             horizon_hours=24,
-            model_name="decision_tree",
+            model_name="LIGHTGBM",
             start_date="2024-12-23",
             end_date="2024-12-30"
         )
@@ -174,11 +174,11 @@ if __name__ == "__main__":
     # Option 1: Single group forecast
     results = run_forecast_pipeline()
     
-    # #Option 2: Multiple groups (uncomment to use)
-    # results = run_multi_group_forecast()
+    #Option 2: Multiple groups
+    results = run_multi_group_forecast()
     
-    # #Option 3: With validation (uncomment to use)
-    # results = run_forecast_with_validation()
+    #Option 3: With validation
+    results = run_forecast_with_validation()
     
     if results is not None:
         print(f"\n📊 Final results shape: {results.shape}")
