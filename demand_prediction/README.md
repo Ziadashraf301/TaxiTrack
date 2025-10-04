@@ -536,7 +536,7 @@ streamlit run demand_prediction/streamlit_app/app.py
 ```
 ## 🎥 Demo Video
 
-<video controls src="Demo.mp4" title="Title"></video>
+[![▶️ Watch the System in Action](https://img.shields.io/badge/▶️%20Watch-Demo-blue?style=for-the-badge)](https://drive.google.com/file/d/1Zr-3G8kGJxDCwWvYoIx4CBjtSuD6YRYy/view?usp=sharing)
 
 ---
 
