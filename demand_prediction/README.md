@@ -536,7 +536,7 @@ streamlit run demand_prediction/streamlit_app/app.py
 ```
 ## 🎥 Demo Video
 
-<video src="Demo.mp4" controls autoplay loop muted width="600"></video>
+<video controls src="Demo.mp4" title="Title"></video>
 
 ---
 
