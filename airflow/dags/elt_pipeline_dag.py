@@ -32,14 +32,8 @@ def ingest_task_callable(dataset_type: str, **kwargs):
 
     start_time = datetime.now()
     try:
-        import importlib
-        import core.clickhouse
-        import data.loader
-        import data.pipeline
-        importlib.reload(core.clickhouse)
-        importlib.reload(data.loader)
-        importlib.reload(data.pipeline)
-        result = data.pipeline.run_monthly_ingestion(dataset_type=dataset_type, execution_date=execution_date)
+        from data.pipeline import run_monthly_ingestion
+        result = run_monthly_ingestion(dataset_type=dataset_type, execution_date=execution_date)
         duration = (datetime.now() - start_time).total_seconds()
         status = result.get("status", "unknown").upper()
         rows = result.get("rows", 0)
@@ -117,23 +111,7 @@ with DAG(
     dbt_run_stg_green = create_dbt_run_task("stg_green_trips")
     dbt_run_stg_yellow = create_dbt_run_task("stg_yellow_trips")
 
-    # dbt_run_seed = BashOperator(
-    #     task_id="dbt_run_seed",
-    #     bash_command="dbt seed --project-dir /opt/dbt --profiles-dir /opt/dbt --log-path /tmp/dbt_logs --target-path /tmp/dbt_target"
-    # )
-
-    # -------------------------------------------------------------------------
-    # dbt Intermediate Model
-    # -------------------------------------------------------------------------
     dbt_run_int_all_trips = create_dbt_run_task("int_all_trips")
-
-    # -------------------------------------------------------------------------
-    # Automated Data Quality Gate (Disabled during backfill, re-enable for prod)
-    # -------------------------------------------------------------------------
-    # dbt_test_gate = BashOperator(
-    #     task_id="dbt_test_data_quality_gate",
-    #     bash_command="dbt test --select stg_green_trips stg_yellow_trips int_all_trips --project-dir /opt/dbt --profiles-dir /opt/dbt --log-path /tmp/dbt_logs --target-path /tmp/dbt_target"
-    # )
 
     # -------------------------------------------------------------------------
     # dbt Dimensional Analytics & Feature Marts

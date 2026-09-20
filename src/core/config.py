@@ -31,22 +31,10 @@ class MinioSettings(BaseSettings):
 
     root_user: str = Field(default="admin", alias="MINIO_ROOT_USER")
     root_password: str = Field(default="password123", alias="MINIO_ROOT_PASSWORD")
-    host: str = Field(default="minio", alias="MINIO_HOST")
+    host: str = Field(default="localhost", alias="MINIO_HOST")
     port: int = Field(default=9000, alias="MINIO_PORT")
     console_port: int = Field(default=9001, alias="MINIO_CONSOLE_PORT")
     secure: bool = Field(default=False, alias="MINIO_SECURE")
-
-    def __init__(self, **data):
-        if not data and not hasattr(self, "_settings_build_values"):
-            data = {
-                "root_user": os.getenv("MINIO_ROOT_USER", "admin"),
-                "root_password": os.getenv("MINIO_ROOT_PASSWORD", "password123"),
-                "host": os.getenv("MINIO_HOST", "minio"),
-                "port": int(os.getenv("MINIO_PORT", "9000")),
-                "console_port": int(os.getenv("MINIO_CONSOLE_PORT", "9001")),
-                "secure": os.getenv("MINIO_SECURE", "false").lower() == "true",
-            }
-        super().__init__(**data)
 
     @property
     def endpoint(self) -> str:
@@ -60,21 +48,9 @@ class ClickHouseSettings(BaseSettings):
     user: str = Field(default="default", alias="CLICKHOUSE_USER")
     password: str = Field(default="", alias="CLICKHOUSE_PASSWORD")
     db: str = Field(default="data_warehouse", alias="CLICKHOUSE_DB")
-    host: str = Field(default="clickhouse", alias="CLICKHOUSE_HOST")
+    host: str = Field(default="localhost", alias="CLICKHOUSE_HOST")
     http_port: int = Field(default=8123, alias="CLICKHOUSE_HTTP_PORT")
     tcp_port: int = Field(default=9005, alias="CLICKHOUSE_TCP_PORT")
-
-    def __init__(self, **data):
-        if not data and not hasattr(self, "_settings_build_values"):
-            data = {
-                "user": os.getenv("CLICKHOUSE_USER", "default"),
-                "password": os.getenv("CLICKHOUSE_PASSWORD", ""),
-                "db": os.getenv("CLICKHOUSE_DB", "data_warehouse"),
-                "host": os.getenv("CLICKHOUSE_HOST", "clickhouse"),
-                "http_port": int(os.getenv("CLICKHOUSE_HTTP_PORT", "8123")),
-                "tcp_port": int(os.getenv("CLICKHOUSE_TCP_PORT", "9005")),
-            }
-        super().__init__(**data)
 
 
 class PostgresSettings(BaseSettings):
@@ -84,37 +60,27 @@ class PostgresSettings(BaseSettings):
     user: str = Field(default="airflow", alias="POSTGRES_USER")
     password: str = Field(default="airflow", alias="POSTGRES_PASSWORD")
     db: str = Field(default="airflow", alias="POSTGRES_DB")
-    host: str = Field(default="postgres", alias="POSTGRES_HOST")
+    host: str = Field(default="localhost", alias="POSTGRES_HOST")
     port: int = Field(default=5432, alias="POSTGRES_PORT")
-
-    def __init__(self, **data):
-        if not data and not hasattr(self, "_settings_build_values"):
-            data = {
-                "user": os.getenv("POSTGRES_USER", "airflow"),
-                "password": os.getenv("POSTGRES_PASSWORD", "airflow"),
-                "db": os.getenv("POSTGRES_DB", "airflow"),
-                "host": os.getenv("POSTGRES_HOST", "postgres"),
-                "port": int(os.getenv("POSTGRES_PORT", "5432")),
-            }
-        super().__init__(**data)
 
 
 class MLflowSettings(BaseSettings):
     """MLflow Tracking Server Configuration"""
     model_config = SettingsConfigDict(env_prefix="MLFLOW_", extra="ignore")
 
-    tracking_uri: str = Field(default="http://mlflow:5000", alias="MLFLOW_TRACKING_URI")
+    tracking_uri: str = Field(default="http://localhost:5000", alias="MLFLOW_TRACKING_URI")
     experiment_name: str = Field(default="taxitrack_demand_forecasting", alias="MLFLOW_EXPERIMENT_NAME")
     artifact_bucket: str = Field(default="mlflow-artifacts", alias="MLFLOW_ARTIFACT_BUCKET")
 
-    def __init__(self, **data):
-        if not data and not hasattr(self, "_settings_build_values"):
-            data = {
-                "tracking_uri": os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"),
-                "experiment_name": os.getenv("MLFLOW_EXPERIMENT_NAME", "taxitrack_demand_forecasting"),
-                "artifact_bucket": os.getenv("MLFLOW_ARTIFACT_BUCKET", "mlflow-artifacts"),
-            }
-        super().__init__(**data)
+    @property
+    def s3_endpoint_url(self) -> str:
+        """MinIO S3 endpoint for MLflow artifacts."""
+        endpoint = os.getenv("MLFLOW_S3_ENDPOINT_URL")
+        if endpoint:
+            return endpoint
+        minio_host = os.getenv("MINIO_HOST", "localhost")
+        minio_port = os.getenv("MINIO_PORT", "9000")
+        return f"http://{minio_host}:{minio_port}"
 
 
 class AppSettings(BaseSettings):
@@ -133,18 +99,11 @@ class AppSettings(BaseSettings):
     postgres: PostgresSettings = Field(default_factory=PostgresSettings)
     mlflow: MLflowSettings = Field(default_factory=MLflowSettings)
 
-    def __init__(self, **data):
-        if not data and not hasattr(self, "_settings_build_values"):
-            data = {
-                "app_name": "TaxiTrack",
-                "environment": os.getenv("ENVIRONMENT", "development"),
-                "base_url": os.getenv("NYC_TLC_BASE_URL", "https://d37ci6vzurychx.cloudfront.net/trip-data"),
-                "minio": MinioSettings(),
-                "clickhouse": ClickHouseSettings(),
-                "postgres": PostgresSettings(),
-                "mlflow": MLflowSettings(),
-            }
-        super().__init__(**data)
+    @property
+    def ml(self):
+        """Lazy accessor for centralized ML configuration."""
+        from core.ml_config import ml_config
+        return ml_config
 
 
 @lru_cache(maxsize=1)
@@ -158,3 +117,6 @@ def get_settings() -> AppSettings:
 
 # Global singleton instance
 settings = get_settings()
+
+# Direct export of ml_config for convenient access: `from core.config import ml_config`
+from core.ml_config import ml_config, MLConfig

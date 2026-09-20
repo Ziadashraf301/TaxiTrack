@@ -7,7 +7,7 @@ name = "taxitrack"
 version = "1.0.0"
 description = "End-to-end NYC Taxi data platform with Airflow, ClickHouse, dbt, LightGBM, ONNX, and Streamlit"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 license = { text = "Apache-2.0" }
 authors = [
     { name = "Ziad Ashraf", email = "ziadashraf98765@gmail.com" }
@@ -48,6 +48,7 @@ ml = [
     "onnxmltools>=1.12.0",
     "skl2onnx>=1.16.0",
     "onnxruntime>=1.17.0",
+    "boto3>=1.34.0",
 ]
 
 # High-performance FastAPI Model Serving
@@ -67,7 +68,6 @@ ui = [
 # Data & ML Observability
 monitoring = [
     "evidently>=0.4.15",
-    "great-expectations>=0.18.0",
     "prometheus-client>=0.20.0",
 ]
 
@@ -100,6 +100,7 @@ exclude = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 addopts = "-v --strict-markers"

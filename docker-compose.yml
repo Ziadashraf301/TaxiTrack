@@ -123,6 +123,7 @@ services:
     volumes:
       - ./.env:/opt/airflow/.env:ro
       - ./src:/opt/airflow/src:ro
+      - ./configs:/opt/airflow/configs:ro
       - ./airflow/dags:/opt/airflow/dags:ro
       - ./dbt:/opt/dbt
     entrypoint: >
@@ -170,6 +171,7 @@ services:
     volumes:
       - ./.env:/opt/airflow/.env:ro
       - ./src:/opt/airflow/src:ro
+      - ./configs:/opt/airflow/configs:ro
       - ./airflow/dags:/opt/airflow/dags:ro
       - ./dbt:/opt/dbt
       - ./airflow/airflow_logs:/opt/airflow/logs
@@ -209,6 +211,7 @@ services:
     volumes:
       - ./.env:/opt/airflow/.env:ro
       - ./src:/opt/airflow/src:ro
+      - ./configs:/opt/airflow/configs:ro
       - ./airflow/dags:/opt/airflow/dags:ro
       - ./dbt:/opt/dbt
       - ./airflow/airflow_logs:/opt/airflow/logs
@@ -233,7 +236,9 @@ services:
   # ============================================================================
   mlflow:
     profiles: ["ml"]
-    image: ghcr.io/mlflow/mlflow:v2.20.0
+    build:
+      context: .
+      dockerfile: docker/mlflow/Dockerfile
     container_name: mlflow_server
     restart: unless-stopped
     depends_on:
@@ -287,8 +292,8 @@ services:
       - clickhouse
     ports:
       - "${STREAMLIT_PORT:-8501}:8501"
-    volumes:
-      - ./demand_prediction/streamlit_app:/app/demand_prediction/streamlit_app:ro
+    # volumes:
+    #   - ./src/ui:/app/src/ui:ro
     environment:
       MODEL_API_URL: http://model-api:8000
       CLICKHOUSE_HOST: clickhouse

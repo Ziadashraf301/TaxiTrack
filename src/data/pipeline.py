@@ -9,9 +9,9 @@ from typing import Dict, Any, Optional
 from core.clickhouse import ClickHouseService
 from core.minio import MinioService
 from core.logging import get_logger
-from data.factory import IngestorFactory
-from data.downloader import StreamingDownloader
-from data.loader import ClickHouseBatchLoader
+from data.ingestors import IngestorFactory
+from data.storage import StreamingDownloader, ClickHouseBatchLoader
+from data.schemas import ensure_batch_tables
 
 logger = get_logger(__name__)
 
@@ -22,23 +22,21 @@ class MonthlyIngestionPipeline:
     def __init__(
         self,
         minio_service: Optional[MinioService] = None,
-        clickhouse_service: Optional[ClickHouseService] = None
+        clickhouse_service: Optional[ClickHouseService] = None,
+        downloader: Optional[StreamingDownloader] = None,
+        loader: Optional[ClickHouseBatchLoader] = None,
     ):
         self.minio = minio_service or MinioService()
         self.clickhouse = clickhouse_service or ClickHouseService()
-        self.downloader = StreamingDownloader(self.minio)
-        self.loader = ClickHouseBatchLoader(self.minio, self.clickhouse)
+        self.downloader = downloader or StreamingDownloader(self.minio)
+        self.loader = loader or ClickHouseBatchLoader(self.minio, self.clickhouse)
 
     def execute(self, dataset_type: str, execution_date: datetime) -> Dict[str, Any]:
         """Execute ingestion pipeline for a given dataset and execution month with rich observability."""
         pipeline_start = time.perf_counter()
         month_str = execution_date.strftime("%Y-%m")
 
-        ingestor = IngestorFactory.get_ingestor(
-            dataset_type,
-            minio_service=self.minio,
-            clickhouse_service=self.clickhouse
-        )
+        ingestor = IngestorFactory.get_ingestor(dataset_type)
 
         file_name = ingestor.format_filename(execution_date)
         bucket_name = ingestor.bucket_name
@@ -50,7 +48,7 @@ class MonthlyIngestionPipeline:
 
         try:
             # Step 0: Ensure target database and batch tables exist
-            self.clickhouse.ensure_batch_tables()
+            ensure_batch_tables(self.clickhouse)
 
             # Step 1: Verify presence in MinIO S3 Lake (download only if missing)
             logger.info(f"--- [Step 1/3] Verifying S3 Lake: s3://{bucket_name}/{file_name} ---")

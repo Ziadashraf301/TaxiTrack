@@ -45,3 +45,5 @@ models/encoders/*.pkl
 # OS specific files
 .DS_Store
 Thumbs.db
+powershell.exe
+uv.lock
