@@ -1,23 +1,24 @@
 {{
     config(
-        materialized='table'
+        materialized='incremental',
+        incremental_strategy='delete+insert',
+        unique_key=['pickup_date', 'pickup_hour', 'pickup_zone', 'pickup_borough', 'service_type']
     )
 }}
 
 with base as (
     select
         pickup_datetime,
-        pickup_location_id,
         service_type,
-        passenger_count,
-        trip_distance,
-        fare_amount,
-        tip_amount,
-        congestion_surcharge,
         pickup_zone,
         pickup_borough,
         dbt_loaded_at
-    from {{ ref('stg_all_trips') }}
+    from {{ ref('int_all_trips') }}
+    where pickup_zone != ''
+      and pickup_borough != ''
+    {% if is_incremental() %}
+      and dbt_loaded_at > (select coalesce(max(dbt_loaded_at), toDateTime('1970-01-01 00:00:00')) from {{ this }})
+    {% endif %}
 ),
 
 aggregated as (
@@ -27,7 +28,8 @@ aggregated as (
         pickup_zone,
         pickup_borough,
         service_type,
-        count(*) as total_trips
+        count(*) as total_trips,
+        max(dbt_loaded_at) as dbt_loaded_at
     from base
     group by
         pickup_date,

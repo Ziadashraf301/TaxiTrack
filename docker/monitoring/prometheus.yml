@@ -1,0 +1,34 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # 1. Prometheus Self-Monitoring
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # 2. ClickHouse OLAP Engine Metrics (Queries, Merges, Memory)
+  - job_name: "clickhouse"
+    static_configs:
+      - targets: ["clickhouse:8123"]
+    metrics_path: "/metrics"
+
+  # 3. MinIO S3 Storage Metrics (Bucket sizes, throughput, errors)
+  - job_name: "minio"
+    metrics_path: "/minio/v2/metrics/cluster"
+    scheme: "http"
+    static_configs:
+      - targets: ["minio:9000"]
+
+  # 4. Model Serving API (Inference p95 latency, prediction throughput)
+  - job_name: "model_api"
+    static_configs:
+      - targets: ["model-api:8000"]
+    metrics_path: "/metrics"
+
+  # 5. Airflow Metrics (Pipeline success/failure, DAG durations)
+  - job_name: "airflow"
+    static_configs:
+      - targets: ["airflow-webserver:8080"]
+    metrics_path: "/api/v1/metrics"

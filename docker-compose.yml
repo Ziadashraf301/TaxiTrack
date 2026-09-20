@@ -1,175 +1,352 @@
 services:
-  postgres_airflow:
-    image: postgres:16
-    container_name: postgres_airflow
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "${POSTGRES_PORT}:5432"
-    volumes:
-      - ./postgres_airflow:/var/lib/postgresql/data
-
+  # ============================================================================
+  # CORE STORAGE & OLAP WAREHOUSE (Always Available)
+  # ============================================================================
   minio:
-    image: minio/minio:latest
+    image: quay.io/minio/minio:latest
     container_name: minio
     hostname: minio
+    restart: unless-stopped
     mem_limit: 2g
     ports:
-      - "${MINIO_PORT}:9000"
-      - "${MINIO_CONSOLE_PORT}:9001"
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-    command: server /data --console-address ":${MINIO_CONSOLE_PORT}"
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-password123}
+    command: server /data --console-address ":9001"
     volumes:
       - ./minio_storage:/data
+    networks:
+      - taxitrack-net
+
+  # Automated bucket provisioning using cached minio/mc image
+  minio-init:
+    image: quay.io/minio/mc:latest
+    container_name: minio_init
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+        until /usr/bin/mc alias set local http://minio:9000 ${MINIO_ROOT_USER:-admin} ${MINIO_ROOT_PASSWORD:-password123}; do
+          echo 'Waiting for MinIO...';
+          sleep 2;
+        done;
+        /usr/bin/mc mb --ignore-existing local/taxi-green;
+        /usr/bin/mc mb --ignore-existing local/taxi-yellow;
+        /usr/bin/mc mb --ignore-existing local/mlflow-artifacts;
+        echo 'MinIO buckets verified.';
+      "
+    networks:
+      - taxitrack-net
 
   clickhouse:
-    image: clickhouse/clickhouse-server:24.3.8
+    image: clickhouse/clickhouse-server:24.3
     container_name: clickhouse
     hostname: clickhouse
+    restart: unless-stopped
     ports:
-      - "${CLICKHOUSE_HTTP_PORT}:8123"
-      - "${CLICKHOUSE_TCP_PORT}:9000"
+      - "${CLICKHOUSE_HTTP_PORT:-8123}:8123"
+      - "${CLICKHOUSE_TCP_PORT:-9005}:9000"
     environment:
-      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
-      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
-      CLICKHOUSE_DB: ${CLICKHOUSE_DB}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-password123}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-data_warehouse}
     volumes:
       - clickhouse_data_warehouse:/var/lib/clickhouse
+    networks:
+      - taxitrack-net
 
-  metabase:
-    image: metabase/metabase:latest
-    container_name: metabase
+  # ============================================================================
+  # UNIFIED POSTGRESQL (Core Tier - Serves Airflow, MLflow, and Metabase on Port 5432)
+  # Uses your existing ./postgres_airflow data with zero re-download/re-ingest!
+  # ============================================================================
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    hostname: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-airflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-airflow}
+      POSTGRES_DB: ${POSTGRES_DB:-airflow}
+      MLFLOW_DB_PASSWORD: ${MLFLOW_DB_PASSWORD:-mlflow123}
+      METABASE_DB_PASSWORD: ${METABASE_DB_PASSWORD:-metabase123}
     ports:
-      - "3000:3000"
-    environment:
-      MB_DB_TYPE: ${MB_DB_TYPE}
-      MB_DB_DBNAME: ${MB_DB_DBNAME}
-      MB_DB_PORT: ${MB_DB_PORT}
-      MB_DB_USER: ${MB_DB_USER}
-      MB_DB_PASS: ${MB_DB_PASS}
-      MB_DB_HOST: ${MB_DB_HOST}
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - metabase_data:/metabase-data
+      - ./postgres_airflow:/var/lib/postgresql/data
+      - ./docker/postgres/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh:ro
+    command: >
+      bash -c "
+        /usr/local/bin/docker-entrypoint.sh postgres &
+        pid=\$$!
+        until pg_isready -h localhost -p 5432 -U ${POSTGRES_USER:-airflow}; do sleep 1; done
+        /docker-entrypoint-initdb.d/init-multiple-dbs.sh || true
+        wait \$$pid
+      "
+    networks:
+      - taxitrack-net
 
+  # ============================================================================
+  # DATA PROFILE (Airflow Orchestration, Native dbt Transformations, Metabase BI)
+  # Run with: docker compose --profile data up -d
+  # ============================================================================
   airflow-init:
-    build:       
+    profiles: ["data"]
+    build:
       context: .
-      dockerfile: airflow/docker/Dockerfile
+      dockerfile: docker/airflow/Dockerfile
+    container_name: airflow_init
     depends_on:
-      - postgres_airflow
+      - postgres
+    env_file:
+      - .env
     environment:
-      AIRFLOW__CORE__EXECUTOR: ${AIRFLOW_EXECUTOR}
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW_SQL_ALCHEMY_CONN}
-      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
-      AIRFLOW__CORE__DEFAULT_TIMEZONE: ${AIRFLOW_DEFAULT_TIMEZONE}
-      AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW_LOAD_EXAMPLES}
-      AIRFLOW__SMTP__SMTP_HOST: ${SMTP_HOST}
-      AIRFLOW__SMTP__SMTP_PORT: ${SMTP_PORT}
-      AIRFLOW__SMTP__SMTP_STARTTLS: ${SMTP_STARTTLS}
-      AIRFLOW__SMTP__SMTP_SSL: ${SMTP_SSL}
-      AIRFLOW__SMTP__SMTP_USER: ${SMTP_USER}
-      AIRFLOW__SMTP__SMTP_PASSWORD: ${SMTP_PASSWORD}
-      AIRFLOW__SMTP__SMTP_MAIL_FROM: ${SMTP_MAIL_FROM}
+      AIRFLOW__CORE__EXECUTOR: ${AIRFLOW_EXECUTOR:-LocalExecutor}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@postgres:5432/${POSTGRES_DB:-airflow}
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY:-t_8Y9aZ4pQeQv7mX1uJ5wK3rT8yB6eN0pL9sR4vY7xM=}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      PYTHONPATH: /opt/airflow/src:/usr/local/lib/python3.12/site-packages
+      DBT_PROFILES_DIR: /opt/dbt
+      DBT_PROJECT_DIR: /opt/dbt
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-data_warehouse}
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_HTTP_PORT: ${CLICKHOUSE_HTTP_PORT:-8123}
+      CLICKHOUSE_TCP_PORT: ${CLICKHOUSE_TCP_PORT:-9005}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-password123}
+      MINIO_HOST: minio
+      MINIO_PORT: ${MINIO_PORT:-9000}
+    volumes:
+      - ./.env:/opt/airflow/.env:ro
+      - ./src:/opt/airflow/src:ro
+      - ./airflow/dags:/opt/airflow/dags:ro
+      - ./dbt:/opt/dbt
     entrypoint: >
       bash -c "
         airflow db migrate &&
-        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email ziadashraf98765@gmail.com
+        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@taxitrack.local || true
       "
+    networks:
+      - taxitrack-net
 
-    volumes: 
-      - ./airflow/dags:/opt/airflow/dags 
-      - ./airflow/src/ingestion:/opt/airflow/src/ingestion 
-      - ./airflow/airflow_logs:/opt/airflow/logs
-      - /var/run/docker.sock:/var/run/docker.sock
-
-  # Airflow Webserver
   airflow-webserver:
-    build:       
-      context: .
-      dockerfile: airflow/docker/Dockerfile
-    container_name: airflow-webserver
-    restart: always
-    depends_on:
-      - postgres_airflow
-      - airflow-init
-    ports:
-      - "8080:8080"
-    environment:
-      AIRFLOW__CORE__EXECUTOR: ${AIRFLOW_EXECUTOR}
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW_SQL_ALCHEMY_CONN}
-      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
-      AIRFLOW__CORE__DEFAULT_TIMEZONE: ${AIRFLOW_DEFAULT_TIMEZONE}
-      AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW_LOAD_EXAMPLES}
-      AIRFLOW__WEBSERVER__SESSION_BACKEND: securecookie
-      AIRFLOW__SMTP__SMTP_HOST: ${SMTP_HOST}
-      AIRFLOW__SMTP__SMTP_PORT: ${SMTP_PORT}
-      AIRFLOW__SMTP__SMTP_STARTTLS: ${SMTP_STARTTLS}
-      AIRFLOW__SMTP__SMTP_SSL: ${SMTP_SSL}
-      AIRFLOW__SMTP__SMTP_USER: ${SMTP_USER}
-      AIRFLOW__SMTP__SMTP_PASSWORD: ${SMTP_PASSWORD}
-      AIRFLOW__SMTP__SMTP_MAIL_FROM: ${SMTP_MAIL_FROM}
-      PYTHONPATH: /opt/airflow/src:/opt/airflow/src
-    command: webserver
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/src/ingestion:/opt/airflow/src/ingestion
-      - ./airflow/airflow_logs:/opt/airflow/logs
-      - /var/run/docker.sock:/var/run/docker.sock
-
-  # Airflow Scheduler
-  airflow-scheduler:
-    build: 
-      context: .
-      dockerfile: airflow/docker/Dockerfile
-    container_name: airflow-scheduler
-    restart: always
-    depends_on:
-      - airflow-webserver
-    environment:
-      AIRFLOW__CORE__EXECUTOR: ${AIRFLOW_EXECUTOR}
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW_SQL_ALCHEMY_CONN}
-      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
-      AIRFLOW__CORE__DEFAULT_TIMEZONE: ${AIRFLOW_DEFAULT_TIMEZONE}
-      AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW_LOAD_EXAMPLES}
-      AIRFLOW__SMTP__SMTP_HOST: ${SMTP_HOST}
-      AIRFLOW__SMTP__SMTP_PORT: ${SMTP_PORT}
-      AIRFLOW__SMTP__SMTP_STARTTLS: ${SMTP_STARTTLS}
-      AIRFLOW__SMTP__SMTP_SSL: ${SMTP_SSL}
-      AIRFLOW__SMTP__SMTP_USER: ${SMTP_USER}
-      AIRFLOW__SMTP__SMTP_PASSWORD: ${SMTP_PASSWORD}
-      AIRFLOW__SMTP__SMTP_MAIL_FROM: ${SMTP_MAIL_FROM}
-      PYTHONPATH: /opt/airflow/src:/opt/airflow/src
-    command: scheduler
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/src/ingestion:/opt/airflow/src/ingestion
-      - ./airflow/airflow_logs:/opt/airflow/logs
-      - /var/run/docker.sock:/var/run/docker.sock
-
-
-
-  # dbt (Data Build Tool
-  dbt:
+    profiles: ["data"]
     build:
       context: .
-      dockerfile: dbt/docker/Dockerfile
-    container_name: dbt
+      dockerfile: docker/airflow/Dockerfile
+    container_name: airflow_webserver
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - airflow-init
+    ports:
+      - "${AIRFLOW_WEBSERVER_PORT:-8080}:8080"
+    env_file:
+      - .env
+    environment:
+      AIRFLOW__CORE__EXECUTOR: ${AIRFLOW_EXECUTOR:-LocalExecutor}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@postgres:5432/${POSTGRES_DB:-airflow}
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY:-t_8Y9aZ4pQeQv7mX1uJ5wK3rT8yB6eN0pL9sR4vY7xM=}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__WEBSERVER__SESSION_BACKEND: securecookie
+      PYTHONPATH: /opt/airflow/src:/usr/local/lib/python3.12/site-packages
+      DBT_PROFILES_DIR: /opt/dbt
+      DBT_PROJECT_DIR: /opt/dbt
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-data_warehouse}
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_HTTP_PORT: ${CLICKHOUSE_HTTP_PORT:-8123}
+      CLICKHOUSE_TCP_PORT: ${CLICKHOUSE_TCP_PORT:-9005}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-password123}
+      MINIO_HOST: minio
+      MINIO_PORT: ${MINIO_PORT:-9000}
+    command: webserver
     volumes:
-      - ./dbt:/dbt
-      - ./dbt/profiles.yml:/root/.dbt/profiles.yml
-    working_dir: /dbt
-    entrypoint: /bin/bash  # Override the default entrypoint
-    command: -c "tail -f /dev/null"  # Keep the container running
+      - ./.env:/opt/airflow/.env:ro
+      - ./src:/opt/airflow/src:ro
+      - ./airflow/dags:/opt/airflow/dags:ro
+      - ./dbt:/opt/dbt
+      - ./airflow/airflow_logs:/opt/airflow/logs
+    networks:
+      - taxitrack-net
 
+  airflow-scheduler:
+    profiles: ["data"]
+    build:
+      context: .
+      dockerfile: docker/airflow/Dockerfile
+    container_name: airflow_scheduler
+    restart: unless-stopped
+    depends_on:
+      - airflow-webserver
+    env_file:
+      - .env
+    environment:
+      AIRFLOW__CORE__EXECUTOR: ${AIRFLOW_EXECUTOR:-LocalExecutor}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@postgres:5432/${POSTGRES_DB:-airflow}
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY:-t_8Y9aZ4pQeQv7mX1uJ5wK3rT8yB6eN0pL9sR4vY7xM=}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      PYTHONPATH: /opt/airflow/src:/usr/local/lib/python3.12/site-packages
+      DBT_PROFILES_DIR: /opt/dbt
+      DBT_PROJECT_DIR: /opt/dbt
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-data_warehouse}
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_HTTP_PORT: ${CLICKHOUSE_HTTP_PORT:-8123}
+      CLICKHOUSE_TCP_PORT: ${CLICKHOUSE_TCP_PORT:-9005}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-password123}
+      MINIO_HOST: minio
+      MINIO_PORT: ${MINIO_PORT:-9000}
+    command: scheduler
+    volumes:
+      - ./.env:/opt/airflow/.env:ro
+      - ./src:/opt/airflow/src:ro
+      - ./airflow/dags:/opt/airflow/dags:ro
+      - ./dbt:/opt/dbt
+      - ./airflow/airflow_logs:/opt/airflow/logs
+    networks:
+      - taxitrack-net
 
+  # metabase:
+  #   profiles: ["data"]
+  #   image: metabase/metabase:latest
+  #   container_name: metabase
+  #   restart: unless-stopped
+  #   ports:
+  #     - "${METABASE_PORT:-3000}:3000"
+  #   volumes:
+  #     - metabase_data:/metabase-data
+  #   networks:
+  #     - taxitrack-net
 
-# Named Volumes
+  # ============================================================================
+  # ML PROFILE (MLflow Tracking, FastAPI Serving, Streamlit Dashboard)
+  # Run with: docker compose --profile ml up -d
+  # ============================================================================
+  mlflow:
+    profiles: ["ml"]
+    image: ghcr.io/mlflow/mlflow:v2.20.0
+    container_name: mlflow_server
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - minio
+    ports:
+      - "${MLFLOW_PORT:-5000}:5000"
+    environment:
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-admin}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-password123}
+    command: >
+      mlflow server
+        --backend-store-uri postgresql://${MLFLOW_DB_USER:-mlflow}:${MLFLOW_DB_PASSWORD:-mlflow123}@postgres:5432/${MLFLOW_DB_NAME:-mlflow}
+        --default-artifact-root s3://mlflow-artifacts/
+        --host 0.0.0.0
+        --port 5000
+    networks:
+      - taxitrack-net
+
+  model-api:
+    profiles: ["ml"]
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+    container_name: model_api
+    restart: unless-stopped
+    depends_on:
+      - minio
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-admin}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-password123}
+      MODEL_PATH: /app/models/lightgbm_model.onnx
+    volumes:
+      - ./models:/app/models:ro
+    networks:
+      - taxitrack-net
+
+  streamlit:
+    profiles: ["ml"]
+    build:
+      context: .
+      dockerfile: docker/streamlit/Dockerfile
+    container_name: streamlit_app
+    restart: unless-stopped
+    depends_on:
+      - model-api
+      - clickhouse
+    ports:
+      - "${STREAMLIT_PORT:-8501}:8501"
+    volumes:
+      - ./demand_prediction/streamlit_app:/app/demand_prediction/streamlit_app:ro
+    environment:
+      MODEL_API_URL: http://model-api:8000
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: 8123
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-data_warehouse}
+    networks:
+      - taxitrack-net
+
+  # ============================================================================
+  # MONITORING PROFILE (Prometheus Metrics & Grafana Dashboards)
+  # Run with: docker compose --profile monitoring up -d
+  # ============================================================================
+  prometheus:
+    profiles: ["monitoring"]
+    image: prom/prometheus:v3.0.0
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./docker/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - taxitrack-net
+
+  grafana:
+    profiles: ["monitoring"]
+    image: grafana/grafana:11.0.0
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - taxitrack-net
+
+# ==============================================================================
+# DOCKER MANAGED NAMED VOLUMES (Isolated from Host & Safe from OneDrive Sync)
+# ==============================================================================
 volumes:
-  postgres_airflow:
-  metabase_data:
+  minio_data:
+    name: taxitrack_minio_data
   clickhouse_data_warehouse:
-  minio_storage:
+    name: taxitrack_clickhouse_data
+  postgres_data:
+    name: taxitrack_postgres_data
+  metabase_data:
+    name: taxitrack_metabase_data
+  prometheus_data:
+    name: taxitrack_prometheus_data
+  grafana_data:
+    name: taxitrack_grafana_data
+
+# ==============================================================================
+# DEDICATED BRIDGE NETWORK
+# ==============================================================================
+networks:
+  taxitrack-net:
+    name: taxitrack-net
+    driver: bridge

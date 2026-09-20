@@ -3,8 +3,9 @@ default:  # profile name
   outputs:
     dev:
       type: clickhouse
-      host: clickhouse        # your ClickHouse host (container name or IP)
-      port: 8123              # HTTP port for ClickHouse
-      user: "ziadashraf98765" # your ClickHouse username
-      password: "x5x6x7x8"    # your ClickHouse password
-      schema: data_warehouse  # the "database" in ClickHouse
+      threads: 4
+      host: "{{ env_var('CLICKHOUSE_HOST', 'clickhouse') }}"
+      port: "{{ env_var('CLICKHOUSE_HTTP_PORT', '8123') | as_number }}"
+      user: "{{ env_var('CLICKHOUSE_USER', 'default') }}"
+      password: "{{ env_var('CLICKHOUSE_PASSWORD', '') }}"
+      schema: "{{ env_var('CLICKHOUSE_DB', 'data_warehouse') }}"
