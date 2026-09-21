@@ -1,7 +1,6 @@
-# ==============================================================================
-# V2: Streamlit Dashboard UI (Pure Frontend Client)
-# ==============================================================================
 FROM python:3.11-slim
+
+WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -9,16 +8,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# Copy pyproject.toml as single source of truth
-COPY pyproject.toml /tmp/pyproject.toml
+COPY pyproject.toml README.md ./
 
-WORKDIR /app
+ENV PYTHONPATH="/app/src"
 
-# Strictly UI dependencies only (Streamlit, Altair, Pandas, Requests)
-RUN uv pip install --system --no-cache "/tmp/pyproject.toml[ui]"
+RUN mkdir -p src && uv pip install --system --no-cache ".[ui]"
 
 EXPOSE 8501
 
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health || exit 1
 
-ENTRYPOINT ["streamlit", "run", "demand_prediction/streamlit_app/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "src/ui/app.py", "--server.port=8501", "--server.address=0.0.0.0"]

@@ -71,7 +71,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-airflow}
       POSTGRES_DB: ${POSTGRES_DB:-airflow}
       MLFLOW_DB_PASSWORD: ${MLFLOW_DB_PASSWORD:-mlflow123}
-      METABASE_DB_PASSWORD: ${METABASE_DB_PASSWORD:-metabase123}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
@@ -107,6 +106,10 @@ services:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@postgres:5432/${POSTGRES_DB:-airflow}
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY:-t_8Y9aZ4pQeQv7mX1uJ5wK3rT8yB6eN0pL9sR4vY7xM=}
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "False"
+      TZ: ${TZ:-Africa/Cairo}
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: ${AIRFLOW_DEFAULT_TIMEZONE:-Africa/Cairo}
+      AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE: ${AIRFLOW_DEFAULT_TIMEZONE:-Africa/Cairo}
       PYTHONPATH: /opt/airflow/src:/usr/local/lib/python3.12/site-packages
       DBT_PROFILES_DIR: /opt/dbt
       DBT_PROJECT_DIR: /opt/dbt
@@ -129,7 +132,10 @@ services:
     entrypoint: >
       bash -c "
         airflow db migrate &&
-        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@taxitrack.local || true
+        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@taxitrack.local || true &&
+        airflow dags unpause ml_model_retrain_and_evaluate_dag || true &&
+        airflow dags unpause ml_drift_monitoring_dag || true &&
+        airflow dags unpause ingest_transform_agg_network_dag || true
       "
     networks:
       - taxitrack-net
@@ -153,7 +159,11 @@ services:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@postgres:5432/${POSTGRES_DB:-airflow}
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY:-t_8Y9aZ4pQeQv7mX1uJ5wK3rT8yB6eN0pL9sR4vY7xM=}
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "False"
       AIRFLOW__WEBSERVER__SESSION_BACKEND: securecookie
+      TZ: ${TZ:-Africa/Cairo}
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: ${AIRFLOW_DEFAULT_TIMEZONE:-Africa/Cairo}
+      AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE: ${AIRFLOW_DEFAULT_TIMEZONE:-Africa/Cairo}
       PYTHONPATH: /opt/airflow/src:/usr/local/lib/python3.12/site-packages
       DBT_PROFILES_DIR: /opt/dbt
       DBT_PROJECT_DIR: /opt/dbt
@@ -167,6 +177,11 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-password123}
       MINIO_HOST: minio
       MINIO_PORT: ${MINIO_PORT:-9000}
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-admin}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-password123}
     command: webserver
     volumes:
       - ./.env:/opt/airflow/.env:ro
@@ -175,6 +190,8 @@ services:
       - ./airflow/dags:/opt/airflow/dags:ro
       - ./dbt:/opt/dbt
       - ./airflow/airflow_logs:/opt/airflow/logs
+      - ./reports:/opt/airflow/reports
+      - ./models:/opt/airflow/models
     networks:
       - taxitrack-net
 
@@ -194,6 +211,10 @@ services:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@postgres:5432/${POSTGRES_DB:-airflow}
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY:-t_8Y9aZ4pQeQv7mX1uJ5wK3rT8yB6eN0pL9sR4vY7xM=}
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "False"
+      TZ: ${TZ:-Africa/Cairo}
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: ${AIRFLOW_DEFAULT_TIMEZONE:-Africa/Cairo}
+      AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE: ${AIRFLOW_DEFAULT_TIMEZONE:-Africa/Cairo}
       PYTHONPATH: /opt/airflow/src:/usr/local/lib/python3.12/site-packages
       DBT_PROFILES_DIR: /opt/dbt
       DBT_PROJECT_DIR: /opt/dbt
@@ -207,6 +228,11 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-password123}
       MINIO_HOST: minio
       MINIO_PORT: ${MINIO_PORT:-9000}
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-admin}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-password123}
     command: scheduler
     volumes:
       - ./.env:/opt/airflow/.env:ro
@@ -215,31 +241,22 @@ services:
       - ./airflow/dags:/opt/airflow/dags:ro
       - ./dbt:/opt/dbt
       - ./airflow/airflow_logs:/opt/airflow/logs
+      - ./reports:/opt/airflow/reports
+      - ./models:/opt/airflow/models
     networks:
       - taxitrack-net
-
-  # metabase:
-  #   profiles: ["data"]
-  #   image: metabase/metabase:latest
-  #   container_name: metabase
-  #   restart: unless-stopped
-  #   ports:
-  #     - "${METABASE_PORT:-3000}:3000"
-  #   volumes:
-  #     - metabase_data:/metabase-data
-  #   networks:
-  #     - taxitrack-net
 
   # ============================================================================
   # ML PROFILE (MLflow Tracking, FastAPI Serving, Streamlit Dashboard)
   # Run with: docker compose --profile ml up -d
   # ============================================================================
   mlflow:
-    profiles: ["ml"]
+    profiles: ["data", "ml", "serving"]
     build:
       context: .
       dockerfile: docker/mlflow/Dockerfile
     container_name: mlflow_server
+    hostname: mlflow
     restart: unless-stopped
     depends_on:
       - postgres
@@ -260,28 +277,41 @@ services:
       - taxitrack-net
 
   model-api:
-    profiles: ["ml"]
+    profiles: ["ml", "serving"]
     build:
       context: .
       dockerfile: docker/api/Dockerfile
     container_name: model_api
     restart: unless-stopped
     depends_on:
+      - clickhouse
+      - mlflow
       - minio
     ports:
       - "${API_PORT:-8000}:8000"
     environment:
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-data_warehouse}
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_HTTP_PORT: ${CLICKHOUSE_HTTP_PORT:-8123}
+      CLICKHOUSE_TCP_PORT: ${CLICKHOUSE_TCP_PORT:-9005}
+      MLFLOW_TRACKING_URI: http://mlflow:5000
       MLFLOW_S3_ENDPOINT_URL: http://minio:9000
       AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-admin}
       AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-password123}
-      MODEL_PATH: /app/models/lightgbm_model.onnx
+      MINIO_HOST: minio
+      PYTHONPATH: /app/src
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/src
     volumes:
+      - ./src:/app/src
+      - ./configs:/app/configs:ro
       - ./models:/app/models:ro
     networks:
       - taxitrack-net
 
   streamlit:
-    profiles: ["ml"]
+    profiles: ["ml", "serving"]
     build:
       context: .
       dockerfile: docker/streamlit/Dockerfile
@@ -289,16 +319,15 @@ services:
     restart: unless-stopped
     depends_on:
       - model-api
-      - clickhouse
     ports:
       - "${STREAMLIT_PORT:-8501}:8501"
-    # volumes:
-    #   - ./src/ui:/app/src/ui:ro
     environment:
-      MODEL_API_URL: http://model-api:8000
-      CLICKHOUSE_HOST: clickhouse
-      CLICKHOUSE_PORT: 8123
-      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-data_warehouse}
+      API_BASE_URL: http://model-api:8000
+      PYTHONPATH: /app/src
+    command: streamlit run src/ui/app.py --server.port=8501 --server.address=0.0.0.0 --server.runOnSave=true
+    volumes:
+      - ./src:/app/src
+      - ./configs:/app/configs:ro
     networks:
       - taxitrack-net
 
@@ -341,8 +370,6 @@ volumes:
     name: taxitrack_clickhouse_data
   postgres_data:
     name: taxitrack_postgres_data
-  metabase_data:
-    name: taxitrack_metabase_data
   prometheus_data:
     name: taxitrack_prometheus_data
   grafana_data:

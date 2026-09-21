@@ -19,23 +19,9 @@ class LightGBMForecaster(BaseForecaster):
     """Concrete demand forecaster implemented with LightGBM GBDT."""
 
     def __init__(self, params: Optional[Dict[str, Any]] = None):
-        default_params = {
-            "n_estimators": 1500,
-            "learning_rate": 0.05,
-            "num_leaves": 128,
-            "min_child_samples": 20,
-            "subsample": 0.8,
-            "colsample_bytree": 0.8,
-            "random_state": 42,
-            "n_jobs": -1,
-            "objective": "regression",
-            "metric": "mae",
-            "importance_type": "gain",
-            "verbose": -1,
-        }
-        if params:
-            default_params.update(params)
-        super().__init__(params=default_params)
+        # Hyperparameter defaults are defined in ml_config.yaml and passed via ForecasterFactory.
+        # Do not duplicate them here — that would shadow the YAML config silently.
+        super().__init__(params=params or {})
 
     @property
     def name(self) -> str:

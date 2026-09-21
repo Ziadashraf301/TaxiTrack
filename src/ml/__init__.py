@@ -13,36 +13,60 @@ Provides backward-compatible re-exports from cohesive subpackages:
 """
 
 # 1. Data Layer
-from ml.data.base import BaseDemandRepository, BaseNetworkRepository
-from ml.data.clickhouse import ClickHouseFeatureRepository
+try:
+    from ml.data.base import BaseDemandRepository, BaseNetworkRepository
+    from ml.data.clickhouse import ClickHouseFeatureRepository
+except ImportError:
+    pass
 
 # 2. Features Layer
-from ml.features.base import BaseFeatureEngineer
-from ml.features.temporal import TemporalFeatureEngineer
+try:
+    from ml.features.base import BaseFeatureEngineer
+    from ml.features.temporal import TemporalFeatureEngineer
+except ImportError:
+    pass
 
 # 3. Models Layer
-from ml.models.base import BaseForecaster, ModelEvaluator
-from ml.models.lightgbm import LightGBMForecaster
-from ml.models.xgboost import XGBoostForecaster
-from ml.models.factory import ForecasterFactory
+try:
+    from ml.models.base import BaseForecaster, ModelEvaluator
+    from ml.models.lightgbm import LightGBMForecaster
+    from ml.models.xgboost import XGBoostForecaster
+    from ml.models.factory import ForecasterFactory
+except ImportError:
+    pass
 
 # 4. Monitoring Layer (Evidently AI)
-from ml.monitoring.detector import EvidentlyDriftDetector
-from ml.monitoring.pipeline import DriftMonitoringPipeline
+try:
+    from ml.monitoring.detector import EvidentlyDriftDetector
+    from ml.monitoring.pipeline import DriftMonitoringPipeline
+except ImportError:
+    pass
 
 # 5. Serving Layer (ONNX)
-from ml.serving.onnx import ONNXModelExporter
+try:
+    from ml.serving.onnx import ONNXModelExporter
+except ImportError:
+    pass
 
 # 6. Tracking Layer (MLflow)
-from ml.tracking.base import BaseExperimentTracker
-from ml.tracking.mlflow import MLflowExperimentTracker
+try:
+    from ml.tracking.base import BaseExperimentTracker
+    from ml.tracking.mlflow import MLflowExperimentTracker
+except ImportError:
+    pass
 
 # 7. Graph Analytics Layer
-from ml.graph.base import BaseGraphAnalyzer
-from ml.graph.spatial import SpatialNetworkAnalyzer
+try:
+    from ml.graph.base import BaseGraphAnalyzer
+    from ml.graph.spatial import SpatialNetworkAnalyzer
+except ImportError:
+    pass
 
 # 8. Orchestrator Pipeline
-from ml.pipeline import MLTrainingPipeline
+try:
+    from ml.pipeline import MLTrainingPipeline
+except ImportError:
+    pass
 
 __all__ = [
     # Data

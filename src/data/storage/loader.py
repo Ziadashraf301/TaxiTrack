@@ -47,10 +47,12 @@ class ClickHouseBatchLoader:
 
             decode_start = time.perf_counter()
             parquet_buffer = BytesIO(raw_bytes)
+
             import pyarrow.parquet as pq
             table = pq.read_table(parquet_buffer, use_threads=True)
             df = table.to_pandas()
             del raw_bytes, parquet_buffer, table
+            
             logger.info(
                 f"Decoded Parquet (parallel PyArrow): {len(df):,} rows, {len(df.columns)} columns in {time.perf_counter() - decode_start:.2f}s"
             )

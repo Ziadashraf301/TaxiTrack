@@ -88,3 +88,14 @@ def test_retrain_dag_structure():
     assert "MLTrainingPipeline" in content
     assert "SpatialNetworkAnalyzer" in content
     assert "schedule_interval=None" in content
+
+
+def test_dags_use_cairo_timezone():
+    """Verify that all DAG files explicitly configure the Africa/Cairo timezone."""
+    for dag_path in get_dag_files():
+        with open(dag_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        assert "Africa/Cairo" in content, (
+            f"DAG {os.path.basename(dag_path)} must configure 'Africa/Cairo' timezone"
+        )
+

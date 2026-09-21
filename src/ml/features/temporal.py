@@ -206,32 +206,33 @@ class TemporalFeatureEngineer(BaseFeatureEngineer):
         test_months: int = 2,
     ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
         """
-        Split raw dataset using the Lookback Buffer pattern:
-        1. Calculate cutoff timestamp once upfront.
-        2. Partition df_train (<= cutoff) to fit feature engineer and transform independently.
-        3. Create df_val_buffered starting (cutoff - max_lookback_hours) to compute continuous
-           lags without artificial NaNs.
-        4. Trim the buffer from validation matrices so evaluation strictly covers (> cutoff).
-        Guarantees zero lookahead, zero target leakage, and zero redundant re-splits.
+        Execute robust temporal train/validation partition using the Lookback Buffer Pattern.
+
+        The validation cutoff is always derived as:
+            effective_max(timestamps) - DateOffset(months=test_months)
+        where effective_max uses the 99.9th percentile for large series to guard
+        against sparse tail outliers. start_date / end_date are applied upstream
+        by the caller (data repository query) before passing df here.
         """
         ts = pd.to_datetime(df[self.timestamp_col])
-        max_date = ts.max()
-        cutoff_date = max_date - pd.DateOffset(months=test_months)
+        # Guard against sparse tail outliers using 99.9th percentile for large series
+        effective_max = ts.quantile(0.999) if len(ts) > 5000 else ts.max()
+        cutoff_dt = effective_max - pd.DateOffset(months=test_months)
 
         # Required lookback buffer: max of all lag hours and shifted rolling windows
         max_lag = max(self.lag_hours) if self.lag_hours else 24
         shift_horizon = min(self.lag_hours) if self.lag_hours else 24
         max_rolling = (max(self.rolling_windows) + shift_horizon) if self.rolling_windows else 48
         lookback_hours = max(max_lag, max_rolling)
-        buffer_start = cutoff_date - pd.Timedelta(hours=lookback_hours)
+        buffer_start = cutoff_dt - pd.Timedelta(hours=lookback_hours)
 
         logger.info(
-            f"Lookback Buffer Split: Cutoff={cutoff_date.date()} | "
+            f"Lookback Buffer Split: Cutoff={cutoff_dt.date()} | "
             f"Buffer Lookback={lookback_hours}h (starts {buffer_start.date()})"
         )
 
         # 1. Isolate training and buffered validation datasets upfront
-        df_train = df[ts <= cutoff_date].copy()
+        df_train = df[ts <= cutoff_dt].copy()
         df_val_buf = df[ts > buffer_start].copy()
 
         # 2. Fit feature engineer strictly on training set
@@ -243,14 +244,14 @@ class TemporalFeatureEngineer(BaseFeatureEngineer):
         # 4. Transform buffered validation features
         X_val_buf, y_val_buf, val_times_buf = self.prepare_matrices(df_val_buf)
 
-        # 5. Trim the lookback buffer so validation evaluation is strictly > cutoff_date
-        val_mask = pd.to_datetime(val_times_buf) > cutoff_date
+        # 5. Trim the lookback buffer so validation evaluation is strictly > cutoff_dt
+        val_mask = pd.to_datetime(val_times_buf) > cutoff_dt
         X_val = X_val_buf[val_mask].copy().reset_index(drop=True)
         y_val = y_val_buf[val_mask].copy().reset_index(drop=True)
 
         logger.info(
             f"Lookback Buffer Split Complete: Train={len(X_train):,} rows ({train_times.min().date()} to {train_times.max().date()}) | "
-            f"Val={len(X_val):,} rows (strictly post-cutoff: {cutoff_date.date()} onwards)"
+            f"Val={len(X_val):,} rows (strictly post-cutoff: {cutoff_dt.date()} onwards)"
         )
         return X_train, X_val, y_train, y_val
 

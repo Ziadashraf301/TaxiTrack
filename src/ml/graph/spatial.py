@@ -125,6 +125,13 @@ class SpatialNetworkAnalyzer(BaseGraphAnalyzer):
         compute centralities, and export tabular results.
         """
         df_routes = self.repo.get_network_metrics(pickup_month=pickup_month)
+        if df_routes.empty and pickup_month:
+            logger.warning(
+                f"No route data found for specified month '{pickup_month}'. "
+                f"Falling back to overall historical route metrics across all available periods..."
+            )
+            df_routes = self.repo.get_network_metrics(pickup_month=None)
+
         if df_routes.empty:
             logger.warning("No route data retrieved from ClickHouse. Graph analysis skipped.")
             return pd.DataFrame()

@@ -1,7 +1,6 @@
-# ==============================================================================
-# Model Serving API Dockerfile (FastAPI + ONNX Runtime via pyproject.toml)
-# ==============================================================================
 FROM python:3.11-slim
+
+WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -9,14 +8,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# Copy pyproject.toml
-COPY pyproject.toml /tmp/pyproject.toml
+COPY pyproject.toml README.md ./
 
-WORKDIR /app
+ENV PYTHONPATH="/app/src"
 
-# Install [api] dependencies directly from pyproject.toml
-RUN uv pip install --system --no-cache "/tmp/pyproject.toml[api]"
+RUN mkdir -p src && uv pip install --system --no-cache ".[api]"
 
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]

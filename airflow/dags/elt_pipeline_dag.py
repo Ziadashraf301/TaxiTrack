@@ -1,16 +1,17 @@
-# airflow/dags/elt_pipeline_dag.py
 """
-Production ELT Pipeline DAG for NYC Taxi Data (Airflow 2.10+)
+ELT Pipeline DAG for NYC Taxi Data (Airflow 2.10+)
 Orchestrates idempotent monthly ingestion, native dbt transformations, and automated data quality gates.
 Preserves internal dag_id='ingest_transform_agg_network_dag' to maintain historical run state.
 """
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.bash import BashOperator
 from core.logging import get_logger
 
 logger = get_logger("taxitrack_airflow_dag")
+cairo_tz = ZoneInfo("Africa/Cairo")
 
 
 def ingest_task_callable(dataset_type: str, **kwargs):
@@ -19,6 +20,7 @@ def ingest_task_callable(dataset_type: str, **kwargs):
     task_instance = kwargs.get("task_instance")
     task_id = task_instance.task_id if task_instance else f"ingest_{dataset_type}"
     run_id = kwargs.get("run_id", "manual")
+    cairo_now_str = datetime.now(cairo_tz).strftime("%Y-%m-%d %H:%M:%S")
 
     execution_date = datetime.strptime(ds_str, "%Y-%m-%d")
     logger.info(
@@ -26,18 +28,22 @@ def ingest_task_callable(dataset_type: str, **kwargs):
         f"  AIRFLOW TASK: {task_id}\n"
         f"  DATASET:      {dataset_type.upper()}\n"
         f"  PARTITION:    {ds_str} ({execution_date.strftime('%B %Y')})\n"
+        f"  TIME (CAIRO): {cairo_now_str}\n"
         f"  RUN ID:       {run_id}\n"
         f"===================================================================="
     )
 
-    start_time = datetime.now()
+    start_time = datetime.now(cairo_tz)
     try:
         from data.pipeline import run_monthly_ingestion
         result = run_monthly_ingestion(dataset_type=dataset_type, execution_date=execution_date)
-        duration = (datetime.now() - start_time).total_seconds()
+        duration = (datetime.now(cairo_tz) - start_time).total_seconds()
         status = result.get("status", "unknown").upper()
         rows = result.get("rows", 0)
         file_name = result.get("file_name", "")
+
+        result["executed_at_cairo"] = cairo_now_str
+        result["timezone"] = "Africa/Cairo"
 
         logger.info(
             f"\n====================================================================\n"
@@ -46,15 +52,17 @@ def ingest_task_callable(dataset_type: str, **kwargs):
             f"  FILE:           {file_name}\n"
             f"  ROWS INSERTED:  {rows:,}\n"
             f"  DURATION:       {duration:.2f}s\n"
+            f"  FINISHED CAIRO: {datetime.now(cairo_tz).strftime('%Y-%m-%d %H:%M:%S')}\n"
             f"===================================================================="
         )
         return result
     except Exception as e:
-        duration = (datetime.now() - start_time).total_seconds()
+        duration = (datetime.now(cairo_tz) - start_time).total_seconds()
         logger.error(
             f"\n====================================================================\n"
             f"  TASK FAILED:    {task_id}\n"
             f"  DURATION:       {duration:.2f}s\n"
+            f"  TIME (CAIRO):   {datetime.now(cairo_tz).strftime('%Y-%m-%d %H:%M:%S')}\n"
             f"  ERROR:          {e}\n"
             f"====================================================================",
             exc_info=True
@@ -77,13 +85,14 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
     "email_on_failure": False,
     "depends_on_past": False,  # Allows testing any single month independently without prior month dependencies
-    "start_date": datetime(2019, 1, 1),
     "execution_timeout": timedelta(hours=1),
 }
+
 
 with DAG(
     dag_id="ingest_transform_agg_network_dag",  # Matches historical Postgres cluster runs
     default_args=default_args,
+    start_date=datetime(2019, 1, 1, tzinfo=cairo_tz),  # Set on DAG, not default_args (Airflow 2.x best practice)
     schedule_interval="@monthly",
     catchup=False,  # Set to False so Airflow doesn't queue 80 historical months at startup!
     max_active_runs=1,

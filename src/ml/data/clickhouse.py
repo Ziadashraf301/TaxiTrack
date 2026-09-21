@@ -85,12 +85,15 @@ class ClickHouseFeatureRepository(BaseDemandRepository, BaseNetworkRepository):
         Fetch origin-destination route volume metrics for graph analysis.
         """
         where_clauses = [
-            f"trip_count >= {min_trips}",
             "source_location != ''",
             "target_location != ''",
         ]
         if pickup_month:
-            where_clauses.append(f"pickup_month = '{pickup_month}'")
+            clean_month = str(pickup_month).replace("-", "").strip()[:6]
+            if clean_month.isdigit():
+                where_clauses.append(f"pickup_month = {int(clean_month)}")
+            else:
+                where_clauses.append(f"toString(pickup_month) = '{clean_month}'")
 
         where_sql = f"WHERE {' AND '.join(where_clauses)}"
 
@@ -105,6 +108,7 @@ class ClickHouseFeatureRepository(BaseDemandRepository, BaseNetworkRepository):
             FROM data_warehouse.trip_location_network_metrics
             {where_sql}
             GROUP BY source_location, target_location
+            HAVING sum(trip_count) >= {min_trips}
             ORDER BY trip_count DESC
         """
 

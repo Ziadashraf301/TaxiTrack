@@ -29,7 +29,8 @@ class MLflowExperimentTracker(BaseExperimentTracker):
         tracking_uri: Optional[str] = None,
         experiment_name: Optional[str] = None,
     ):
-        self.tracking_uri = tracking_uri or settings.mlflow.tracking_uri
+        # Use resolved_tracking_uri for Docker-aware hostname resolution
+        self.tracking_uri = tracking_uri or settings.mlflow.resolved_tracking_uri
         self.experiment_name = experiment_name or settings.mlflow.experiment_name
 
         self._configure_environment()
@@ -47,8 +48,10 @@ class MLflowExperimentTracker(BaseExperimentTracker):
         """Inject MinIO credentials and endpoint for MLflow S3 artifact backend."""
         os.environ["MLFLOW_TRACKING_URI"] = self.tracking_uri
         os.environ["MLFLOW_S3_ENDPOINT_URL"] = settings.mlflow.s3_endpoint_url
+        os.environ["AWS_ENDPOINT_URL"] = settings.mlflow.s3_endpoint_url
         os.environ["AWS_ACCESS_KEY_ID"] = settings.minio.root_user
         os.environ["AWS_SECRET_ACCESS_KEY"] = settings.minio.root_password
+
 
     def _ensure_experiment(self) -> str:
         """Create or retrieve existing MLflow experiment."""
@@ -69,7 +72,8 @@ class MLflowExperimentTracker(BaseExperimentTracker):
     def start_run(self, run_name: str, tags: Optional[Dict[str, str]] = None):
         """Context manager starting a tracked MLflow run."""
         self._configure_environment()
-        run_tags = {"framework": "LightGBM", "dataset": "NYC_TLC_Taxi"}
+        # Base tag: dataset provenance. model_architecture is passed by callers via tags.
+        run_tags = {"dataset": "NYC_TLC_Taxi"}
         if tags:
             run_tags.update(tags)
         return mlflow.start_run(
@@ -174,6 +178,7 @@ class MLflowExperimentTracker(BaseExperimentTracker):
                     tags={"stage": "baseline_2025"},
                 )
                 logger.info(f"Registered model version: {mv.name} v{mv.version} (run_id: {run_id}).")
+                self.promote_model_to_production(model_name=model_name, version=str(mv.version))
                 return run_id
             except Exception as e:
                 try:
@@ -186,7 +191,54 @@ class MLflowExperimentTracker(BaseExperimentTracker):
                         tags={"stage": "baseline_2025"},
                     )
                     logger.info(f"Created registered model '{model_name}' and added v{mv.version}.")
+                    self.promote_model_to_production(model_name=model_name, version=str(mv.version))
                     return run_id
                 except Exception as inner_e:
                     logger.warning(f"Could not register model in registry: {inner_e}. Run artifacts are safely logged.")
                     return run_id
+
+    def promote_model_to_production(
+        self,
+        model_name: str = "taxi-demand-forecaster",
+        version: Optional[str] = None,
+    ) -> None:
+        """
+        Promote a model version to Production:
+        - Modern MLflow (>=2.8): Assigns '@champion' and '@production' aliases.
+        - Legacy MLflow: Transitions stage to 'Production'.
+        """
+        try:
+            if not version:
+                versions = self.client.search_model_versions(
+                    f"name = '{model_name}'",
+                    order_by=["version_number DESC"],
+                    max_results=1,
+                )
+                if not versions:
+                    logger.warning(f"No model versions found for '{model_name}' to promote.")
+                    return
+                version = str(versions[0].version)
+
+            # 1. Modern MLflow Aliases
+            for alias in ("champion", "production"):
+                try:
+                    self.client.set_registered_model_alias(name=model_name, alias=alias, version=version)
+                    logger.info(f"Set alias '@{alias}' for '{model_name}' v{version}.")
+                except Exception as alias_err:
+                    logger.debug(f"Could not set alias '{alias}': {alias_err}")
+
+            # 2. Legacy MLflow Stage Transition
+            try:
+                self.client.transition_model_version_stage(
+                    name=model_name,
+                    version=version,
+                    stage="Production",
+                    archive_existing_versions=True,
+                )
+                logger.info(f"Transitioned '{model_name}' v{version} to stage 'Production'.")
+            except Exception as stage_err:
+                logger.debug(f"Could not transition stage: {stage_err}")
+
+        except Exception as e:
+            logger.warning(f"Error promoting model '{model_name}' v{version} to production: {e}")
+

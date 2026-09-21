@@ -5,6 +5,12 @@ FROM apache/airflow:2.10.2
 
 USER root
 
+# Install system dependencies (libgomp1 is required by LightGBM for OpenMP support)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgomp1 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Increase network timeout for large wheels (prevents 30s timeout failures)
 ENV UV_HTTP_TIMEOUT=180
 
@@ -16,7 +22,7 @@ COPY pyproject.toml /tmp/pyproject.toml
 
 # Compile and install dependencies directly from pyproject.toml using uv
 # --system ensures uv inspects pre-installed packages in apache/airflow:2.10.2 to avoid redundant downloads
-RUN uv pip compile --system /tmp/pyproject.toml --extra data --extra ml -o /tmp/reqs.tmp \
+RUN uv pip compile --system /tmp/pyproject.toml --extra data --extra ml --extra monitoring -o /tmp/reqs.tmp \
     && uv pip install --system --no-cache -r /tmp/reqs.tmp \
     && rm -f /tmp/reqs.tmp
 

@@ -18,9 +18,8 @@ data:
     - "pickup_borough"
     - "service_type"
   group_col: "group_id"
-  # Training window configuration
-  start_date: "2019-01-01"
-  end_date: "2020-07-01"
+  # test_months: fixed pipeline design param (train/val split size).
+  # start_date / end_date: runtime values — must come from Airflow dag_run.conf.
   test_months: 2
   frequency: "1h"
 
@@ -79,5 +78,4 @@ serving:
 mlflow:
   experiment_name: "taxitrack_demand_forecasting"
   registered_model_name: "taxi-demand-forecaster"
-  tracking_uri: "http://localhost:5000"
-  artifact_bucket: "mlflow-artifacts"
+

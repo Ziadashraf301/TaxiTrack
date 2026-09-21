@@ -3,6 +3,9 @@
 Central ML Configuration Loader (Single Source of Truth - SSOT)
 Parses configs/ml_config.yaml into strongly-typed Pydantic models.
 Accessible across Core, Data Engineering, Airflow DAGs, and ML pipelines.
+
+Runtime values (start_date, end_date) are NOT stored here — they are owned by
+Airflow dag_run.conf and passed explicitly into pipeline callables.
 """
 import os
 from pathlib import Path
@@ -21,8 +24,7 @@ class DataConfig(BaseModel):
     target_col: str = "total_trips"
     group_cols: List[str] = ["pickup_zone", "pickup_borough", "service_type"]
     group_col: str = "group_id"
-    start_date: Optional[str] = "2019-01-01"
-    end_date: Optional[str] = "2020-07-01"
+    # Fixed pipeline design parameter — not a runtime date.
     test_months: int = 2
     frequency: str = "1h"
 
@@ -82,10 +84,32 @@ class ServingConfig(BaseModel):
 
 
 class MLflowConfig(BaseModel):
-    experiment_name: str = "taxitrack_demand_forecasting"
+    """
+    ML-specific MLflow settings (experiment name, registered model name).
+    Infrastructure settings (tracking URI, S3 endpoint) delegate to core.config.MLflowSettings SSOT.
+    """
     registered_model_name: str = "taxi-demand-forecaster"
-    tracking_uri: str = "http://localhost:5000"
-    artifact_bucket: str = "mlflow-artifacts"
+    tracking_uri: Optional[str] = None
+    artifact_bucket: Optional[str] = None
+
+    def get_tracking_uri(self) -> str:
+        """Resolve tracking URI from core settings SSOT (Docker-aware)."""
+        if self.tracking_uri:
+            return self.tracking_uri
+        from core.config import settings
+        return settings.mlflow.resolved_tracking_uri
+
+    def get_experiment_name(self) -> str:
+        """Resolve experiment name from core settings SSOT."""
+        from core.config import settings
+        return settings.mlflow.experiment_name
+
+    def get_artifact_bucket(self) -> str:
+        """Resolve artifact bucket from core settings SSOT."""
+        if self.artifact_bucket:
+            return self.artifact_bucket
+        from core.config import settings
+        return settings.mlflow.artifact_bucket
 
 
 class PipelineMetadataConfig(BaseModel):
@@ -108,7 +132,6 @@ class MLConfig(BaseModel):
     def from_yaml(cls, filepath: Optional[str] = None) -> "MLConfig":
         """Load configuration from YAML file or return defaults if file not found."""
         if filepath is None:
-            # Search common locations
             candidates = [
                 Path("configs/ml_config.yaml"),
                 Path("/opt/airflow/configs/ml_config.yaml"),

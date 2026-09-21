@@ -25,8 +25,26 @@ except ImportError:
         return kwargs
 
 
+def is_in_docker() -> bool:
+    """Detect if executing inside a Docker container or Airflow worker."""
+    return os.path.exists("/.dockerenv") or bool(os.getenv("AIRFLOW_HOME"))
+
+
+def _resolve_host(env_var: str, current_value: str, docker_hostname: str) -> str:
+    """
+    Shared Docker-aware host resolution logic.
+    Priority: explicit env var > non-localhost value > docker/localhost based on runtime.
+    """
+    env_host = os.getenv(env_var)
+    if env_host:
+        return env_host
+    if current_value and current_value not in ("localhost", "127.0.0.1"):
+        return current_value
+    return docker_hostname if is_in_docker() else "localhost"
+
+
 class MinioSettings(BaseSettings):
-    """MinIO S3 Object Storage Configuration"""
+    """MinIO S3 Object Storage Configuration (Single Source of Truth)"""
     model_config = SettingsConfigDict(env_prefix="MINIO_", extra="ignore")
 
     root_user: str = Field(default="admin", alias="MINIO_ROOT_USER")
@@ -37,8 +55,17 @@ class MinioSettings(BaseSettings):
     secure: bool = Field(default=False, alias="MINIO_SECURE")
 
     @property
+    def resolved_host(self) -> str:
+        return _resolve_host("MINIO_HOST", self.host, "minio")
+
+    @property
     def endpoint(self) -> str:
-        return f"{self.host}:{self.port}"
+        return f"{self.resolved_host}:{self.port}"
+
+    @property
+    def endpoint_url(self) -> str:
+        scheme = "https" if self.secure else "http"
+        return f"{scheme}://{self.endpoint}"
 
 
 class ClickHouseSettings(BaseSettings):
@@ -52,6 +79,10 @@ class ClickHouseSettings(BaseSettings):
     http_port: int = Field(default=8123, alias="CLICKHOUSE_HTTP_PORT")
     tcp_port: int = Field(default=9005, alias="CLICKHOUSE_TCP_PORT")
 
+    @property
+    def resolved_host(self) -> str:
+        return _resolve_host("CLICKHOUSE_HOST", self.host, "clickhouse")
+
 
 class PostgresSettings(BaseSettings):
     """Unified PostgreSQL Metadata Store Configuration"""
@@ -63,9 +94,17 @@ class PostgresSettings(BaseSettings):
     host: str = Field(default="localhost", alias="POSTGRES_HOST")
     port: int = Field(default=5432, alias="POSTGRES_PORT")
 
+    @property
+    def resolved_host(self) -> str:
+        return _resolve_host("POSTGRES_HOST", self.host, "postgres")
+
 
 class MLflowSettings(BaseSettings):
-    """MLflow Tracking Server Configuration"""
+    """
+    MLflow Tracking Server Infrastructure Configuration (Single Source of Truth).
+    Owns: tracking_uri, experiment_name, artifact_bucket, S3 endpoint.
+    ML-specific settings (registered_model_name, hyperparameters) live in ml_config.yaml.
+    """
     model_config = SettingsConfigDict(env_prefix="MLFLOW_", extra="ignore")
 
     tracking_uri: str = Field(default="http://localhost:5000", alias="MLFLOW_TRACKING_URI")
@@ -73,12 +112,26 @@ class MLflowSettings(BaseSettings):
     artifact_bucket: str = Field(default="mlflow-artifacts", alias="MLFLOW_ARTIFACT_BUCKET")
 
     @property
+    def resolved_tracking_uri(self) -> str:
+        raw = os.getenv("MLFLOW_TRACKING_URI") or self.tracking_uri
+        # Inside Docker: if targeting localhost, route to container network 'mlflow'
+        if is_in_docker() and ("localhost" in raw or "127.0.0.1" in raw):
+            return "http://mlflow:5000"
+        # Outside Docker (host): if target has docker container hostname 'mlflow', route to localhost
+        if not is_in_docker() and "mlflow:" in raw:
+            return "http://localhost:5000"
+        return raw
+
+    @property
     def s3_endpoint_url(self) -> str:
-        """MinIO S3 endpoint for MLflow artifacts."""
+        """MinIO S3 endpoint for MLflow artifacts - derived from MinioSettings SSOT."""
         endpoint = os.getenv("MLFLOW_S3_ENDPOINT_URL")
         if endpoint:
+            if not is_in_docker() and "minio:" in endpoint:
+                return "http://localhost:9000"
             return endpoint
-        minio_host = os.getenv("MINIO_HOST", "localhost")
+        # Fallback to MinIO host resolution
+        minio_host = os.getenv("MINIO_HOST") or ("minio" if is_in_docker() else "localhost")
         minio_port = os.getenv("MINIO_PORT", "9000")
         return f"http://{minio_host}:{minio_port}"
 
@@ -99,12 +152,6 @@ class AppSettings(BaseSettings):
     postgres: PostgresSettings = Field(default_factory=PostgresSettings)
     mlflow: MLflowSettings = Field(default_factory=MLflowSettings)
 
-    @property
-    def ml(self):
-        """Lazy accessor for centralized ML configuration."""
-        from core.ml_config import ml_config
-        return ml_config
-
 
 @lru_cache(maxsize=1)
 def get_settings() -> AppSettings:
@@ -117,6 +164,3 @@ def get_settings() -> AppSettings:
 
 # Global singleton instance
 settings = get_settings()
-
-# Direct export of ml_config for convenient access: `from core.config import ml_config`
-from core.ml_config import ml_config, MLConfig
