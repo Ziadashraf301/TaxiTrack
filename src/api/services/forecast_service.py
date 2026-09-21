@@ -1,6 +1,6 @@
 """Forecast service providing historical demand retrieval and ONNX runtime inference."""
 from datetime import datetime, timedelta
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from api.schemas.forecast import ForecastPoint, HistoricalPoint
@@ -27,6 +27,26 @@ class ForecastService(BaseDataService):
         self.feature_engineer = feature_engineer
         self.model_version = model_version
 
+    def get_all_zones(self) -> List[Dict[str, str]]:
+        """Retrieve list of all distinct boroughs and zones present in the data warehouse."""
+        cache_key = "forecast:zones:all"
+
+        def _fetch() -> List[Dict[str, str]]:
+            query = """
+                SELECT DISTINCT
+                    pickup_borough AS borough,
+                    pickup_zone AS zone
+                FROM data_warehouse.mart_demand_prediction
+                WHERE pickup_zone != '' AND pickup_borough != ''
+                ORDER BY pickup_borough ASC, pickup_zone ASC
+            """
+            df = self.ch.client.query_df(query)
+            if df.empty:
+                return []
+            return [{"borough": str(r["borough"]), "zone": str(r["zone"])} for _, r in df.iterrows()]
+
+        return self._cached(cache_key, _fetch)
+
     def get_historical(
         self,
         start_date: str,
@@ -42,6 +62,7 @@ class ForecastService(BaseDataService):
             zone = pickup_zone.lower().strip()
             borough = pickup_borough.lower().strip()
             service = service_type.lower().strip()
+            service_clean = "yellow_trip" if service == "yellow" else ("green_trip" if service == "green" else service)
 
             query = f"""
                 SELECT
@@ -51,7 +72,7 @@ class ForecastService(BaseDataService):
                 FROM data_warehouse.mart_demand_prediction
                 WHERE lower(trim(pickup_zone)) = '{zone}'
                   AND lower(trim(pickup_borough)) = '{borough}'
-                  AND lower(trim(service_type)) = '{service}'
+                  AND (lower(trim(service_type)) = '{service_clean}' OR lower(trim(service_type)) = '{service}')
                   AND pickup_date >= '{start_date}'
                   AND pickup_date <= '{end_date}'
                 ORDER BY pickup_date ASC, pickup_hour ASC
@@ -78,20 +99,24 @@ class ForecastService(BaseDataService):
         pickup_zone: str,
         pickup_borough: str,
         service_type: str,
-        horizon_hours: int = 24,
+        horizon_hours: int = 720,
+        end_date: Optional[str] = None,
     ) -> List[ForecastPoint]:
         """
         Generate forward-looking demand predictions using the production ONNX model.
-        Constructs group_id, retrieves lookback buffer, transforms features, and runs inference.
+        Constructs group_id, retrieves lookback buffer up to end_date, transforms features, and runs inference.
         """
         zone = pickup_zone.strip()
         borough = pickup_borough.strip()
         service = service_type.strip()
-        group_id = f"{zone}__{borough}__{service}".lower()
+        service_clean = "yellow_trip" if service.lower() == "yellow" else ("green_trip" if service.lower() == "green" else service.lower())
+        group_id = f"{zone}__{borough}__{service_clean}".lower()
 
-        logger.info(f"Predicting demand for group '{group_id}' (horizon={horizon_hours}h)...")
+        logger.info(f"Predicting demand for group '{group_id}' (horizon={horizon_hours}h, end_date={end_date})...")
 
         # 1. Fetch lookback buffer (192h > 168h max lag)
+        # Filter strictly on or before end_date to anchor forecast immediately following the chosen time window
+        date_filter = f"AND pickup_date <= '{end_date}'" if end_date else "AND pickup_date <= today()"
         query = f"""
             SELECT
                 pickup_date,
@@ -103,7 +128,8 @@ class ForecastService(BaseDataService):
             FROM data_warehouse.mart_demand_prediction
             WHERE lower(trim(pickup_zone)) = '{zone.lower()}'
               AND lower(trim(pickup_borough)) = '{borough.lower()}'
-              AND lower(trim(service_type)) = '{service.lower()}'
+              AND (lower(trim(service_type)) = '{service_clean}' OR lower(trim(service_type)) = '{service.lower()}')
+              {date_filter}
             ORDER BY pickup_date DESC, pickup_hour DESC
             LIMIT 192
         """
@@ -112,7 +138,7 @@ class ForecastService(BaseDataService):
         if df_lookback is None or df_lookback.empty:
             raise KeyError(
                 f"No historical demand records found for zone='{pickup_zone}', "
-                f"borough='{pickup_borough}', service='{service_type}'"
+                f"borough='{pickup_borough}', service='{service_type}'" + (f" on or before {end_date}" if end_date else "")
             )
 
         # Sort chronologically ascending
@@ -126,6 +152,14 @@ class ForecastService(BaseDataService):
         )
 
         last_dt = df_lookback["pickup_datetime"].max()
+        if end_date:
+            try:
+                target_end_dt = datetime.strptime(end_date, "%Y-%m-%d").replace(hour=23, minute=0, second=0)
+                if last_dt < target_end_dt:
+                    last_dt = target_end_dt
+            except Exception:
+                pass
+
         future_dts = [last_dt + timedelta(hours=i) for i in range(1, horizon_hours + 1)]
 
         # 2. Build future placeholder rows
@@ -135,7 +169,7 @@ class ForecastService(BaseDataService):
             "pickup_hour": [dt.hour for dt in future_dts],
             "pickup_zone": zone,
             "pickup_borough": borough,
-            "service_type": service,
+            "service_type": service_clean,
             "total_trips": [df_lookback["total_trips"].tail(24).mean()] * horizon_hours,
         })
 

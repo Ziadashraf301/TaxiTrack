@@ -1,5 +1,5 @@
 """Network service for spatial corridor analytics and NetworkX graph metrics."""
-from typing import Any, List
+from typing import Any, List, Optional
 import pandas as pd
 from api.schemas.network import CentralityRow, CorridorRow
 from api.services.base import BaseDataService
@@ -19,25 +19,71 @@ class NetworkService(BaseDataService):
         """Standardize month representations (e.g. '2019-01' -> '201901')."""
         return str(pickup_month).replace("-", "").strip()
 
-    def get_top_corridors(self, pickup_month: str, top_n: int = 20) -> List[CorridorRow]:
-        """Fetch top origin-destination transit corridors for a given month."""
-        month_clean = self._clean_month(pickup_month)
-        cache_key = f"corridors:{month_clean}:{top_n}"
+    def get_top_corridors(
+        self,
+        pickup_month: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        zone: Optional[str] = None,
+        top_n: int = 20,
+    ) -> List[CorridorRow]:
+        """Fetch top origin-destination transit corridors across the specified date range and zone."""
+        start_m = None
+        end_m = None
+        if start_date:
+            start_m = str(start_date).replace("-", "")[:6]
+        if end_date:
+            end_m = str(end_date).replace("-", "")[:6]
+        if pickup_month and not start_m:
+            start_m = end_m = self._clean_month(pickup_month)
+        if not start_m:
+            start_m = "201901"
+        if not end_m:
+            end_m = start_m
+
+        zone_clean = zone.strip() if zone and zone.lower() not in ("all", "any") else None
+        cache_key = f"corridors:{start_m}:{end_m}:{zone_clean}:{top_n}"
 
         def _fetch() -> List[CorridorRow]:
+            where_clauses = [
+                f"toString(pickup_month) >= '{start_m}'",
+                f"toString(pickup_month) <= '{end_m}'",
+            ]
+            if zone_clean:
+                where_clauses.append(f"(lower(trim(source_location)) = '{zone_clean.lower()}' OR lower(trim(target_location)) = '{zone_clean.lower()}')")
+
+            where_sql = " AND ".join(where_clauses)
             query = f"""
                 SELECT
                     source_location,
                     target_location,
-                    trip_count,
-                    avg_distance,
-                    avg_duration_minutes
+                    coalesce(sum(trip_count), 0) AS trip_count,
+                    round(avg(avg_distance), 2) AS avg_distance,
+                    round(avg(avg_duration_minutes), 2) AS avg_duration_minutes
                 FROM data_warehouse.trip_location_network_metrics
-                WHERE toString(pickup_month) = '{month_clean}'
+                WHERE {where_sql}
+                GROUP BY source_location, target_location
                 ORDER BY trip_count DESC
                 LIMIT {top_n}
             """
             df = self.ch.client.query_df(query)
+            if (df is None or df.empty) and zone_clean:
+                fallback_where = f"toString(pickup_month) >= '{start_m}' AND toString(pickup_month) <= '{end_m}'"
+                query_fallback = f"""
+                    SELECT
+                        source_location,
+                        target_location,
+                        coalesce(sum(trip_count), 0) AS trip_count,
+                        round(avg(avg_distance), 2) AS avg_distance,
+                        round(avg(avg_duration_minutes), 2) AS avg_duration_minutes
+                    FROM data_warehouse.trip_location_network_metrics
+                    WHERE {fallback_where}
+                    GROUP BY source_location, target_location
+                    ORDER BY trip_count DESC
+                    LIMIT {top_n}
+                """
+                df = self.ch.client.query_df(query_fallback)
+
             if df is None or df.empty:
                 return []
 

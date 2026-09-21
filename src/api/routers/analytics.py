@@ -48,10 +48,14 @@ def get_timeseries(
 def get_breakdown(
     start_date: str = Query(..., description="Start date (YYYY-MM-DD)", examples=["2019-01-01"]),
     end_date: str = Query(..., description="End date (YYYY-MM-DD)", examples=["2019-03-01"]),
+    borough: Optional[str] = Query(None, description="Optional borough filter"),
+    service_type: Optional[str] = Query(None, description="Optional service type filter"),
     service: AnalyticsService = Depends(get_analytics_service),
 ) -> List[BreakdownRow]:
     """Retrieve cross-tabulated breakdown by borough and service type."""
     return service.get_breakdown(
         start_date=start_date,
         end_date=end_date,
+        borough=borough,
+        service_type=service_type,
     )

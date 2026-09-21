@@ -82,9 +82,16 @@ class TaxiTrackClient:
         self,
         start_date: str,
         end_date: str,
+        borough: Optional[str] = None,
+        service_type: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """Fetch borough and service type cross-tabulation table data."""
-        return self._get("/api/analytics/breakdown", params={"start_date": start_date, "end_date": end_date})
+        params = {"start_date": start_date, "end_date": end_date}
+        if borough and borough.lower() != "all":
+            params["borough"] = borough
+        if service_type and service_type.lower() != "all":
+            params["service_type"] = service_type
+        return self._get("/api/analytics/breakdown", params=params)
 
     def get_historical(
         self,
@@ -104,12 +111,17 @@ class TaxiTrackClient:
         }
         return self._get("/api/forecast/historical", params=params)
 
+    def get_zones(self) -> List[Dict[str, Any]]:
+        """Fetch all available boroughs and zones from the backend warehouse."""
+        return self._get("/api/forecast/zones")
+
     def get_forecast(
         self,
         pickup_zone: str,
         pickup_borough: str,
         service_type: str,
-        horizon_hours: int = 24,
+        horizon_hours: int = 720,
+        end_date: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """Generate forward-looking hourly demand predictions using ONNX inference."""
         params = {
@@ -118,15 +130,28 @@ class TaxiTrackClient:
             "service_type": service_type,
             "horizon_hours": horizon_hours,
         }
+        if end_date:
+            params["end_date"] = end_date
         return self._get("/api/forecast/predict", params=params)
 
     def get_top_corridors(
         self,
-        pickup_month: str,
+        pickup_month: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        zone: Optional[str] = None,
         top_n: int = 20,
     ) -> List[Dict[str, Any]]:
         """Fetch top origin-destination transit corridors."""
-        params = {"pickup_month": pickup_month, "top_n": top_n}
+        params: Dict[str, Any] = {"top_n": top_n}
+        if pickup_month:
+            params["pickup_month"] = pickup_month
+        if start_date:
+            params["start_date"] = start_date
+        if end_date:
+            params["end_date"] = end_date
+        if zone and zone.lower() != "all":
+            params["zone"] = zone
         return self._get("/api/network/top-corridors", params=params)
 
     def get_centrality(

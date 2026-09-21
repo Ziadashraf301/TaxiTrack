@@ -160,22 +160,33 @@ class AnalyticsService(BaseDataService):
         self,
         start_date: str,
         end_date: str,
+        borough: Optional[str] = None,
+        service_type: Optional[str] = None,
     ) -> List[BreakdownRow]:
         """Fetch borough and service type cross-tabulation breakdown."""
-        cache_key = f"breakdown:{start_date}:{end_date}"
+        cache_key = f"breakdown:{start_date}:{end_date}:{borough}:{service_type}"
 
         def _fetch() -> List[BreakdownRow]:
-            where_sql = self._build_where_clause(start_date, end_date)
+            where_sql = self._build_where_clause(start_date, end_date, borough, service_type)
             query = f"""
+                WITH agg AS (
+                    SELECT
+                        borough,
+                        service_type,
+                        coalesce(sum(num_trips), 0) AS trips_cnt,
+                        round(coalesce(sum(total_revenue), 0.0), 2) AS rev_val,
+                        coalesce(sum(total_tips), 0.0) AS tips_val
+                    FROM data_warehouse.mart_daily_taxi_performance
+                    WHERE {where_sql} AND borough != ''
+                    GROUP BY borough, service_type
+                )
                 SELECT
                     borough,
                     service_type,
-                    coalesce(sum(num_trips), 0) AS num_trips,
-                    round(coalesce(sum(total_revenue), 0.0), 2) AS total_revenue,
-                    round(if(sum(total_revenue) > 0, (sum(total_tips) / sum(total_revenue)) * 100.0, 0.0), 2) AS avg_tip_rate
-                FROM data_warehouse.mart_daily_taxi_performance
-                WHERE {where_sql} AND borough != ''
-                GROUP BY borough, service_type
+                    trips_cnt AS num_trips,
+                    rev_val AS total_revenue,
+                    round(if(rev_val > 0, (tips_val / rev_val) * 100.0, 0.0), 2) AS avg_tip_rate
+                FROM agg
                 ORDER BY num_trips DESC
             """
             df = self.ch.client.query_df(query)

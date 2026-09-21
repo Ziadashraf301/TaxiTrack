@@ -324,9 +324,15 @@ services:
     environment:
       API_BASE_URL: http://model-api:8000
       PYTHONPATH: /app/src
-    command: streamlit run src/ui/app.py --server.port=8501 --server.address=0.0.0.0 --server.runOnSave=true
+      STREAMLIT_THEME_BASE: "light"
+      STREAMLIT_THEME_PRIMARY_COLOR: "#2563EB"
+      STREAMLIT_THEME_BACKGROUND_COLOR: "#F8F9FD"
+      STREAMLIT_THEME_SECONDARY_BACKGROUND_COLOR: "#FFFFFF"
+      STREAMLIT_THEME_TEXT_COLOR: "#0F172A"
+    command: streamlit run src/ui/app.py --server.port=8501 --server.address=0.0.0.0 --server.runOnSave=true --theme.base=light --theme.primaryColor=#2563EB --theme.backgroundColor=#F8F9FD --theme.secondaryBackgroundColor=#FFFFFF --theme.textColor=#0F172A
     volumes:
       - ./src:/app/src
+      - ./.streamlit:/app/.streamlit:ro
       - ./configs:/app/configs:ro
     networks:
       - taxitrack-net
